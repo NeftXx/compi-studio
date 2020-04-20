@@ -3,33 +3,58 @@
 
 <head>
   <%- include('partials/head') -%>
+  <link rel="stylesheet" href="css/lib/codemirror.css">
+  <link rel="stylesheet" href="css/lib/dialog.css">
+  <link rel="stylesheet" href="css/lib/matchesonscrollbar.css">
+  <link rel="stylesheet" href="css/lib/show-hint.css">
+  <link rel="stylesheet" href="css/lib/eclipse.css">
+  <link rel="stylesheet" href="css/lib/darcula.css">
+  <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
   <%- include('partials/menu') -%>
-
-  <ul id="messages"></ul>
-  <form action="">
-    <input id="m" autocomplete="off" /><button>Send</button>
-  </form>
-
+  <main>
+    <div class="container" style="width: 95%;">
+      <div style="padding-top: 2em;">
+        <ul id="tabs-swipe-demo" class="tabs grey lighten-2">
+          <li class="tab col s3"><a class="active" href="#swipe-1">Código J#</a></li>
+          <li class="tab col s3"><a href="#swipe-2">Código 3D</a></li>
+        </ul>
+        <div id="swipe-1" class="col s12">
+          <div>
+            <textarea name="code" id="code"></textarea>
+          </div>
+        </div>
+        <div id="swipe-2" class="col s12">
+          <div>
+            <textarea name="editor-cd3" id="editor-cd3"></textarea>
+          </div>
+        </div>
+      </div>
+      <div style="padding-top: 1em; padding-bottom: 2em;">
+        <p>Resultado</p>
+        <textarea name="console" id="console" readonly></textarea>
+      </div>
+    </div>
+  </main>
+  <%- include('partials/footer') -%>
 </body>
 <%- include('partials/script') -%>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
-  $(function () {
-    var socket = io();
-    $('form').submit(function (e) {
-      e.preventDefault(); // prevents page reloading
-      socket.emit('chat message', $('#m').val());
-      $('#m').val('');
-      return false;
-    });
-    socket.on('chat message', function (msg) {
-      $('#messages').append($('<li>').text(msg));
-    });
-  });
-</script>
+<script src="js/lib/codemirror.js"></script>
+<script src="js/lib/active-line.js"></script>
+<script src="js/lib/annotatescrollbar.js"></script>
+<script src="js/lib/closebrackets.js"></script>
+<script src="js/lib/dialog.js"></script>
+<script src="js/lib/jump-to-line.js"></script>
+<script src="js/lib/matchbrackets.js"></script>
+<script src="js/lib/matchesonscrollbar.js"></script>
+<script src="js/lib/searchcursor.js"></script>
+<script src="js/lib/simple.js"></script>
+<script src="js/lib/show-hint.js"></script>
+<script src="js/mode/jsharp.js"></script>
+<script src="js/mode/cd3.js"></script>
+<script src="js/mode/console.js"></script>
+<script src="js/index.js"></script>
 
 </html>
