@@ -1,7 +1,7 @@
-import Jump from "./jump";
-import Scope from "../../scope/scope";
-import RelationalExp from "../expression/relational_exp";
-import { ErrorC3D } from "../../utils/errorC3D";
+import Jump from './jump';
+import Scope from '../../scope/scope';
+import RelationalExp from '../expression/relational_exp';
+import { ErrorC3D } from '../../utils/errorC3D';
 
 export default class CondJumpIf extends Jump {
   constructor(
@@ -15,8 +15,12 @@ export default class CondJumpIf extends Jump {
 
   public interpret(scope: Scope): void {
     let value = this.exp.interpret(scope);
-    if (typeof value !== "boolean") {
-      throw new ErrorC3D(this.line, this.column, "in the expression given in the if.");
+    if (typeof value !== 'boolean') {
+      throw new ErrorC3D(
+        this.line,
+        this.column,
+        'in the expression given in the if.'
+      );
     }
 
     if (value) {

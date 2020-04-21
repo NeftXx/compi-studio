@@ -1,6 +1,6 @@
-import Scope from "../../scope/scope";
-import { ErrorC3D } from "../../utils/errorC3D";
-import AstNode from "../ast_node";
+import Scope from '../../scope/scope';
+import { ErrorC3D } from '../../utils/errorC3D';
+import AstNode from '../ast_node';
 
 export default class AccessHeap extends AstNode {
   constructor(
@@ -24,12 +24,18 @@ export default class AccessHeap extends AstNode {
       if (value) {
         return value;
       } else {
-        throw new ErrorC3D(this.line, this.column,
+        throw new ErrorC3D(
+          this.line,
+          this.column,
           `position ${position} does not exist in the ${this.id}.`
         );
       }
     } else {
-      throw new ErrorC3D(this.line, this.column, `the variable is not a structure.`);
+      throw new ErrorC3D(
+        this.line,
+        this.column,
+        `the variable is not a structure.`
+      );
     }
   }
 }

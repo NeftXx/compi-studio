@@ -1,8 +1,8 @@
-import Binding from "./binding";
-import MethodDeclaration from "../ast/method/method_declaration";
-import DestinyJump from "../ast/jump/destiny_of_jump";
-import ConsoleC3D from "../utils/console";
-import AstNode from "../ast/ast_node";
+import Binding from './binding';
+import MethodDeclaration from '../ast/method/method_declaration';
+import DestinyJump from '../ast/jump/destiny_of_jump';
+import ConsoleC3D from '../utils/console';
+import AstNode from '../ast/ast_node';
 
 export default class Scope {
   private statements: Array<AstNode>;

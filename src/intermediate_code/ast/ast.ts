@@ -1,8 +1,8 @@
-import AstNode from "./ast_node";
-import Scope from "../scope/scope";
-import Jump from "./jump/jump";
-import { ErrorC3D } from "../utils/errorC3D";
-import MethodInvocation from "./method/method_invocation";
+import AstNode from './ast_node';
+import Scope from '../scope/scope';
+import Jump from './jump/jump';
+import { ErrorC3D } from '../utils/errorC3D';
+import MethodInvocation from './method/method_invocation';
 
 export default class Ast {
   public scope: Scope;

@@ -1,7 +1,7 @@
-import AstNode from "../ast_node";
-import DestinyJump from "./destiny_of_jump";
-import Scope from "../../scope/scope";
-import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from '../ast_node';
+import DestinyJump from './destiny_of_jump';
+import Scope from '../../scope/scope';
+import { ErrorC3D } from '../../utils/errorC3D';
 
 export default abstract class Jump extends AstNode {
   public destinyJump: DestinyJump | undefined;
@@ -19,7 +19,11 @@ export default abstract class Jump extends AstNode {
     if (destinyJump) {
       this.destinyJump = destinyJump;
     } else {
-      throw new ErrorC3D(this.line, this.column, `the tag ${this.label} was not found.`);
+      throw new ErrorC3D(
+        this.line,
+        this.column,
+        `the tag ${this.label} was not found.`
+      );
     }
   }
 }

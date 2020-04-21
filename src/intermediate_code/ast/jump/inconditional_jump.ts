@@ -1,5 +1,5 @@
-import Scope from "../../scope/scope";
-import Jump from "./jump";
+import Scope from '../../scope/scope';
+import Jump from './jump';
 
 export default class InconJump extends Jump {
   constructor(line: number, column: number, label: string) {

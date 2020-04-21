@@ -1,7 +1,7 @@
-import AstNode from "../ast_node";
-import Scope from "../../scope/scope";
-import Expression from "../expression/expression";
-import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from '../ast_node';
+import Scope from '../../scope/scope';
+import Expression from '../expression/expression';
+import { ErrorC3D } from '../../utils/errorC3D';
 
 export default class VarAssigment extends AstNode {
   constructor(
@@ -19,17 +19,21 @@ export default class VarAssigment extends AstNode {
 
   public interpret(scope: Scope): void {
     let value = this.exp.interpret(scope);
-    if (typeof value !== "number") {
-      throw new ErrorC3D(this.line, this.column,
+    if (typeof value !== 'number') {
+      throw new ErrorC3D(
+        this.line,
+        this.column,
         `when assigning the result in the variable ${this.id}.`
       );
     }
 
     let binding = scope.getVar(this.id);
-    if (binding && typeof binding.value === "number") {
+    if (binding && typeof binding.value === 'number') {
       binding.value = value;
     } else {
-      throw new ErrorC3D(this.line, this.column,
+      throw new ErrorC3D(
+        this.line,
+        this.column,
         `in the assignment the identifier ${this.id} is not declared.`
       );
     }

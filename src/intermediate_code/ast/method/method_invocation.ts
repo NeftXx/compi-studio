@@ -1,7 +1,7 @@
-import AstNode from "../ast_node";
-import Scope from "../../scope/scope";
-import MethodDeclaration from "./method_declaration";
-import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from '../ast_node';
+import Scope from '../../scope/scope';
+import MethodDeclaration from './method_declaration';
+import { ErrorC3D } from '../../utils/errorC3D';
 
 export default class MethodInvocation extends AstNode {
   public method: MethodDeclaration | undefined;
@@ -19,7 +19,11 @@ export default class MethodInvocation extends AstNode {
     if (method) {
       this.method = method;
     } else {
-      throw new ErrorC3D(this.line, this.column, `${this.id} method not found.`);
+      throw new ErrorC3D(
+        this.line,
+        this.column,
+        `${this.id} method not found.`
+      );
     }
   }
 }

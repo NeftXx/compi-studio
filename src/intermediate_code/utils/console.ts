@@ -10,6 +10,6 @@ export default class ConsoleC3D {
   }
 
   public toString(): string {
-    return this.strings.join("");
+    return this.strings.join('');
   }
 }
