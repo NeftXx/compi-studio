@@ -1,18 +1,23 @@
-import Expression from "../expression/expression";
 import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from "../ast_node";
 
-export default class Identifier extends Expression {
+export default class Identifier extends AstNode {
   constructor(line: number, column: number, public id: string) {
     super(line, column);
   }
 
-  public interpret(scope: Scope): void {
+  public preInterpret(scope: Scope) {
+    scope.addStatement(this);
+  }
+
+  public interpret(scope: Scope): number {
     let binding = scope.getVar(this.id);
     if (binding && typeof binding.value === "number") {
-      this.value = binding.value;
+      return binding.value;
     } else {
-      throw new Error(
-        `Semantic error in line ${this.line} and column ${this.column}, variable ${this.id} does not exist or it is a structure.`
+      throw new ErrorC3D(this.line, this.column,
+        `variable ${this.id} does not exist or it is a structure.`
       );
     }
   }

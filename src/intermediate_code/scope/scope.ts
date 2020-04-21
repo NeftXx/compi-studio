@@ -1,16 +1,22 @@
 import Binding from "./binding";
 import MethodDeclaration from "../ast/method/method_declaration";
 import DestinyJump from "../ast/jump/destiny_of_jump";
+import ConsoleC3D from "../utils/console";
+import AstNode from "../ast/ast_node";
 
 export default class Scope {
+  private statements: Array<AstNode>;
   private variables: Map<string, Binding>;
   private methods: Map<string, MethodDeclaration>;
   private labels: Map<string, DestinyJump>;
+  public console: ConsoleC3D;
 
   constructor() {
+    this.statements = new Array();
     this.variables = new Map();
     this.methods = new Map();
     this.labels = new Map();
+    this.console = new ConsoleC3D();
   }
 
   /**
@@ -46,5 +52,13 @@ export default class Scope {
 
   public getLabel(label: string): DestinyJump | undefined {
     return this.labels.get(label);
+  }
+
+  public addStatement(node: AstNode): void {
+    this.statements.push(node);
+  }
+
+  public getStatement(position: number): AstNode {
+    return this.statements[position];
   }
 }

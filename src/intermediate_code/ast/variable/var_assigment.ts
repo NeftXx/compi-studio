@@ -1,6 +1,7 @@
 import AstNode from "../ast_node";
 import Scope from "../../scope/scope";
 import Expression from "../expression/expression";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default class VarAssigment extends AstNode {
   constructor(
@@ -12,22 +13,24 @@ export default class VarAssigment extends AstNode {
     super(line, column);
   }
 
-  public preInterpret(scope: Scope): void {}
+  public preInterpret(scope: Scope): void {
+    scope.addStatement(this);
+  }
 
   public interpret(scope: Scope): void {
-    this.exp.interpret(scope);
-    if (typeof this.exp.value !== "number") {
-      throw new Error(
-        `Semantic error in line ${this.line} and column ${this.column}, when assigning the result in the variable ${this.id}.`
+    let value = this.exp.interpret(scope);
+    if (typeof value !== "number") {
+      throw new ErrorC3D(this.line, this.column,
+        `when assigning the result in the variable ${this.id}.`
       );
     }
 
     let binding = scope.getVar(this.id);
     if (binding && typeof binding.value === "number") {
-      binding.value = this.exp.value;
+      binding.value = value;
     } else {
-      throw new Error(
-        `Semantic error in line ${this.line} and column ${this.column}, in the assignment the identifier ${this.id} is not declared.`
+      throw new ErrorC3D(this.line, this.column,
+        `in the assignment the identifier ${this.id} is not declared.`
       );
     }
   }

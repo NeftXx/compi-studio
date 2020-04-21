@@ -24,6 +24,7 @@ id            [a-zA-Z][_a-zA-Z0-9ñÑ]+
 "%"                                   { return "%";             }
 ":"                                   { return ":";             }
 ","                                   { return ",";             }
+";"                                   { return ";";             }
 "["                                   { return "[";             }
 "]"                                   { return "]";             }
 "("                                   { return "(";             }
@@ -44,3 +45,4 @@ id            [a-zA-Z][_a-zA-Z0-9ñÑ]+
 {id}                                  { return "ID";            }
 {char_terminal}                       { return "CHAR_TERMINAL"; }
 <<EOF>>                               { return "EOF";           }
+.                                     { return "INVALID"        }

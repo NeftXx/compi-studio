@@ -1,49 +1,45 @@
 import Scope from "../../scope/scope";
-import Expression from "./expression";
+import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from "../ast_node";
 
-export default class RelationalExp extends Expression {
+export default class RelationalExp extends AstNode {
   constructor(
     line: number,
     column: number,
-    public exp1: Expression,
+    public exp1: AstNode,
     public operator: string,
-    public exp2: Expression
+    public exp2: AstNode
   ) {
     super(line, column);
   }
 
-  public interpret(scope: Scope): void {
-    this.exp1.interpret(scope);
-    this.exp2.interpret(scope);
+  public preInterpret(scope: Scope) {
+    scope.addStatement(this);
+  }
 
-    if (
-      typeof this.exp1.value !== "number" &&
-      typeof this.exp2.value !== "number"
-    ) {
-      throw new Error(
-        `Semantic error in line ${this.line} and column ${this.column}, expressions must be a number.`
-      );
+  public interpret(scope: Scope): boolean {
+    let valueExp1 = this.exp1.interpret(scope);
+    let valueExp2 = this.exp2.interpret(scope);
+
+    if (typeof valueExp1 !== "number" && typeof valueExp2 !== "number") {
+      throw new ErrorC3D(this.line, this.column, `expressions must be a number.`);
     }
 
     switch (this.operator) {
       case "<>":
-        this.value = this.exp1.value != this.exp2.value;
-        return;
+        return valueExp1 !== valueExp2;
       case "==":
-        this.value = this.exp1.value == this.exp2.value;
-        return;
+        return valueExp1 === valueExp2;
       case ">":
-        this.value = this.exp1.value > this.exp2.value;
-        return;
+        return valueExp1 > valueExp2;
       case ">=":
-        this.value = this.exp1.value >= this.exp2.value;
-        return;
+        return valueExp1 >= valueExp2;
       case "<":
-        this.value = this.exp1.value < this.exp2.value;
-        return;
+        return valueExp1 < valueExp2;
       case "<=":
-        this.value = this.exp1.value <= this.exp2.value;
-        return;
+        return valueExp1 <= valueExp2;
     }
+
+    throw new ErrorC3D(this.line, this.column, `this operator is not valid.`);
   }
 }

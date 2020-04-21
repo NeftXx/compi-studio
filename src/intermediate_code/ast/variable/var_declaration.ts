@@ -1,5 +1,6 @@
 import AstNode from "../ast_node";
 import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default class VarDeclaration extends AstNode {
   constructor(
@@ -17,10 +18,11 @@ export default class VarDeclaration extends AstNode {
     else ok = scope.addVar(this.id, 0);
 
     if (!ok) {
-      throw new Error(
-        `Semantic error in line ${this.line} and column ${this.column}, the identifier ${this.id} has already been declared.`
+      throw new ErrorC3D(this.line, this.column,
+        `the identifier ${this.id} has already been declared.`
       );
     }
+    scope.addStatement(this);
   }
 
   public interpret(scope: Scope): void {

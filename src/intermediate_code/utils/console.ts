@@ -1,4 +1,4 @@
-export class Console {
+export default class ConsoleC3D {
   private strings: Array<string>;
 
   public constructor() {
@@ -7,10 +7,6 @@ export class Console {
 
   public append(value: string) {
     this.strings.push(value);
-  }
-
-  public clear() {
-    this.strings.length = 0;
   }
 
   public toString(): string {

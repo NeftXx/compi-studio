@@ -17,7 +17,7 @@
     "prettier:check": "npm run prettier:base -- --list-different \"src/**/*.{ts,tsx}\"",
     "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\"",
     "jison:jsharp": "cd src/jsharp/grammar && jison grammar.jison grammar.jisonlex -o grammar.js",
-    "jison:cd3": "cd src/intermediate_code/grammar && jison grammar.jison grammar.jisonlex -o grammar.js",
+    "jison:c3d": "cd src/intermediate_code/grammar && jison grammar.jison grammar.jisonlex -o grammar.js",
     "ts:node": "ts-node src/index.ts",
     "dev": "nodemon",
     "start": "node ."
