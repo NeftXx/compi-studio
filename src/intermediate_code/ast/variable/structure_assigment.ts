@@ -1,6 +1,5 @@
 import AstNode from '../ast_node';
 import Scope from '../../scope/scope';
-import Expression from '../expression/expression';
 import { ErrorC3D } from '../../utils/errorC3D';
 
 export default class StructureAssigment extends AstNode {
@@ -10,8 +9,8 @@ export default class StructureAssigment extends AstNode {
     line: number,
     column: number,
     public id: string,
-    public position: Expression,
-    public exp: Expression
+    public position: AstNode,
+    public exp: AstNode
   ) {
     super(line, column);
   }

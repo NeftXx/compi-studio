@@ -1,6 +1,5 @@
 import AstNode from './ast_node';
 import Scope from '../scope/scope';
-import Expression from './expression/expression';
 import { ErrorC3D } from '../utils/errorC3D';
 
 export default class Print extends AstNode {
@@ -8,7 +7,7 @@ export default class Print extends AstNode {
     line: number,
     column: number,
     public terminal: string,
-    public exp: Expression
+    public exp: AstNode
   ) {
     super(line, column);
   }

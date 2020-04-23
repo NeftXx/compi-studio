@@ -1,6 +1,5 @@
 import AstNode from '../ast_node';
 import Scope from '../../scope/scope';
-import Expression from '../expression/expression';
 import { ErrorC3D } from '../../utils/errorC3D';
 
 export default class VarAssigment extends AstNode {
@@ -8,7 +7,7 @@ export default class VarAssigment extends AstNode {
     line: number,
     column: number,
     public id: string,
-    public exp: Expression
+    public exp: AstNode
   ) {
     super(line, column);
   }
