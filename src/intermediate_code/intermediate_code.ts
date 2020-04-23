@@ -1,12 +1,12 @@
-import Ast from './ast/ast';
-import { parse } from './grammar/grammar';
-import { logger } from '../utils/logger';
+import Ast from "./ast/ast";
+import { parse } from "./grammar/grammar";
+import { logger } from "../utils/logger";
 
 export default class IntermediateCode {
   private message: string;
 
   constructor() {
-    this.message = '';
+    this.message = "";
   }
 
   exec(input: string): boolean {
@@ -14,7 +14,7 @@ export default class IntermediateCode {
       let ast: Ast = parse(input);
       ast.preInterpret();
       ast.interpret();
-      this.message = 'successfully completed';
+      this.message = "successfully completed";
       return true;
     } catch (error) {
       logger.error(error.message);
