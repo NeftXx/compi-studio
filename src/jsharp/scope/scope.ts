@@ -1,4 +1,4 @@
-import { Variable } from "./variable";
+import { Variable } from './variable';
 
 export class Scope {
   public variables: Map<string, Variable>;

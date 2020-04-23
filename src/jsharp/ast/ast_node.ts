@@ -1,7 +1,7 @@
-import Ast from "./ast";
-import { Scope } from "../scope/scope";
-import { TypeFactory } from "../scope/type";
-import CodeBuilder from "../scope/code_builder";
+import Ast from './ast';
+import { Scope } from '../scope/scope';
+import { TypeFactory } from '../scope/type';
+import CodeBuilder from '../scope/code_builder';
 
 export abstract class AstNode {
   public constructor(public nodeInfo: NodeInfo) {}

@@ -7,11 +7,11 @@ export abstract class JType {
 }
 
 export class BaseType extends JType {
-  public static readonly INTEGER: BaseType = new BaseType("integer");
-  public static readonly DOUBLE: BaseType = new BaseType("double");
-  public static readonly BOOLEAN: BaseType = new BaseType("boolean");
-  public static readonly CHAR: BaseType = new BaseType("char");
-  public static readonly STRING: BaseType = new BaseType("String");
+  public static readonly INTEGER: BaseType = new BaseType('integer');
+  public static readonly DOUBLE: BaseType = new BaseType('double');
+  public static readonly BOOLEAN: BaseType = new BaseType('boolean');
+  public static readonly CHAR: BaseType = new BaseType('char');
+  public static readonly STRING: BaseType = new BaseType('String');
 
   private constructor(name: string) {
     super(name);
@@ -21,7 +21,7 @@ export class BaseType extends JType {
     if (this === BaseType.INTEGER) return 0;
     if (this === BaseType.DOUBLE) return 0.0;
     if (this === BaseType.BOOLEAN) return false;
-    if (this === BaseType.CHAR) return "\0";
+    if (this === BaseType.CHAR) return '\0';
     return null;
   }
 
@@ -32,9 +32,9 @@ export class BaseType extends JType {
 
 export class AuxiliarType extends JType {
   public static readonly UNDEFINED: AuxiliarType = new AuxiliarType(
-    "undefined"
+    'undefined'
   );
-  public static readonly VOID: AuxiliarType = new AuxiliarType("void");
+  public static readonly VOID: AuxiliarType = new AuxiliarType('void');
 
   private constructor(name: string) {
     super(name);

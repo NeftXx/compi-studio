@@ -1,9 +1,9 @@
-import Arithmetic from "./arithmetic";
-import CodeBuilder from "../../../scope/code_builder";
-import { TypeFactory, JType } from "../../../scope/type";
-import { Scope } from "../../../scope/scope";
-import { NodeInfo } from "../../ast_node";
-import Expression from "../expression";
+import Arithmetic from './arithmetic';
+import CodeBuilder from '../../../scope/code_builder';
+import { TypeFactory, JType } from '../../../scope/type';
+import { Scope } from '../../../scope/scope';
+import { NodeInfo } from '../../ast_node';
+import Expression from '../expression';
 
 export default class Operation extends Arithmetic {
   public constructor(

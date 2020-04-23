@@ -32,6 +32,6 @@ export default class CodeBuilder {
   }
 
   public getCodeTranslate(): string {
-    return this.translateCode.join("");
+    return this.translateCode.join('');
   }
 }
