@@ -1,8 +1,17 @@
-import Ast from './ast/ast';
-import { logger } from '../utils/logger';
+import Ast from "./ast/ast";
+import { logger } from "../utils/logger";
 
-export default class JSharp {
-  public exec(input: string): boolean {
+export interface Data {
+  files: Array<FileInformation>;
+}
+
+export interface FileInformation {
+  filename: string;
+  content: string;
+}
+
+export class JSharp {
+  public exec(data: Data): boolean {
     try {
       return true;
     } catch (error) {
