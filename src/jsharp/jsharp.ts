@@ -1,6 +1,6 @@
-import Ast from './ast/ast';
-import { logger } from '../utils/logger';
-import { Parser as JSharpParser } from './grammar/grammar';
+import Ast from "./ast/ast";
+import { logger } from "../utils/logger";
+import { Parser as JSharpParser } from "./grammar/grammar";
 
 export interface FileInformation {
   filename: string;
@@ -24,28 +24,28 @@ export class JSharp {
       //   trees.push(parser.parse(file.content));
       // }
       return {
-        translate: 'Hola',
-        symbolsTable: '',
-        errorsTable: '',
+        translate: "Hola",
+        symbolsTable: "",
+        errorsTable: "",
       };
     } catch (error) {
       return {
-        translate: '',
-        symbolsTable: '',
-        errorsTable: '',
+        translate: "",
+        symbolsTable: "",
+        errorsTable: "",
       };
     }
   }
 
   private translate(trees: Array<Ast>): string {
-    return '';
+    return "";
   }
 
   private createSymbolTable(): string {
-    return '';
+    return "";
   }
 
   private createErrorTable(): string {
-    return '';
+    return "";
   }
 }

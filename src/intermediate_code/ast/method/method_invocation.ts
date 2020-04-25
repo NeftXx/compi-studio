@@ -1,7 +1,7 @@
-import AstNode from '../ast_node';
-import Scope from '../../scope/scope';
-import MethodDeclaration from './method_declaration';
-import { ErrorC3D } from '../../utils/errorC3D';
+import AstNode from "../ast_node";
+import Scope from "../../scope/scope";
+import MethodDeclaration from "./method_declaration";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default class MethodInvocation extends AstNode {
   public method: MethodDeclaration | undefined;

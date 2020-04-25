@@ -1,7 +1,7 @@
-import AstNode from '../ast_node';
-import DestinyJump from './destiny_of_jump';
-import Scope from '../../scope/scope';
-import { ErrorC3D } from '../../utils/errorC3D';
+import AstNode from "../ast_node";
+import DestinyJump from "./destiny_of_jump";
+import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default abstract class Jump extends AstNode {
   public destinyJump: DestinyJump | undefined;

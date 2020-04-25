@@ -1,6 +1,6 @@
-import AstNode from '../ast_node';
-import Scope from '../../scope/scope';
-import { ErrorC3D } from '../../utils/errorC3D';
+import AstNode from "../ast_node";
+import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default class VarAssigment extends AstNode {
   constructor(
@@ -18,7 +18,7 @@ export default class VarAssigment extends AstNode {
 
   public interpret(scope: Scope): void {
     let value = this.exp.interpret(scope);
-    if (typeof value !== 'number') {
+    if (typeof value !== "number") {
       throw new ErrorC3D(
         this.line,
         this.column,
@@ -27,7 +27,7 @@ export default class VarAssigment extends AstNode {
     }
 
     let binding = scope.getVar(this.id);
-    if (binding && typeof binding.value === 'number') {
+    if (binding && typeof binding.value === "number") {
       binding.value = value;
     } else {
       throw new ErrorC3D(

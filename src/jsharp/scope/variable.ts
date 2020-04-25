@@ -1,4 +1,4 @@
-import { JType } from './type';
+import { JType } from "./type";
 
 export class Variable {
   public constructor(

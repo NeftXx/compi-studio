@@ -1,5 +1,5 @@
-import { Variable } from './variable';
-import { ErrorType } from './type';
+import { Variable } from "./variable";
+import { ErrorType } from "./type";
 
 export class Scope {
   public variables: Map<string, Variable>;

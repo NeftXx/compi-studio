@@ -1,6 +1,6 @@
-import Scope from '../../scope/scope';
-import { ErrorC3D } from '../../utils/errorC3D';
-import AstNode from '../ast_node';
+import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from "../ast_node";
 
 export default class Identifier extends AstNode {
   constructor(line: number, column: number, public id: string) {
@@ -13,7 +13,7 @@ export default class Identifier extends AstNode {
 
   public interpret(scope: Scope): number {
     let binding = scope.getVar(this.id);
-    if (binding && typeof binding.value === 'number') {
+    if (binding && typeof binding.value === "number") {
       return binding.value;
     } else {
       throw new ErrorC3D(

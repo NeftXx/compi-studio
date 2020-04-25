@@ -1,4 +1,4 @@
-import Scope from '../scope/scope';
+import Scope from "../scope/scope";
 
 export default abstract class AstNode {
   constructor(public line: number, public column: number) {}

@@ -1,5 +1,5 @@
-import Scope from '../../scope/scope';
-import AstNode from '../ast_node';
+import Scope from "../../scope/scope";
+import AstNode from "../ast_node";
 
 export default class NumberExp extends AstNode {
   constructor(line: number, column: number, private value: number) {

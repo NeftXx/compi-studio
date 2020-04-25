@@ -1,6 +1,6 @@
-import AstNode from '../ast_node';
-import Scope from '../../scope/scope';
-import { ErrorC3D } from '../../utils/errorC3D';
+import AstNode from "../ast_node";
+import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
 
 export default class VarDeclaration extends AstNode {
   constructor(

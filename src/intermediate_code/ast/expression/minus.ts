@@ -1,6 +1,6 @@
-import Scope from '../../scope/scope';
-import { ErrorC3D } from '../../utils/errorC3D';
-import AstNode from '../ast_node';
+import Scope from "../../scope/scope";
+import { ErrorC3D } from "../../utils/errorC3D";
+import AstNode from "../ast_node";
 
 export default class Minus extends AstNode {
   constructor(line: number, column: number, public exp: AstNode) {
@@ -13,7 +13,7 @@ export default class Minus extends AstNode {
 
   public interpret(scope: Scope): number {
     let value = this.exp.interpret(scope);
-    if (typeof value !== 'number') {
+    if (typeof value !== "number") {
       throw new ErrorC3D(
         this.line,
         this.column,

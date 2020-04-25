@@ -1,5 +1,5 @@
-import Scope from '../../scope/scope';
-import AstNode from '../ast_node';
+import Scope from "../../scope/scope";
+import AstNode from "../ast_node";
 
 export default class DestinyJump extends AstNode {
   constructor(line: number, column: number, public label: string) {
