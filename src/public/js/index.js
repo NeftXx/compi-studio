@@ -94,3 +94,9 @@ btnDownload.addEventListener("click", () => {
   var text = editorCd3.getValue();
   saveTextAsFile(text, "traduccion.txt");
 });
+var btnClearTranslate = document.getElementById("btnClearTranslate");
+btnClearTranslate.addEventListener("click", () => {
+  document.getElementById("body-errors-table").innerHTML = "";
+  document.getElementById("body-symbols-table").innerHTML = "";
+  resultC3D.setValue("");
+});
