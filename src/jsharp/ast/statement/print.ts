@@ -1,9 +1,9 @@
-import Statement from "./statement";
-import Expression from "../expression/expression";
-import CodeBuilder from "@jsharp/scope/code_builder";
-import NodeInfo from "@jsharp/scope/node_info";
-import { TypeFactory, ErrorType } from "@jsharp/scope/type";
-import { Scope } from "@jsharp/scope/scope";
+import Statement from './statement';
+import Expression from '../expression/expression';
+import CodeBuilder from '@jsharp/scope/code_builder';
+import NodeInfo from '@jsharp/scope/node_info';
+import { TypeFactory, ErrorType } from '@jsharp/scope/type';
+import { Scope } from '@jsharp/scope/scope';
 
 export default class Print extends Statement {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -47,7 +47,7 @@ export default class Print extends Statement {
         `Stack[${t2}] = ${temporaryLast}; # asignacion de parametro\n`
       );
       codeBuilder.setTranslatedCode(
-        "P = P + 1;\ncall native_print_boolean;\nP = P - 1;\n"
+        'P = P + 1;\ncall native_print_boolean;\nP = P - 1;\n'
       );
     } else if (typeFactory.isString(this.exp.type)) {
       let temporaryLast = codeBuilder.getLastTemporary();
@@ -61,7 +61,7 @@ export default class Print extends Statement {
         `Stack[${t2}] = ${temporaryLast}; # asignacion de parametro\n`
       );
       codeBuilder.setTranslatedCode(
-        "P = P + 1;\ncall native_print_string;\nP = P - 1;\n"
+        'P = P + 1;\ncall native_print_string;\nP = P - 1;\n'
       );
     }
   }

@@ -1,7 +1,7 @@
-import { Scope } from "../scope/scope";
-import CodeBuilder from "../scope/code_builder";
-import NodeInfo from "../scope/node_info";
-import { TypeFactory } from "@jsharp/scope/type";
+import { Scope } from '../scope/scope';
+import CodeBuilder from '../scope/code_builder';
+import NodeInfo from '../scope/node_info';
+import { TypeFactory } from '@jsharp/scope/type';
 
 export abstract class AstNode {
   public constructor(public nodeInfo: NodeInfo) {}

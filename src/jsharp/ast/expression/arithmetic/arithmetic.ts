@@ -1,8 +1,8 @@
-import CodeBuilder from "@jsharp/scope/code_builder";
-import NodeInfo from "@jsharp/scope/node_info";
-import { TypeFactory } from "@jsharp/scope/type";
-import { Scope } from "@jsharp/scope/scope";
-import Expression from "../expression";
+import CodeBuilder from '@jsharp/scope/code_builder';
+import NodeInfo from '@jsharp/scope/node_info';
+import { TypeFactory } from '@jsharp/scope/type';
+import { Scope } from '@jsharp/scope/scope';
+import Expression from '../expression';
 
 export default class Arithmetic extends Expression {
   public constructor(
@@ -21,7 +21,7 @@ export default class Arithmetic extends Expression {
     let type2 = this.expRight.type;
     if (typeFactory.isBaseType(type1) && typeFactory.isBaseType(type2)) {
       if (
-        this.operator === "+" &&
+        this.operator === '+' &&
         (typeFactory.isString(type1) ||
           typeFactory.isString(type2) ||
           (typeFactory.isChar(type1) && typeFactory.isChar(type2)))
@@ -71,7 +71,7 @@ export default class Arithmetic extends Expression {
     let t2 = codeBuilder.getNewTemporary();
     codeBuilder.addUnusedTemporary(t2);
     if (typeFactory.isNumeric(this.type)) {
-      if (this.operator === "^^") {
+      if (this.operator === '^^') {
       } else {
         let t3 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(

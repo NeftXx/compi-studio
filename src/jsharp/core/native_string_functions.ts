@@ -1,4 +1,4 @@
-import CodeBuilder from "@jsharp/scope/code_builder";
+import CodeBuilder from '@jsharp/scope/code_builder';
 
 export default class NativeStringFunctions {
   public static readonly _instance: NativeStringFunctions = new NativeStringFunctions();
@@ -10,7 +10,7 @@ export default class NativeStringFunctions {
   }
 
   private concatStringString(codeBuilder: CodeBuilder) {
-    codeBuilder.setTranslatedCode("");
+    codeBuilder.setTranslatedCode('');
   }
 
   public static getInstance(): NativeStringFunctions {

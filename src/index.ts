@@ -1,7 +1,7 @@
-import "module-alias/register";
+import 'module-alias/register';
 
-import Application from "./app";
-import SocketConnector from "./utils/connector";
+import Application from './app';
+import SocketConnector from './utils/connector';
 
 const SERVER_PORT = 3000;
 
