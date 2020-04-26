@@ -103,14 +103,15 @@ NullLiteral           "null"
 {Identifier}                      { return "IDENTIFIER"; }
 
 /* Separators */
+"^^"                              { return "^^"; }
 "++"                              { return "++"; }
 "--"                              { return "--"; }
 "!="                              { return "!="; }
 "=="                              { return "=="; }
 ">="                              { return ">="; }
 "<="                              { return "<="; }
-"&&"                              { return "&&"; }
-"||"                              { return "||"; }
+"&"                               { return "&"; }
+"|"                               { return "|"; }
 "+"                               { return "+"; }
 "-"                               { return "-"; }
 "*"                               { return "*"; }

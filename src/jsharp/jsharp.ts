@@ -53,6 +53,13 @@ export class JSharp {
   <td>${currentFile}</td>
 </tr>`,
         };
+      } else {
+        logger.error(error.message);
+        return {
+          translate: "",
+          symbolsTable: "",
+          errorsTable: "",
+        };
       }
     }
   }

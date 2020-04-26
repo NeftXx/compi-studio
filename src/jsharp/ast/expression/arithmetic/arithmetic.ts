@@ -68,10 +68,39 @@ export default class Arithmetic extends Expression {
     let t1 = codeBuilder.getLastTemporary();
     codeBuilder.addUnusedTemporary(t1);
     this.expRight.translate(typeFactory, codeBuilder, scope);
-    let t2 = codeBuilder.getNewTemporary();
+    let t2 = codeBuilder.getLastTemporary();
     codeBuilder.addUnusedTemporary(t2);
     if (typeFactory.isNumeric(this.type)) {
       if (this.operator === "^^") {
+        let t3 = codeBuilder.getNewTemporary();
+        codeBuilder.setTranslatedCode(
+          `${t3} = P + 5; # Cambio simulado de ambito\n`
+        );
+
+        let t4 = codeBuilder.getNewTemporary();
+        codeBuilder.setTranslatedCode(
+          `${t4} = ${t3} + 1; # indice parametro\n`
+        );
+        codeBuilder.setTranslatedCode(
+          `Stack[${t4}] = ${t1}; # asignacion de parametro\n`
+        );
+
+        t4 = codeBuilder.getNewTemporary();
+        codeBuilder.setTranslatedCode(
+          `${t4} = ${t3} + 2; # indice parametro\n`
+        );
+        codeBuilder.setTranslatedCode(
+          `Stack[${t4}] = ${t2}; # asignacion de parametro\n`
+        );
+
+        codeBuilder.setTranslatedCode(
+          "P = P + 5;\ncall native_potencia;\nP = P - 5;\n"
+        );
+        t4 = codeBuilder.getNewTemporary();
+        codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0; # indice return\n`);
+        codeBuilder.setTranslatedCode(
+          `${codeBuilder.getNewTemporary()} = stack[${t4}]; # asignacion del resultado del return\n`
+        );
       } else {
         let t3 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(

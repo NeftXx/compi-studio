@@ -6,23 +6,24 @@
   const { default: Ast } = require("../ast/ast");
   const { default: NodeInfo } = require("../scope/node_info");
   const { default: Print } = require("../ast/statement/print");
+  const { default: Arithmetic } = require("../ast/expression/arithmetic/arithmetic");
   const { default: Literal } = require("../ast/expression/literal");
 %}
-
-%left UMINUS
 
 %start compilation_unit
 
 %right '='
 %right '?' ':'
-%left '||'
-%left '&&'
-%left '^'
+%left '++' '--'
+%left '|'
+%left '&'
 %left '!=' '=='
 %nonassoc '>=' '>' '<=' '<'
 %left '+' '-'
 %left '*' '/' '%'
-%left '(' ')'
+%right '^^'
+%right UMINUS '!'
+%left '(' ')' '[' ']'
 
 %% /* language grammar */
 
@@ -55,7 +56,50 @@ statement
 ;
 
 expression
-  : STRING_LITERAL {
+  : expression '^^' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "^^", $3
+    );
+  }
+  | expression '+' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "+", $3
+    );
+  }
+  | expression '-' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "-", $3
+    );
+  }
+  | expression '*' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "*", $3
+    );
+  }
+  | expression '/' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "/", $3
+    );
+  }
+  | expression '%' expression {
+    $$ = new Arithmetic(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "%", $3
+    );
+  }
+  | '(' expression ')' { $$ = $2; }
+  | STRING_LITERAL {
     $$ = new Literal(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
