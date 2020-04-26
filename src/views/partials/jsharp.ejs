@@ -37,16 +37,29 @@
 </div>
 <div style="padding-top: 1em; padding-bottom: 2em;">
   <ul id="tabs-tables" class="tabs">
+    <li class="tab col s3"><a class="active" href="#errors-table">Tabla de errores</a></li>
     <li class="tab col s3">
-      <a class="active" href="#symbols-table">Tabla de simbolos</a>
+      <a href="#symbols-table">Tabla de simbolos</a>
     </li>
-    <li class="tab col s3"><a href="#errors-table">Tabla de errores</a></li>
   </ul>
+  <div id="errors-table" class="col s12">
+    <table class="highlight">
+      <thead>
+        <tr>
+          <th>Descripción</th>
+          <th>Fila</th>
+          <th>Columna</th>
+          <th>Archivo</th>
+        </tr>
+      </thead>
+      <tbody id="body-errors-table">
+      </tbody>
+    </table>
+  </div>
   <div id="symbols-table" class="col s12">
     <table class="highlight">
       <thead>
         <tr>
-          <th>Tipo</th>
           <th>Descripción</th>
           <th>Fila</th>
           <th>Columna</th>
@@ -54,20 +67,6 @@
       </thead>
 
       <tbody id="body-symbols-table">
-      </tbody>
-    </table>
-  </div>
-  <div id="errors-table" class="col s12">
-    <table class="highlight">
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Descripción</th>
-          <th>Fila</th>
-          <th>Columna</th>
-        </tr>
-      </thead>
-      <tbody id="body-errors-table">
       </tbody>
     </table>
   </div>

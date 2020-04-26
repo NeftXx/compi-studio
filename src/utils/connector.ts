@@ -1,6 +1,6 @@
 import { Server } from "http";
 import SocketIO from "socket.io";
-import { FileInformation, JSharp, JSharpResult } from "@jsharp/jsharp";
+import { FileInformation, JSharp, JSharpResult } from "../jsharp/jsharp";
 import { logger } from "./logger";
 
 export default class SocketConnector {

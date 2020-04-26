@@ -1,4 +1,4 @@
-import CodeBuilder from "@jsharp/scope/code_builder";
+import CodeBuilder from "../scope/code_builder";
 
 export default class NativeStringFunctions {
   public static readonly _instance: NativeStringFunctions = new NativeStringFunctions();

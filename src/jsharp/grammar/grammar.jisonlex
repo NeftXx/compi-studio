@@ -32,7 +32,6 @@ NullLiteral           "null"
 
 /* Keywords */
 "import"                          { return "import"; }
-"true"                            { return "true"; }
 "switch"                          { return "switch"; }
 "continue"                        { return "continue"; }
 "private"                         { return "private"; }
@@ -40,7 +39,6 @@ NullLiteral           "null"
 "try"                             { return "try"; }
 "integer"                         { return "integer"; }
 "var"                             { return "var"; }
-"false"                           { return "false"; }
 "case"                            { return "case"; }
 "return"                          { return "return"; }
 "void"                            { return "void"; }
@@ -67,7 +65,7 @@ NullLiteral           "null"
 {BooleanLiteral}                  { return "BOOLEAN_LITERAL";   }
 {DoubleLiteral}                   { return "DOUBLE_LITERAL";    }
 {IntegerLiteral}                  { return "INTEGER_LITERAL";   }
-\'                                { stringBuilder.length = 0; this.pushState("CHAR");   }
+\'                                { stringBuilder.length = 0; this.begin("CHAR");   }
 <CHAR>\'                          {
                                     this.popState(); yytext = stringBuilder.join("");
                                     return "CHAR_LITERAL";
@@ -77,14 +75,14 @@ NullLiteral           "null"
 <CHAR>"\\\\"                      { stringBuilder.push("\\");   }
 <CHAR>"\\n"                       { stringBuilder.push("\n");   }
 <CHAR>"\\r"                       { stringBuilder.push("\r");   }
-<CHAR>"\\v"                       { stringBuilder.push("\v");   }
+<CHAR>"\\v"                       { stringBuilder.push("\t");   }
 <CHAR>\\.                         { stringBuilder.push(yytext); }
 <CHAR>{EndOfLine}                 {
                                     this.popState();
                                     return "ILLEGAL_CHARACTER";
                                   }
 <CHAR>[^\r\n\"\'\\]+              { stringBuilder.push(yytext); }
-\"                                { stringBuilder.length = 0; this.pushState("STRING"); }
+\"                                { stringBuilder.length = 0; this.begin("STRING"); }
 <STRING>\"                        {
                                     this.popState(); yytext = stringBuilder.join("");
                                     return "STRING_LITERAL";
@@ -93,7 +91,7 @@ NullLiteral           "null"
 <STRING>"\\\\"                    { stringBuilder.push("\\");   }
 <STRING>"\\n"                     { stringBuilder.push("\n");   }
 <STRING>"\\r"                     { stringBuilder.push("\r");   }
-<STRING>"\\v"                     { stringBuilder.push("\v");   }
+<STRING>"\\t"                     { stringBuilder.push("\t");   }
 <STRING>\\.                       { stringBuilder.push(yytext); }
 <STRING>{EndOfLine}               {
                                     this.popState();

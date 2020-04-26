@@ -1,7 +1,7 @@
-import CodeBuilder from "@jsharp/scope/code_builder";
-import NodeInfo from "@jsharp/scope/node_info";
-import { TypeFactory } from "@jsharp/scope/type";
-import { Scope } from "@jsharp/scope/scope";
+import CodeBuilder from "../../../scope/code_builder";
+import NodeInfo from "../../../scope/node_info";
+import { TypeFactory } from "../../..//scope/type";
+import { Scope } from "../../../scope/scope";
 import Expression from "../expression";
 
 export default class Arithmetic extends Expression {

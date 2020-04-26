@@ -1,8 +1,8 @@
 import Expression from "./expression";
-import NodeInfo from "@jsharp/scope/node_info";
-import CodeBuilder from "@jsharp/scope/code_builder";
-import { Scope } from "@jsharp/scope/scope";
-import { JType, TypeFactory } from "@jsharp/scope/type";
+import NodeInfo from "../../scope/node_info";
+import CodeBuilder from "../../scope/code_builder";
+import { Scope } from "../../scope/scope";
+import { JType, TypeFactory } from "../../scope/type";
 
 export default class Literal extends Expression {
   public constructor(
@@ -31,7 +31,7 @@ export default class Literal extends Expression {
     scope: Scope
   ): void {
     if (typeof this.value === "string") {
-      codeBuilder.setTranslatedCode(`# Inicio de cadena ${this.value}\n`);
+      codeBuilder.setTranslatedCode(`# Inicio de cadena\n`);
       let tempStart = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${tempStart} = H;\n`);
       for (let i = 0; i < this.value.length; i++) {
@@ -46,7 +46,7 @@ export default class Literal extends Expression {
       codeBuilder.setTranslatedCode(`${tempEnd} = ${tempStart};\n`);
       codeBuilder.addUnusedTemporary(tempEnd);
       codeBuilder.removeUnusedTemporary(tempStart);
-      codeBuilder.setTranslatedCode(`# Fin de cadena ${this.value}\n`);
+      codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
     } else if (typeof this.value === "number") {
       let temporary = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${temporary} = ${this.value};\n`);

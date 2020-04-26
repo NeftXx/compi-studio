@@ -1,6 +1,8 @@
 import Ast from "./ast/ast";
 import { logger } from "../utils/logger";
 import { Parser as JSharpParser } from "./grammar/grammar";
+import { TypeFactory, ErrorType } from "./scope/type";
+import CodeBuilder from "./scope/code_builder";
 
 export interface FileInformation {
   filename: string;
@@ -15,25 +17,43 @@ export interface JSharpResult {
 
 export class JSharp {
   public exec(data: Array<FileInformation>): JSharpResult {
+    let typeFactory = new TypeFactory();
+    let codeBuilder = new CodeBuilder();
+    let errorsList: Array<ErrorType> = [];
+    let parser: any;
+    let trees: Array<Ast> = [];
+    let currentFile = "";
     try {
-      // let parser: any;
-      // let trees: Array<Ast> = [];
-      // for (let file of data) {
-      //   parser = new JSharpParser();
-      //   parser.yy = { filename: file.filename };
-      //   trees.push(parser.parse(file.content));
-      // }
+      for (let file of data) {
+        parser = new JSharpParser();
+        currentFile = file.filename;
+        parser.yy = { filename: currentFile, typeFactory: typeFactory };
+        trees.push(parser.parse(file.content));
+      }
+      for (let tree of trees) {
+        tree.newScope(errorsList);
+        tree.buildScope(typeFactory);
+        tree.translate(typeFactory, codeBuilder);
+      }
       return {
-        translate: "Hola",
+        translate: codeBuilder.getCodeTranslate(),
         symbolsTable: "",
         errorsTable: "",
       };
     } catch (error) {
-      return {
-        translate: "",
-        symbolsTable: "",
-        errorsTable: "",
-      };
+      if (error.hash) {
+        return {
+          translate: "",
+          symbolsTable: "",
+          errorsTable: `
+<tr>
+  <td>Error no se esperaba el token: ${error.hash.token}.</td>
+  <td>${error.hash.loc.first_line}</td>
+  <td>${error.hash.loc.last_column}</td>
+  <td>${currentFile}</td>
+</tr>`,
+        };
+      }
     }
   }
 
@@ -45,7 +65,17 @@ export class JSharp {
     return "";
   }
 
-  private createErrorTable(): string {
-    return "";
+  private createErrorTable(errorsList: Array<ErrorType>): string {
+    let str = [];
+    for (let error of errorsList) {
+      str.push(`
+    <tr>
+      <td>${error.getMessage()}</td>
+      <td>${error.getLine()}</td>
+      <td>${error.getColumn()}</td>
+      <td>${error.getFilename()}</td>
+    </tr>`);
+    }
+    return str.join("");
   }
 }

@@ -1,4 +1,4 @@
-import CodeBuilder from "@jsharp/scope/code_builder";
+import CodeBuilder from "../scope/code_builder";
 
 export default class NativePrintFunction {
   public static readonly _instance: NativePrintFunction = new NativePrintFunction();
@@ -56,6 +56,7 @@ ${L1}:
   print("%c", 101); # e
 ${L2}:
 end
+
 `);
   }
 

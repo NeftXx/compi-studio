@@ -1,5 +1,3 @@
-import "module-alias/register";
-
 import Application from "./app";
 import SocketConnector from "./utils/connector";
 

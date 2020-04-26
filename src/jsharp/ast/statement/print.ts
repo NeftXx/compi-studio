@@ -1,9 +1,9 @@
 import Statement from "./statement";
 import Expression from "../expression/expression";
-import CodeBuilder from "@jsharp/scope/code_builder";
-import NodeInfo from "@jsharp/scope/node_info";
-import { TypeFactory, ErrorType } from "@jsharp/scope/type";
-import { Scope } from "@jsharp/scope/scope";
+import CodeBuilder from "../../scope/code_builder";
+import NodeInfo from "../../scope/node_info";
+import { TypeFactory, ErrorType } from "../../scope/type";
+import { Scope } from "../../scope/scope";
 
 export default class Print extends Statement {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -25,15 +25,15 @@ export default class Print extends Statement {
     this.exp.translate(typeFactory, codeBuilder, scope);
     if (typeFactory.isChar(this.exp.type)) {
       codeBuilder.setTranslatedCode(
-        `print("%c", ${codeBuilder.getLastTemporary()})\n`
+        `print("%c", ${codeBuilder.getLastTemporary()});\n`
       );
     } else if (typeFactory.isInteger(this.exp.type)) {
       codeBuilder.setTranslatedCode(
-        `print("%i", ${codeBuilder.getLastTemporary()})\n`
+        `print("%i", ${codeBuilder.getLastTemporary()});\n`
       );
     } else if (typeFactory.isDouble(this.exp.type)) {
       codeBuilder.setTranslatedCode(
-        `print("%d", ${codeBuilder.getLastTemporary()})\n`
+        `print("%d", ${codeBuilder.getLastTemporary()});\n`
       );
     } else if (typeFactory.isBoolean(this.exp.type)) {
       let temporaryLast = codeBuilder.getLastTemporary();
