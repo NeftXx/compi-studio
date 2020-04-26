@@ -7,6 +7,8 @@
   const { default: NodeInfo } = require("../scope/node_info");
   const { default: Print } = require("../ast/statement/print");
   const { default: Arithmetic } = require("../ast/expression/arithmetic/arithmetic");
+  const { default: Relational } = require("../ast/expression/relational");
+  const { default: And } = require("../ast/expression/and");
   const { default: Literal } = require("../ast/expression/literal");
 %}
 
@@ -15,8 +17,8 @@
 %right '='
 %right '?' ':'
 %left '++' '--'
-%left '|'
-%left '&'
+%left '||'
+%left '&&'
 %left '!=' '=='
 %nonassoc '>=' '>' '<=' '<'
 %left '+' '-'
@@ -56,7 +58,14 @@ statement
 ;
 
 expression
-  : expression '^^' expression {
+  : expression '&&' expression {
+    $$ = new And(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | expression '^^' expression {
     $$ = new Arithmetic(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
@@ -98,6 +107,34 @@ expression
       ), $1, "%", $3
     );
   }
+  | expression '>' expression {
+    $$ = new Relational(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, ">", $3
+    )
+  }
+  | expression '>=' expression {
+    $$ = new Relational(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, ">=", $3
+    )
+  }
+  | expression '<' expression {
+    $$ = new Relational(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "<", $3
+    )
+  }
+  | expression '<=' expression {
+    $$ = new Relational(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "<=", $3
+    )
+  }
   | '(' expression ')' { $$ = $2; }
   | STRING_LITERAL {
     $$ = new Literal(
@@ -124,7 +161,7 @@ expression
     $$ = new Literal(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), yy.typeFactory.getBoolean(), $1.toLowerCase() === "true"
+      ), yy.typeFactory.getBoolean(), $1.toLowerCase() === "true" ? 1: 0
     );
   }
   | IDENTIFIER {

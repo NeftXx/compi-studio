@@ -110,8 +110,8 @@ NullLiteral           "null"
 "=="                              { return "=="; }
 ">="                              { return ">="; }
 "<="                              { return "<="; }
-"&"                               { return "&"; }
-"|"                               { return "|"; }
+"&&"                              { return "&&"; }
+"||"                              { return "||"; }
 "+"                               { return "+"; }
 "-"                               { return "-"; }
 "*"                               { return "*"; }
