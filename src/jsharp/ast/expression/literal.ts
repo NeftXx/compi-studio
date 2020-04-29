@@ -1,19 +1,16 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import CodeBuilder from "../../scope/code_builder";
-import { Scope } from "../../scope/scope";
+import { BlockScope } from "../../scope/scope";
 import { JType, TypeFactory } from "../../scope/type";
 
 export default class Literal extends Expression {
-  public constructor(
-    nodeInfo: NodeInfo,
-    public type: JType,
-    public value: any
-  ) {
+  public constructor(nodeInfo: NodeInfo, type: JType, public value: any) {
     super(nodeInfo);
+    this.type = type;
   }
 
-  public verifyType(typeFactory: TypeFactory, scope: Scope): JType {
+  public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
     if (typeFactory.isInteger(this.type) && typeof this.value === "number") {
       this.value = ~~this.value;
     } else if (
@@ -22,13 +19,12 @@ export default class Literal extends Expression {
     ) {
       this.value = this.value.charCodeAt(0);
     }
-    return this.type;
   }
 
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeBuilder,
-    scope: Scope
+    scope: BlockScope
   ): void {
     if (typeof this.value === "string") {
       codeBuilder.setTranslatedCode(`# Inicio de cadena\n`);
@@ -42,19 +38,18 @@ export default class Literal extends Expression {
       }
       codeBuilder.setTranslatedCode(`Heap[H] = 0;\n`);
       codeBuilder.setTranslatedCode("H = H + 1;\n");
-      let tempEnd = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${tempEnd} = ${tempStart};\n`);
-      codeBuilder.addUnusedTemporary(tempEnd);
       codeBuilder.removeUnusedTemporary(tempStart);
       codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
+      codeBuilder.setLastAddress(tempStart);
     } else if (typeof this.value === "number") {
-      let temporary = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${temporary} = ${this.value};\n`);
-      codeBuilder.addUnusedTemporary(temporary);
+      codeBuilder.setLastAddress(this.value.toString());
+    } else if (typeof this.value === "boolean") {
+      let label = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`goto ${label};\n`);
+      if (this.value) codeBuilder.addTrueLabel(label);
+      else codeBuilder.addFalseLabel(label);
     } else {
-      let temporary = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${temporary} = -1;\n`);
-      codeBuilder.addUnusedTemporary(temporary);
+      codeBuilder.setLastAddress("-1");
     }
   }
 }

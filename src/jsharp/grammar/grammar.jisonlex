@@ -8,6 +8,7 @@ IntegerLiteral        [0-9]+
 DoubleLiteral         [0-9]+("."[0-9]+)?
 BooleanLiteral        "true"|"false"
 NullLiteral           "null"
+File                  [A-Za-z0-9_-]+"."*[A-Za-z0-9]
 
 
 %x END_OF_LINE_COMMENT
@@ -101,6 +102,9 @@ NullLiteral           "null"
 
 /* Names */
 {Identifier}                      { return "IDENTIFIER"; }
+
+/* File */
+{File}                            { return "FILE"; }
 
 /* Separators */
 "^^"                              { return "^^"; }

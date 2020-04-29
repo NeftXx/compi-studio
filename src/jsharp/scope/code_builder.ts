@@ -9,6 +9,9 @@ export default class CodeBuilder {
   private nativeFunction: NativePrintFunction;
   private nativeStringFunctions: NativeStringFunctions;
   private labelJumpMethods: string;
+  private lastAddress: string;
+  private trueLabels: Array<string>;
+  private falseLabels: Array<string>;
 
   public constructor() {
     this.temporaryCounter = 0;
@@ -20,7 +23,12 @@ export default class CodeBuilder {
     this.labelJumpMethods = this.getNewLabel();
     this.nativeFunction.generete(this);
     this.nativeStringFunctions.generete(this);
-    this.translateCode.push(`${this.labelJumpMethods}:\n`);
+    this.translateCode.push(
+      `${this.labelJumpMethods}:\n# Seccion de codigo de usuario\n`
+    );
+    this.lastAddress = "";
+    this.trueLabels = [];
+    this.falseLabels = [];
   }
 
   public getNewTemporary(): string {
@@ -33,12 +41,48 @@ export default class CodeBuilder {
     return `L${this.labelCounter}`;
   }
 
-  public getLastTemporary(): string {
-    return `t${this.temporaryCounter}`;
+  public setLastAddress(address: string): void {
+    this.lastAddress = address;
   }
 
-  public getLastLabel(): string {
-    return `L${this.labelCounter}`;
+  public getLastAddress(): string {
+    return this.lastAddress;
+  }
+
+  public addTrueLabel(label: string) {
+    this.trueLabels.push(label);
+  }
+
+  public addFalseLabel(label: string) {
+    this.falseLabels.push(label);
+  }
+
+  public getTrueLabel(): string {
+    return this.trueLabels.pop();
+  }
+
+  public getFalseLabel(): string {
+    return this.falseLabels.pop();
+  }
+
+  public printTrueLabels(): void {
+    if (this.trueLabels.length > 0) {
+      let length = this.trueLabels.length;
+      for (let i = 0; i < length; i++) {
+        this.translateCode.push(`${this.trueLabels.pop()}: `);
+      }
+      this.translateCode.push("\n");
+    }
+  }
+
+  public printFalseLabels(): void {
+    if (this.falseLabels.length > 0) {
+      let length = this.falseLabels.length;
+      for (let i = 0; i < length; i++) {
+        this.translateCode.push(`${this.falseLabels.pop()}: `);
+      }
+      this.translateCode.push("\n");
+    }
   }
 
   public setTranslatedCode(translatedCode: string): void {

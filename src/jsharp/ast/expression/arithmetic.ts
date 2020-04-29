@@ -1,8 +1,8 @@
-import CodeBuilder from "../../../scope/code_builder";
-import NodeInfo from "../../../scope/node_info";
-import { TypeFactory } from "../../..//scope/type";
-import { Scope } from "../../../scope/scope";
-import Expression from "../expression";
+import CodeBuilder from "../../scope/code_builder";
+import NodeInfo from "../../scope/node_info";
+import { TypeFactory } from "../../scope/type";
+import { BlockScope } from "../../scope/scope";
+import Expression from "./expression";
 
 export default class Arithmetic extends Expression {
   public constructor(
@@ -14,7 +14,7 @@ export default class Arithmetic extends Expression {
     super(nodeInfo);
   }
 
-  public verifyType(typeFactory: TypeFactory, scope: Scope): void {
+  public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
     this.expLeft.verifyType(typeFactory, scope);
     this.expRight.verifyType(typeFactory, scope);
     let type1 = this.expLeft.type;
@@ -32,7 +32,7 @@ export default class Arithmetic extends Expression {
 
       if (typeFactory.isBoolean(type1) || typeFactory.isBoolean(type2)) {
         this.type = typeFactory.getErrorType(
-          `Error no se puede operar con el operando ${this.operator} una expresion de tipo ${type1} con una expresion ${type2}.`,
+          `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
           this.nodeInfo
         );
         return;
@@ -54,7 +54,7 @@ export default class Arithmetic extends Expression {
       return;
     }
     this.type = typeFactory.getErrorType(
-      `Error no se puede operar con el operando ${this.operator} una expresion de tipo ${type1} con una expresion ${type2}.`,
+      `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
       this.nodeInfo
     );
   }
@@ -62,14 +62,12 @@ export default class Arithmetic extends Expression {
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeBuilder,
-    scope: Scope
+    scope: BlockScope
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
-    let t1 = codeBuilder.getLastTemporary();
-    codeBuilder.addUnusedTemporary(t1);
+    let dir1 = codeBuilder.getLastAddress();
     this.expRight.translate(typeFactory, codeBuilder, scope);
-    let t2 = codeBuilder.getLastTemporary();
-    codeBuilder.addUnusedTemporary(t2);
+    let dir2 = codeBuilder.getLastAddress();
     if (typeFactory.isNumeric(this.type)) {
       if (this.operator === "^^") {
         let t3 = codeBuilder.getNewTemporary();
@@ -82,7 +80,7 @@ export default class Arithmetic extends Expression {
           `${t4} = ${t3} + 1; # indice parametro\n`
         );
         codeBuilder.setTranslatedCode(
-          `Stack[${t4}] = ${t1}; # asignacion de parametro\n`
+          `Stack[${t4}] = ${dir1}; # asignacion de parametro\n`
         );
 
         t4 = codeBuilder.getNewTemporary();
@@ -90,7 +88,7 @@ export default class Arithmetic extends Expression {
           `${t4} = ${t3} + 2; # indice parametro\n`
         );
         codeBuilder.setTranslatedCode(
-          `Stack[${t4}] = ${t2}; # asignacion de parametro\n`
+          `Stack[${t4}] = ${dir2}; # asignacion de parametro\n`
         );
 
         codeBuilder.setTranslatedCode(
@@ -98,17 +96,17 @@ export default class Arithmetic extends Expression {
         );
         t4 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0; # indice return\n`);
+        let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
-          `${codeBuilder.getNewTemporary()} = stack[${t4}]; # asignacion del resultado del return\n`
+          `${dir} = stack[${t4}]; # asignacion del resultado del return\n`
         );
+        codeBuilder.setLastAddress(dir);
       } else {
-        let t3 = codeBuilder.getNewTemporary();
+        let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
-          `${t3} = ${t1} ${this.operator} ${t2};\n`
+          `${dir} = ${dir1} ${this.operator} ${dir2};\n`
         );
-        codeBuilder.addUnusedTemporary(t3);
-        codeBuilder.removeUnusedTemporary(t1);
-        codeBuilder.removeUnusedTemporary(t2);
+        codeBuilder.setLastAddress(dir);
       }
     } else {
     }

@@ -82,7 +82,7 @@ CodeMirror.on(SELECT_FILE, "change", () => {
   );
 });
 
-openBuffer(INIT_FILE, 'print("Hello World!");');
+openBuffer(INIT_FILE, 'void principal() {\n\tprint("Hello World!");\n}\n');
 selectBuffer(editorCode, INIT_FILE);
 M.FormSelect.init(SELECT_FILE);
 

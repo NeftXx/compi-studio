@@ -3,13 +3,15 @@ import { logger } from "../utils/logger";
 import { Parser as JSharpParser } from "./grammar/grammar";
 import { TypeFactory, ErrorType } from "./scope/type";
 import CodeBuilder from "./scope/code_builder";
-
+import { GlobalScope } from "./scope/scope";
+//TODO: ARREGLAR this.ASTNODES BUSCAR LA CLASE CON ESTE ERROR
 export interface FileInformation {
   filename: string;
   content: string;
 }
 
 export interface JSharpResult {
+  isError: boolean;
   translate: string;
   symbolsTable: string;
   errorsTable: string;
@@ -17,55 +19,99 @@ export interface JSharpResult {
 
 export class JSharp {
   public exec(data: Array<FileInformation>): JSharpResult {
-    let typeFactory = new TypeFactory();
-    let codeBuilder = new CodeBuilder();
-    let errorsList: Array<ErrorType> = [];
-    let parser: any;
-    let trees: Array<Ast> = [];
     let currentFile = "";
     try {
+      let typeFactory = new TypeFactory();
+      let trees: Array<Ast> = [];
+      let parser: any;
       for (let file of data) {
         parser = new JSharpParser();
         currentFile = file.filename;
         parser.yy = { filename: currentFile, typeFactory: typeFactory };
         trees.push(parser.parse(file.content));
       }
-      for (let tree of trees) {
-        tree.newScope(errorsList);
-        tree.buildScope(typeFactory);
-        tree.translate(typeFactory, codeBuilder);
+      let globalScope = this.createGlobalScope(trees);
+      this.buildScopes(trees, typeFactory, globalScope);
+      if (globalScope.errorsEmpty()) {
+        let codeBuilder = new CodeBuilder();
+        this.translate(trees, typeFactory, codeBuilder, globalScope);
+        return {
+          isError: false,
+          translate: codeBuilder.getCodeTranslate(),
+          symbolsTable: this.createSymbolTable(),
+          errorsTable: "",
+        };
+      } else {
+        return {
+          isError: true,
+          translate: "",
+          symbolsTable: this.createSymbolTable(),
+          errorsTable: this.createErrorTable(globalScope.errorsList),
+        };
       }
-      return {
-        translate: codeBuilder.getCodeTranslate(),
-        symbolsTable: "",
-        errorsTable: "",
-      };
     } catch (error) {
       if (error.hash) {
         return {
+          isError: true,
           translate: "",
           symbolsTable: "",
           errorsTable: `
-<tr>
-  <td>Error no se esperaba el token: ${error.hash.token}.</td>
-  <td>${error.hash.loc.first_line}</td>
-  <td>${error.hash.loc.last_column}</td>
-  <td>${currentFile}</td>
-</tr>`,
+    <tr>
+      <td>Error no se esperaba el token: ${error.hash.token}.</td>
+      <td>${error.hash.loc.first_line}</td>
+      <td>${error.hash.loc.last_column}</td>
+      <td>${currentFile}</td>
+    </tr>`,
         };
       } else {
         logger.error(error.message);
         return {
+          isError: true,
           translate: "",
           symbolsTable: "",
-          errorsTable: "",
+          errorsTable: `
+    <tr>
+      <td>Ocurrio un error en el servidor</td>
+      <td>0</td>
+      <td>0</td>
+      <td></td>
+    </tr>
+    `,
         };
       }
     }
   }
 
-  private translate(trees: Array<Ast>): string {
-    return "";
+  private translate(
+    trees: Array<Ast>,
+    typeFactory: TypeFactory,
+    codeBuilder: CodeBuilder,
+    globalScope: GlobalScope
+  ) {
+    for (let tree of trees) {
+      tree.translate(typeFactory, codeBuilder, globalScope);
+    }
+  }
+
+  private buildScopes(
+    trees: Array<Ast>,
+    typeFactory: TypeFactory,
+    globalScope: GlobalScope
+  ): void {
+    for (let tree of trees) {
+      tree.buildImports(globalScope);
+    }
+    for (let tree of trees) {
+      tree.buildScope(typeFactory, globalScope);
+    }
+  }
+
+  private createGlobalScope(trees: Array<Ast>): GlobalScope {
+    let globalScope = new GlobalScope();
+    for (let ast of trees) {
+      globalScope.createFileScope(ast.filename);
+    }
+    return globalScope;
   }
 
   private createSymbolTable(): string {

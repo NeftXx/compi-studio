@@ -1,6 +1,6 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
-import { Scope } from "../../scope/scope";
+import { BlockScope } from "../../scope/scope";
 import CodeBuilder from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
 
@@ -14,39 +14,36 @@ export default class Relational extends Expression {
     super(nodeInfo);
   }
 
-  public verifyType(typeFactory: TypeFactory, scope: Scope): void {
-    this.type = typeFactory.getBoolean();
+  public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
+    this.expLeft.verifyType(typeFactory, scope);
+    let type1 = this.expLeft.type;
+    this.expRight.verifyType(typeFactory, scope);
+    let type2 = this.expRight.type;
+    if (typeFactory.isNumeric(type1) && typeFactory.isNumeric(type2)) {
+      this.type = typeFactory.getBoolean();
+    } else {
+      this.type = typeFactory.getErrorType(
+        `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
+        this.nodeInfo
+      );
+    }
   }
 
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeBuilder,
-    scope: Scope
+    scope: BlockScope
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
-    let t1 = codeBuilder.getLastTemporary();
-    codeBuilder.addUnusedTemporary(t1);
+    let dir1 = codeBuilder.getLastAddress();
     this.expRight.translate(typeFactory, codeBuilder, scope);
-    let t2 = codeBuilder.getLastTemporary();
-    codeBuilder.addUnusedTemporary(t2);
-    let t3 = codeBuilder.getNewTemporary();
-    let L1 = codeBuilder.getNewLabel();
-    let L2 = codeBuilder.getNewLabel();
+    let dir2 = codeBuilder.getLastAddress();
+    let LV = codeBuilder.getNewLabel();
+    let LF = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(
-      `if (${t1} ${this.operator} ${t2}) goto ${L1};\n`
+      `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
     );
-    codeBuilder.removeUnusedTemporary(t1);
-    codeBuilder.removeUnusedTemporary(t2);
-    codeBuilder.setTranslatedCode(`${t3} = 0;\n`);
-    codeBuilder.addUnusedTemporary(t3);
-    codeBuilder.setTranslatedCode(`goto ${L2};\n${L1}:\n`);
-    codeBuilder.setTranslatedCode(`${t3} = 1;\n`);
-    codeBuilder.addUnusedTemporary(t3);
-    codeBuilder.setTranslatedCode(`${L2}:\n`);
-    codeBuilder.setTranslatedCode(
-      `${codeBuilder.getNewTemporary()} = ${t3};\n`
-    );
-    codeBuilder.addUnusedTemporary(codeBuilder.getLastTemporary());
-    codeBuilder.removeUnusedTemporary(t3);
+    codeBuilder.addTrueLabel(LV);
+    codeBuilder.addFalseLabel(LF);
   }
 }
