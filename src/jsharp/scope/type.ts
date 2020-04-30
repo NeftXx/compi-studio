@@ -7,6 +7,8 @@ export abstract class JType {
     return null;
   }
 
+  public abstract isEquals(otherType: JType): boolean;
+
   public toString(): string {
     return this.name;
   }
@@ -21,6 +23,10 @@ export class BaseType extends JType {
 
   private constructor(name: string) {
     super(name);
+  }
+
+  public isEquals(otherType: JType): boolean {
+    return this === otherType;
   }
 
   public getValueDefault(): any {
@@ -39,11 +45,19 @@ export class AuxiliarType extends JType {
   private constructor(name: string) {
     super(name);
   }
+
+  public isEquals(otherType: JType): boolean {
+    return this === otherType;
+  }
 }
 
 export class ErrorType extends JType {
   public constructor(private message: string, private nodeInfo: NodeInfo) {
     super("error");
+  }
+
+  public isEquals(otherType: JType): boolean {
+    return otherType instanceof ErrorType;
   }
 
   public getMessage(): string {

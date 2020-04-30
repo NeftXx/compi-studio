@@ -1,16 +1,13 @@
 import { Variable } from "./variable";
-import { ErrorType } from "./type";
-
-interface HashTable<T> {
-  [key: string]: T;
-}
+import { ErrorType, JType } from "./type";
 
 export class GlobalScope {
   public errorsList: Array<ErrorType>;
-  public filesScope: HashTable<FileScope>;
+  public filesScope: Map<string, FileScope>;
 
   public constructor() {
-    this.filesScope = {};
+    this.filesScope = new Map();
+    this.errorsList = [];
   }
 
   public createFileScope(filename: string): void {
@@ -24,23 +21,40 @@ export class GlobalScope {
   public errorsEmpty(): boolean {
     return this.errorsList.length === 0;
   }
-}
-
-export class BlockScope {
-  public variables: Map<string, Variable>;
-
-  public constructor(private errorsList: Array<ErrorType>) {
-    this.variables = new Map();
-  }
 
   public addError(error: ErrorType) {
     this.errorsList.push(error);
   }
 }
 
+export class BlockScope {
+  protected size: number;
+  protected variables: Map<string, Variable>;
+
+  public constructor(protected errorsList: Array<ErrorType>) {
+    this.variables = new Map();
+    this.size = 0;
+  }
+
+  public addError(error: ErrorType) {
+    this.errorsList.push(error);
+  }
+
+  public createVariable(name: string, type: JType): boolean {
+    if (this.variables.has(name)) return false;
+    this.size++;
+    this.variables.set(name, new Variable(name, type, this.size));
+    return true;
+  }
+
+  public getSize(): number {
+    return this.size;
+  }
+}
+
 export class FileScope extends BlockScope {
   public importsScope: Array<FileScope>;
-  public methods: HashTable<FileScope>;
+  public methods: Map<string, MethodScope>;
 
   public constructor(
     public readonly filename: string,
@@ -48,14 +62,50 @@ export class FileScope extends BlockScope {
   ) {
     super(errorsList);
     this.importsScope = [];
-    this.methods = {};
+    this.methods = new Map();
   }
 
   public addImport(fileScope: FileScope): void {
     this.importsScope.push(fileScope);
   }
 
-  public createMethod() {}
+  public createMethod(
+    identifier: string,
+    paramNames: Array<string>,
+    type: JType
+  ): boolean {
+    let methodTemp = this.methods.get(identifier);
+    if (methodTemp) {
+      let ok = true;
+    }
+    this.methods.set(
+      identifier,
+      new MethodScope(this.errorsList, identifier, paramNames, type)
+    );
+    return true;
+  }
+
+  public getMethod(identifier: string): MethodScope {
+    return this.methods.get(identifier);
+  }
 }
 
-export class MethodScope extends BlockScope {}
+export class MethodScope extends BlockScope {
+  public constructor(
+    errorsList: Array<ErrorType>,
+    private identifier: string,
+    private paramNames: Array<string>,
+    private returnType: JType
+  ) {
+    super(errorsList);
+    this.size = 1;
+  }
+
+  public getReturnType(): JType {
+    return this.returnType;
+  }
+
+  public getIdentifier(): string {
+    return this.identifier;
+  }
+}

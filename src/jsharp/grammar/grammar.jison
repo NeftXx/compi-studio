@@ -35,10 +35,10 @@
 %% /* language grammar */
 
 compilation_unit
-  : import_statement global_statement EOF {
+  : import_statement global_statements_list EOF {
     return new Ast($2, yy.filename, $1);
   }
-  | global_statement EOF {
+  | global_statements_list EOF {
     return new Ast($1, yy.filename);
   }
 ;
@@ -151,22 +151,22 @@ primitive_type
 ;
 
 reference_type
-  : ID
+  : IDENTIFIER
 ;
 
 array_type
   : array_type '[' ']'
   | primitive_type '[' ']'
-  | ID '[' ']'
+  | IDENTIFIER '[' ']'
 ;
 
 parameter_list
-  : parameter_list parameter { $$ = $1; $$.push($2); }
+  : parameter_list ',' parameter { $$ = $1; $$.push($3); }
   | parameter { $$ = [$1]; }
 ;
 
 parameter
-  : type ID {
+  : type IDENTIFIER {
     $$ = new ParameterStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1

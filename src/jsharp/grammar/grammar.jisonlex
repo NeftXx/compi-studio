@@ -5,10 +5,10 @@
 EndOfLine             \r|\n|\r\n
 Identifier            [a-zA-Z_][_a-zA-Z0-9ñÑ]+
 IntegerLiteral        [0-9]+
-DoubleLiteral         [0-9]+("."[0-9]+)?
+DoubleLiteral         [0-9]+(\.[0-9]+)
 BooleanLiteral        "true"|"false"
 NullLiteral           "null"
-File                  [A-Za-z0-9_-]+"."*[A-Za-z0-9]
+File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)+
 
 
 %x END_OF_LINE_COMMENT
@@ -100,11 +100,12 @@ File                  [A-Za-z0-9_-]+"."*[A-Za-z0-9]
                                   }
 <STRING>[^\r\n\"\\]+              { stringBuilder.push(yytext); }
 
+/* File */
+{File}                            { return "FILE"; }
+
 /* Names */
 {Identifier}                      { return "IDENTIFIER"; }
 
-/* File */
-{File}                            { return "FILE"; }
 
 /* Separators */
 "^^"                              { return "^^"; }

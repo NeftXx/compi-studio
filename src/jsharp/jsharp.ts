@@ -4,7 +4,7 @@ import { Parser as JSharpParser } from "./grammar/grammar";
 import { TypeFactory, ErrorType } from "./scope/type";
 import CodeBuilder from "./scope/code_builder";
 import { GlobalScope } from "./scope/scope";
-//TODO: ARREGLAR this.ASTNODES BUSCAR LA CLASE CON ESTE ERROR
+
 export interface FileInformation {
   filename: string;
   content: string;

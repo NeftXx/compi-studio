@@ -1,23 +1,35 @@
 import CodeBuilder from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
-import { TypeFactory, JType } from "../../scope/type";
-import { BlockScope } from "../../scope/scope";
+import { TypeFactory, JType, ErrorType } from "../../scope/type";
+import { MethodScope } from "../../scope/scope";
 import Statement from "./statement";
 
 export default class ParameterStm extends Statement {
   public constructor(
     nodeInfo: NodeInfo,
-    private type: JType,
-    private identifier: string
+    public type: JType,
+    public identifier: string
   ) {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {}
+  public buildScope(typeFactory: TypeFactory, scope: MethodScope): void {
+    let ok = scope.createVariable(this.identifier, this.type);
+    if (!ok) {
+      scope.addError(
+        new ErrorType(
+          `Error el parametro ${
+            this.identifier
+          } ya esta declarado en el metodo ${scope.getIdentifier()}.`,
+          this.nodeInfo
+        )
+      );
+    }
+  }
 
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeBuilder,
-    scope: BlockScope
+    scope: MethodScope
   ): void {}
 }

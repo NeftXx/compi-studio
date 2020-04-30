@@ -9,6 +9,7 @@ export default class CodeBuilder {
   private nativeFunction: NativePrintFunction;
   private nativeStringFunctions: NativeStringFunctions;
   private labelJumpMethods: string;
+  private mainFunction: string;
   private lastAddress: string;
   private trueLabels: Array<string>;
   private falseLabels: Array<string>;
@@ -23,12 +24,11 @@ export default class CodeBuilder {
     this.labelJumpMethods = this.getNewLabel();
     this.nativeFunction.generete(this);
     this.nativeStringFunctions.generete(this);
-    this.translateCode.push(
-      `${this.labelJumpMethods}:\n# Seccion de codigo de usuario\n`
-    );
+    this.translateCode.push(`\n# Seccion de codigo de usuario\n`);
     this.lastAddress = "";
     this.trueLabels = [];
     this.falseLabels = [];
+    this.mainFunction = "";
   }
 
   public getNewTemporary(): string {
@@ -85,6 +85,12 @@ export default class CodeBuilder {
     }
   }
 
+  public setMainFunction(identifier: string): void {
+    if (this.mainFunction === "") {
+      this.mainFunction = identifier;
+    }
+  }
+
   public setTranslatedCode(translatedCode: string): void {
     this.translateCode.push(translatedCode);
   }
@@ -100,7 +106,20 @@ export default class CodeBuilder {
   }
 
   public getCodeTranslate(): string {
-    return this.createHeader() + this.translateCode.join("");
+    if (this.mainFunction === "") {
+      return (
+        this.createHeader() +
+        this.translateCode.join("") +
+        `${this.labelJumpMethods}:\n`
+      );
+    }
+    return (
+      this.createHeader() +
+      this.translateCode.join("") +
+      `${this.labelJumpMethods}:
+call ${this.mainFunction};
+`
+    );
   }
 
   private createHeader(): string {
@@ -119,7 +138,7 @@ var P, H, E; # Sección de apuntadores
 var Heap[];  # Sección de Heap
 var Stack[]; # Sección de Stack
 
-goto ${this.labelJumpMethods}; # Ignorar procedimientos
+goto ${this.labelJumpMethods};
 `);
     return header.join("");
   }
