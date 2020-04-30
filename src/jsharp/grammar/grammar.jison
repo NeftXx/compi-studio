@@ -15,6 +15,10 @@
   const { default: FunctionStm } = require("../ast/statement/function");
   const { default: ParameterStm } = require("../ast/statement/parameter");
   const { default: BlockStm } = require("../ast/statement/block");
+  const { default: IfStm } = require("../ast/statement/if_statement");
+  const { default: SubIf } = require("../ast/statement/sub_if");
+  const { default: WhileStm } = require("../ast/statement/while");
+  const { default: DoWhileStm } = require("../ast/statement/do_while");
 %}
 
 %start compilation_unit
@@ -75,56 +79,56 @@ global_statement
 ;
 
 function_statement
-  : visibility type IDENTIFIER '(' parameter_list ')' block_statement {
+  : visibility type IDENTIFIER '(' parameter_list ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $2, $3, $5, $7
     );
   }
-  | visibility type IDENTIFIER '(' ')' block_statement {
+  | visibility type IDENTIFIER '(' ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $2, $3, [], $6
     );
   }
-  | visibility 'void' IDENTIFIER '(' parameter_list ')' block_statement {
+  | visibility 'void' IDENTIFIER '(' parameter_list ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), yy.typeFactory.getVoid(), $3, $5, $7
     );
   }
-  | visibility 'void' IDENTIFIER '(' ')' block_statement {
+  | visibility 'void' IDENTIFIER '(' ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), yy.typeFactory.getVoid(), $3, [], $6
     );
   }
-  | type IDENTIFIER '(' parameter_list ')' block_statement {
+  | type IDENTIFIER '(' parameter_list ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $1, $2, $4, $6
     );
   }
-  | type IDENTIFIER '(' ')' block_statement {
+  | type IDENTIFIER '(' ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $1, $2, [], $5
     );
   }
-  | 'void' IDENTIFIER '(' parameter_list ')' block_statement {
+  | 'void' IDENTIFIER '(' parameter_list ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), yy.typeFactory.getVoid(), $2, $4, $6
     );
   }
-  | 'void' IDENTIFIER '(' ')' block_statement {
+  | 'void' IDENTIFIER '(' ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
@@ -175,8 +179,8 @@ parameter
   }
 ;
 
-block_statement
-  : '{' block '}' {
+block
+  : '{' block_statement '}' {
     $$ = new BlockStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
@@ -192,12 +196,79 @@ block_statement
   }
 ;
 
-block
-  : block statement { $$ = $1; $$.push($2); }
+block_statement
+  : block_statement statement { $$ = $1; $$.push($2); }
   | statement { $$ = [$1]; }
 ;
 
 statement
+  : print_statement { $$ = $1; }
+  | if_statement { $$ = $1; }
+  | while_statement { $$ = $1; }
+  | do_while_statement { $$ = $1; }
+;
+
+do_while_statement
+  : 'do' block 'while' '(' expression ')' {
+    $$ = new DoWhileStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $5
+    );
+  }
+  | 'do' block 'while' '(' expression ')' ';' {
+    $$ = new DoWhileStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $5
+    );
+  }
+;
+
+while_statement
+  : 'while' '(' expression ')' block {
+    $$ = new WhileStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $3, $5
+    );
+  }
+;
+
+if_statement
+  : if_list 'else' block {
+    $1.push(new SubIf(
+      new NodeInfo(
+        yy.filename, @1.first_line, @1.first_column
+      ), $3));
+    $$ = new IfStm(
+        new NodeInfo(yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1), $1
+      );
+  }
+  | if_list {
+    $$ = new IfStm(
+        new NodeInfo(yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1), $1
+      );
+  }
+;
+
+if_list
+  : if_list 'else' 'if' '(' expression ')' block {
+    $$ = $1;
+    $$.push(new SubIf(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $7, $5));
+  }
+  | 'if' '(' expression ')' block {
+    $$ = [new SubIf(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $5, $3)];
+  }
+;
+
+print_statement
   : 'print' '(' expression ')' {
     $$ = new Print(
       new NodeInfo(
