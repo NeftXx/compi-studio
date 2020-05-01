@@ -1,7 +1,9 @@
 import NativePrintFunction from "../core/native_function";
 import NativeStringFunctions from "../core/native_string_functions";
+import { MethodScope } from "./scope";
 
 export default class CodeBuilder {
+  public ptrStack: number;
   private temporaryCounter: number;
   private labelCounter: number;
   private translateCode: Array<string>;
@@ -9,10 +11,11 @@ export default class CodeBuilder {
   private nativeFunction: NativePrintFunction;
   private nativeStringFunctions: NativeStringFunctions;
   private labelJumpMethods: string;
-  private mainFunction: string;
+  private mainFunction: MethodScope | undefined;
   private lastAddress: string;
   private trueLabels: Array<string>;
   private falseLabels: Array<string>;
+  private globalVariables: Array<string>;
 
   public constructor() {
     this.temporaryCounter = 0;
@@ -28,7 +31,9 @@ export default class CodeBuilder {
     this.lastAddress = "";
     this.trueLabels = [];
     this.falseLabels = [];
-    this.mainFunction = "";
+    this.mainFunction = undefined;
+    this.ptrStack = 0;
+    this.globalVariables = [];
   }
 
   public getNewTemporary(): string {
@@ -85,14 +90,18 @@ export default class CodeBuilder {
     }
   }
 
-  public setMainFunction(identifier: string): void {
-    if (this.mainFunction === "") {
-      this.mainFunction = identifier;
+  public setMainFunction(method: MethodScope): void {
+    if (this.mainFunction) {
+      this.mainFunction = method;
     }
   }
 
   public setTranslatedCode(translatedCode: string): void {
     this.translateCode.push(translatedCode);
+  }
+
+  public setGlobalVariables(translatedCode: string) {
+    this.globalVariables.push(translatedCode);
   }
 
   public addUnusedTemporary(temporary: string): void {
@@ -106,19 +115,21 @@ export default class CodeBuilder {
   }
 
   public getCodeTranslate(): string {
-    if (this.mainFunction === "") {
+    if (this.mainFunction) {
       return (
         this.createHeader() +
         this.translateCode.join("") +
-        `${this.labelJumpMethods}:\n`
+        `${this.labelJumpMethods}:
+P = P + ${this.mainFunction.getSize()};
+call ${this.mainFunction.getName()};
+P = P - ${this.mainFunction.getSize()};
+  `
       );
     }
     return (
       this.createHeader() +
       this.translateCode.join("") +
-      `${this.labelJumpMethods}:
-call ${this.mainFunction};
-`
+      `${this.labelJumpMethods}:\n`
     );
   }
 
@@ -138,6 +149,8 @@ var P, H, E; # Sección de apuntadores
 var Heap[];  # Sección de Heap
 var Stack[]; # Sección de Stack
 
+${this.globalVariables.join("")}
+P = ${this.ptrStack};
 goto ${this.labelJumpMethods};
 `);
     return header.join("");

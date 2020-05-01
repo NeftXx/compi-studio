@@ -28,7 +28,9 @@ export class JSharp {
         parser = new JSharpParser();
         currentFile = file.filename;
         parser.yy = { filename: currentFile, typeFactory: typeFactory };
-        trees.push(parser.parse(file.content));
+        if (file.content !== "") {
+          trees.push(parser.parse(file.content));
+        }
       }
       let globalScope = this.createGlobalScope(trees);
       this.buildScopes(trees, typeFactory, globalScope);
@@ -57,7 +59,11 @@ export class JSharp {
           symbolsTable: "",
           errorsTable: `
     <tr>
-      <td>Error no se esperaba el token: ${error.hash.token}.</td>
+      <td>Error no se esperaba: <strong>${
+        error.hash.token
+      }</strong>. Se esperaba: <strong>${error.hash.expected.join(
+            " "
+          )}</strong>.</td>
       <td>${error.hash.loc.first_line}</td>
       <td>${error.hash.loc.last_column}</td>
       <td>${currentFile}</td>

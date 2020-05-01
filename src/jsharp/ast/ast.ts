@@ -1,8 +1,10 @@
-import { GlobalScope, FileScope } from "../scope/scope";
+import { GlobalScope, FileScope, MethodScope } from "../scope/scope";
 import { TypeFactory, ErrorType } from "../scope/type";
 import Statement from "./statement/statement";
 import CodeBuilder from "../scope/code_builder";
 import ImportStm from "./statement/import";
+import FunctionStm from "./statement/function";
+import { Variable } from "../scope/variable";
 
 export default class Ast {
   public constructor(
@@ -43,7 +45,14 @@ export default class Ast {
   public buildScope(typeFactory: TypeFactory, globalScope: GlobalScope): void {
     let fileScope = globalScope.getFileScope(this.filename);
     for (let statement of this.astNodes) {
-      statement.buildScope(typeFactory, fileScope);
+      if (statement instanceof FunctionStm) {
+        statement.buildScope(typeFactory, fileScope);
+      }
+    }
+    for (let statement of this.astNodes) {
+      if (!(statement instanceof FunctionStm)) {
+        statement.buildScope(typeFactory, fileScope);
+      }
     }
   }
 
@@ -53,6 +62,15 @@ export default class Ast {
     globalScope: GlobalScope
   ): void {
     let fileScope = globalScope.getFileScope(this.filename);
+    fileScope.variables.forEach((variable: Variable, key: string) => {
+      variable.address = codeBuilder.ptrStack++;
+      codeBuilder.setGlobalVariables(
+        `stack[${variable.address}] = ${variable.type.getValueDefault()};\n`
+      );
+    });
+    fileScope.methods.forEach((method: MethodScope, key: string) => {
+      method.updateAddresses();
+    });
     for (let statement of this.astNodes) {
       statement.translate(typeFactory, codeBuilder, fileScope);
     }

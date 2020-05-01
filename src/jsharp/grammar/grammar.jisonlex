@@ -3,7 +3,7 @@
   * Author: Ronald Berdúo
   */
 EndOfLine             \r|\n|\r\n
-Identifier            [a-zA-Z_][_a-zA-Z0-9ñÑ]+
+Identifier            [a-zA-Z_][_a-zA-Z0-9ñÑ]*
 IntegerLiteral        [0-9]+
 DoubleLiteral         [0-9]+(\.[0-9]+)
 BooleanLiteral        "true"|"false"
@@ -117,6 +117,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)+
 "<="                              { return "<="; }
 "&&"                              { return "&&"; }
 "||"                              { return "||"; }
+":="                              { return ":="; }
 "+"                               { return "+"; }
 "-"                               { return "-"; }
 "*"                               { return "*"; }
@@ -142,7 +143,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)+
 "."                               { return "."; }
 
 <<EOF>>                           { return "EOF"; }
-.                                 { return "ILLEGAL_CHARACTER"; }
+.                                 { return yytext; }
 
 %%
 let stringBuilder = [];

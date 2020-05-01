@@ -19,6 +19,14 @@ export default class Relational extends Expression {
     let type1 = this.expLeft.type;
     this.expRight.verifyType(typeFactory, scope);
     let type2 = this.expRight.type;
+    if (typeFactory.isErrorType(type1)) {
+      this.type = type1;
+      return;
+    }
+    if (typeFactory.isErrorType(type2)) {
+      this.type = type2;
+      return;
+    }
     if (typeFactory.isNumeric(type1) && typeFactory.isNumeric(type2)) {
       this.type = typeFactory.getBoolean();
     } else {

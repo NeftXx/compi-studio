@@ -4,7 +4,7 @@ export abstract class JType {
   constructor(public readonly name: string) {}
 
   public getValueDefault(): any {
-    return null;
+    return -1;
   }
 
   public abstract isEquals(otherType: JType): boolean;
@@ -32,9 +32,9 @@ export class BaseType extends JType {
   public getValueDefault(): any {
     if (this === BaseType.INTEGER) return 0;
     if (this === BaseType.DOUBLE) return 0.0;
-    if (this === BaseType.BOOLEAN) return false;
+    if (this === BaseType.BOOLEAN) return 0;
     if (this === BaseType.CHAR) return "\0";
-    return null;
+    return -1;
   }
 }
 

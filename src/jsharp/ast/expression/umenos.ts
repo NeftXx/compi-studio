@@ -12,6 +12,10 @@ export default class UMenos extends Expression {
   public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
     this.exp.verifyType(typeFactory, scope);
     let typeTemp = this.exp.type;
+    if (typeFactory.isErrorType(typeTemp)) {
+      this.type = typeTemp;
+      return;
+    }
     if (typeFactory.isInteger(typeTemp) || typeFactory.isDouble(typeTemp)) {
       this.type = typeTemp;
     } else {

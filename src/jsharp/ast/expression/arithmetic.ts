@@ -19,6 +19,14 @@ export default class Arithmetic extends Expression {
     this.expRight.verifyType(typeFactory, scope);
     let type1 = this.expLeft.type;
     let type2 = this.expRight.type;
+    if (typeFactory.isErrorType(type1)) {
+      this.type = type1;
+      return;
+    }
+    if (typeFactory.isErrorType(type2)) {
+      this.type = type2;
+      return;
+    }
     if (typeFactory.isBaseType(type1) && typeFactory.isBaseType(type2)) {
       if (
         this.operator === "+" &&
@@ -43,14 +51,6 @@ export default class Arithmetic extends Expression {
         return;
       }
       this.type = typeFactory.getInteger();
-      return;
-    }
-    if (typeFactory.isErrorType(type1)) {
-      this.type = type1;
-      return;
-    }
-    if (typeFactory.isErrorType(type2)) {
-      this.type = type2;
       return;
     }
     this.type = typeFactory.getErrorType(

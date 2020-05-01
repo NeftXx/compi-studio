@@ -7,16 +7,18 @@ import BlockStm from "./block";
 import Expression from "../expression/expression";
 
 export default class DoWhileStm extends Statement {
+  private nameScope: string;
+
   public constructor(
     nodeInfo: NodeInfo,
     public block: BlockStm,
     public expression: Expression
   ) {
     super(nodeInfo);
+    this.nameScope = "";
   }
 
   public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
-    this.block.buildScope(typeFactory, scope);
     this.expression.verifyType(typeFactory, scope);
     let type = this.expression.type;
     if (type instanceof ErrorType) {
@@ -31,6 +33,9 @@ export default class DoWhileStm extends Statement {
         );
       }
     }
+    this.nameScope = scope.createScope();
+    let localScope = scope.getScope(this.nameScope);
+    this.block.buildScope(typeFactory, localScope);
   }
 
   public translate(
@@ -40,7 +45,8 @@ export default class DoWhileStm extends Statement {
   ): void {
     let labelReturn = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(`${labelReturn}:\n`);
-    this.block.translate(typeFactory, codeBuilder, scope);
+    let localScope = scope.getScope(this.nameScope);
+    this.block.translate(typeFactory, codeBuilder, localScope);
     this.expression.translate(typeFactory, codeBuilder, scope);
     codeBuilder.printTrueLabels();
     codeBuilder.setTranslatedCode(`goto ${labelReturn};\n`);

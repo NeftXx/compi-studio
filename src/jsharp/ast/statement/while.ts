@@ -7,12 +7,15 @@ import BlockStm from "./block";
 import Expression from "../expression/expression";
 
 export default class WhileStm extends Statement {
+  private nameScope: string;
+
   public constructor(
     nodeInfo: NodeInfo,
     public expression: Expression,
     public block: BlockStm
   ) {
     super(nodeInfo);
+    this.nameScope = "";
   }
 
   public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
@@ -30,7 +33,9 @@ export default class WhileStm extends Statement {
         );
       }
     }
-    this.block.buildScope(typeFactory, scope);
+    this.nameScope = scope.createScope();
+    let localScope = scope.getScope(this.nameScope);
+    this.block.buildScope(typeFactory, localScope);
   }
 
   public translate(
@@ -42,7 +47,8 @@ export default class WhileStm extends Statement {
     codeBuilder.setTranslatedCode(`${labelReturn}:\n`);
     this.expression.translate(typeFactory, codeBuilder, scope);
     codeBuilder.printTrueLabels();
-    this.block.translate(typeFactory, codeBuilder, scope);
+    let localScope = scope.getScope(this.nameScope);
+    this.block.translate(typeFactory, codeBuilder, localScope);
     codeBuilder.setTranslatedCode(`goto ${labelReturn};\n`);
     codeBuilder.printFalseLabels();
   }

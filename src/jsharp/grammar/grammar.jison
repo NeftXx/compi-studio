@@ -7,8 +7,10 @@
   const { default: NodeInfo } = require("../scope/node_info");
   const { default: ImportStm } = require("../ast/statement/import");
   const { default: Print } = require("../ast/statement/print");
+  const { default: Identifier } = require("../ast/expression/identifier");
   const { default: Arithmetic } = require("../ast/expression/arithmetic");
   const { default: Relational } = require("../ast/expression/relational");
+  const { default: Comparator } = require("../ast/expression/comparator");
   const { default: And } = require("../ast/expression/and");
   const { default: UMenos } = require("../ast/expression/umenos");
   const { default: Literal } = require("../ast/expression/literal");
@@ -19,6 +21,11 @@
   const { default: SubIf } = require("../ast/statement/sub_if");
   const { default: WhileStm } = require("../ast/statement/while");
   const { default: DoWhileStm } = require("../ast/statement/do_while");
+  const {
+    VarDeclaration,
+    VarDeclarationGlobal,
+    VarDeclarationType,
+  } = require("../ast/statement/variable_declaration");
 %}
 
 %start compilation_unit
@@ -70,12 +77,20 @@ file_list
 ;
 
 global_statements_list
-  : global_statements_list global_statement { $$ = $1; $$.push($2); }
-  | global_statement { $$ = [$1]; }
+  : global_statements_list global_statement {
+    $$ = $1;
+    if ($2) $$.push($2);
+  }
+  | global_statement {
+    $$ = [];
+    if ($1) $$.push($1);
+  }
 ;
 
 global_statement
-  : function_statement
+  : function_statement { $$ = $1; }
+  | variable_declaration { $$ = $1; }
+  | variable_declaration ';' { $$ = $1; }
 ;
 
 function_statement
@@ -197,8 +212,14 @@ block
 ;
 
 block_statement
-  : block_statement statement { $$ = $1; $$.push($2); }
-  | statement { $$ = [$1]; }
+  : block_statement statement {
+    $$ = $1;
+    if ($2) $$.push($2);
+  }
+  | statement {
+    $$ = [];
+    if ($1) $$.push($1);
+  }
 ;
 
 statement
@@ -206,6 +227,52 @@ statement
   | if_statement { $$ = $1; }
   | while_statement { $$ = $1; }
   | do_while_statement { $$ = $1; }
+  | variable_declaration { $$ = $1; }
+  | variable_declaration ';' { $$ = $1; }
+  | error ';'
+;
+
+variable_declaration
+  : type id_list '=' expression {
+    $$ = new VarDeclarationType(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2, $4
+    );
+  }
+  | 'var' IDENTIFIER ':=' expression {
+    $$ = new VarDeclaration(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), false, $2, $4
+    );
+  }
+  | 'const' IDENTIFIER ':=' expression {
+    $$ = new VarDeclaration(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), true, $2, $4
+    );
+  }
+  | 'global' IDENTIFIER ':=' expression {
+    $$ = new VarDeclarationGlobal(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $4
+    );
+  }
+  | type id_list {
+    $$ = new VarDeclarationType(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
+;
+
+id_list
+  : id_list ',' IDENTIFIER
+  | IDENTIFIER
 ;
 
 do_while_statement
@@ -363,6 +430,20 @@ expression
       ), $1, "<=", $3
     )
   }
+  | expression '==' expression {
+    $$ = new Comparator(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "==", $3
+    )
+  }
+  | expression '!=' expression {
+    $$ = new Comparator(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "!=", $3
+    )
+  }
   | '(' expression ')' { $$ = $2; }
   | '-' expression %prec UMINUS {
     $$ = new UMenos(
@@ -400,5 +481,10 @@ expression
     );
   }
   | IDENTIFIER {
+    $$ = new Identifier(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
   }
 ;

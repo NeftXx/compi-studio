@@ -1,7 +1,7 @@
 import CodeBuilder from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, JType, ErrorType } from "../../scope/type";
-import { BlockScope, FileScope } from "../../scope/scope";
+import { FileScope } from "../../scope/scope";
 import Statement from "./statement";
 import Parameter from "./parameter";
 import Block from "./block";
@@ -50,10 +50,11 @@ export default class FunctionStm extends Statement {
     let nameFunction = `${scope.filename.replace(/[.]|[-]/gi, "_")}_${
       this.identifierReal
     }`;
-    if (this.identifier === "principal") {
-      codeBuilder.setMainFunction(nameFunction);
-    }
     let methodScope = scope.getMethod(this.identifierReal);
+    if (this.identifier === "principal") {
+      methodScope.setName(nameFunction);
+      codeBuilder.setMainFunction(methodScope);
+    }
     codeBuilder.setTranslatedCode(`proc ${nameFunction}  begin\n`);
     this.block.translate(typeFactory, codeBuilder, methodScope);
     codeBuilder.setTranslatedCode("end\n");

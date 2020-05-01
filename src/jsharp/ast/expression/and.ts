@@ -18,6 +18,14 @@ export default class And extends Expression {
     this.expRight.verifyType(typeFactory, scope);
     let type1 = this.expLeft.type;
     let type2 = this.expRight.type;
+    if (typeFactory.isErrorType(type1)) {
+      this.type = type1;
+      return;
+    }
+    if (typeFactory.isErrorType(type2)) {
+      this.type = type2;
+      return;
+    }
     if (typeFactory.isBoolean(type1) && typeFactory.isBoolean(type2)) {
       this.type = typeFactory.getBoolean();
     } else {

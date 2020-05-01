@@ -14,7 +14,7 @@ export default class ParameterStm extends Statement {
   }
 
   public buildScope(typeFactory: TypeFactory, scope: MethodScope): void {
-    let ok = scope.createVariable(this.identifier, this.type);
+    let ok = scope.createVariable(this.identifier, this.type, false);
     if (!ok) {
       scope.addError(
         new ErrorType(
