@@ -95,7 +95,7 @@ export class JSharp {
     globalScope: GlobalScope
   ) {
     for (let tree of trees) {
-      tree.translate(typeFactory, codeBuilder, globalScope);
+      // tree.translate(typeFactory, codeBuilder, globalScope);
     }
   }
 
@@ -105,7 +105,7 @@ export class JSharp {
     globalScope: GlobalScope
   ): void {
     for (let tree of trees) {
-      tree.buildImports(globalScope);
+      tree.resolveImports(globalScope);
     }
     for (let tree of trees) {
       tree.buildScope(typeFactory, globalScope);

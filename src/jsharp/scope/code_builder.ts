@@ -120,10 +120,11 @@ export default class CodeBuilder {
         this.createHeader() +
         this.translateCode.join("") +
         `${this.labelJumpMethods}:
+# Inicio de ejecucion del programa
 P = P + ${this.mainFunction.getSize()};
 call ${this.mainFunction.getName()};
 P = P - ${this.mainFunction.getSize()};
-  `
+`
       );
     }
     return (

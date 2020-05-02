@@ -13,27 +13,27 @@ export default class Ast {
     public readonly importList?: ImportStm
   ) {}
 
-  public buildImports(globalScope: GlobalScope) {
+  public resolveImports(globalScope: GlobalScope) {
     if (this.importList) {
-      let fileScope = globalScope.getFileScope(this.filename);
+      let fileScope = globalScope.enterFileScope(this.filename);
       let currentImport: FileScope;
-      for (let importStm of this.importList.filenames) {
-        currentImport = globalScope.getFileScope(importStm);
+      for (let filenameImport of this.importList.filenames) {
+        currentImport = globalScope.enterFileScope(filenameImport);
         if (currentImport) {
           if (fileScope === currentImport) {
             globalScope.errorsList.push(
               new ErrorType(
-                `Error no se puede importar el mismo archivo.`,
+                `Error esta intentando importar el mismo archivo ${filenameImport} en su entorno.`,
                 this.importList.nodeInfo
               )
             );
           } else {
-            fileScope.addImport(currentImport);
+            fileScope.addImport(filenameImport, currentImport);
           }
         } else {
           globalScope.errorsList.push(
             new ErrorType(
-              `Error no se encontro el archivo ${importStm}.`,
+              `Error no se encontro el archivo ${filenameImport}.`,
               this.importList.nodeInfo
             )
           );
@@ -43,7 +43,7 @@ export default class Ast {
   }
 
   public buildScope(typeFactory: TypeFactory, globalScope: GlobalScope): void {
-    let fileScope = globalScope.getFileScope(this.filename);
+    let fileScope = globalScope.enterFileScope(this.filename);
     for (let statement of this.astNodes) {
       if (statement instanceof FunctionStm) {
         statement.buildScope(typeFactory, fileScope);
@@ -61,7 +61,7 @@ export default class Ast {
     codeBuilder: CodeBuilder,
     globalScope: GlobalScope
   ): void {
-    let fileScope = globalScope.getFileScope(this.filename);
+    let fileScope = globalScope.enterFileScope(this.filename);
     fileScope.variables.forEach((variable: Variable, key: string) => {
       variable.address = codeBuilder.ptrStack++;
       codeBuilder.setGlobalVariables(

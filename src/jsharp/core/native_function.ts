@@ -9,6 +9,7 @@ export default class NativePrintFunction {
     this.printString(codeBuilder);
     this.printBoolean(codeBuilder);
     this.pow(codeBuilder);
+    this.printGlobalVariableError(codeBuilder);
   }
 
   private printString(codeBuilder: CodeBuilder): void {
@@ -153,6 +154,57 @@ proc native_potencia begin
     ${t2} = P + 3;
     ${t3} = stack[${t2}]; # potencia
     stack[${t1}] = ${t3}; # return potencia
+end
+`);
+  }
+
+  private printGlobalVariableError(codeBuilder: CodeBuilder) {
+    codeBuilder.setTranslatedCode(`
+proc native_print_global_variable_error begin
+  print("%c", 69);
+  print("%c", 114);
+  print("%c", 114);
+  print("%c", 111);
+  print("%c", 114);
+  print("%c", 32);
+  print("%c", 115);
+  print("%c", 101);
+  print("%c", 32);
+  print("%c", 104);
+  print("%c", 97);
+  print("%c", 32);
+  print("%c", 105);
+  print("%c", 110);
+  print("%c", 116);
+  print("%c", 101);
+  print("%c", 110);
+  print("%c", 116);
+  print("%c", 97);
+  print("%c", 110);
+  print("%c", 100);
+  print("%c", 111);
+  print("%c", 32);
+  print("%c", 97);
+  print("%c", 99);
+  print("%c", 99);
+  print("%c", 101);
+  print("%c", 100);
+  print("%c", 101);
+  print("%c", 114);
+  print("%c", 32);
+  print("%c", 97);
+  print("%c", 32);
+  print("%c", 108);
+  print("%c", 97);
+  print("%c", 32);
+  print("%c", 118);
+  print("%c", 97);
+  print("%c", 114);
+  print("%c", 105);
+  print("%c", 97);
+  print("%c", 98);
+  print("%c", 108);
+  print("%c", 101); 
 end
 `);
   }

@@ -2,7 +2,6 @@ var socket = io();
 
 socket.on("translateResult", function (result) {
   document.getElementById("body-errors-table").innerHTML = result.errorsTable;
-  document.getElementById("body-symbols-table").innerHTML = result.symbolsTable;
   resultC3D.setValue(result.translate);
   if (result.isError) {
     Toast.fire({

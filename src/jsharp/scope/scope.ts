@@ -1,5 +1,6 @@
 import { Variable } from "./variable";
 import { ErrorType, JType } from "./type";
+import Structure from "../ast/statement/structure";
 
 export class GlobalScope {
   public errorsList: Array<ErrorType>;
@@ -14,7 +15,7 @@ export class GlobalScope {
     this.filesScope[filename] = new FileScope(filename, this.errorsList);
   }
 
-  public getFileScope(filename: string): FileScope {
+  public enterFileScope(filename: string): FileScope {
     return this.filesScope[filename];
   }
 
@@ -111,21 +112,36 @@ export class BlockScope {
 }
 
 export class FileScope extends BlockScope {
-  public importsScope: Array<FileScope>;
+  public importsScope: Map<string, FileScope>;
   public methods: Map<string, MethodScope>;
+  public structures: Map<string, Structure>;
 
   public constructor(
     public readonly filename: string,
     errorsList: Array<ErrorType>
   ) {
     super(undefined, errorsList);
-    this.importsScope = [];
+    this.importsScope = new Map();
     this.methods = new Map();
     this.globalScope = this;
   }
 
-  public addImport(fileScope: FileScope): void {
-    this.importsScope.push(fileScope);
+  public addImport(filename: string, fileScope: FileScope): void {
+    this.importsScope.set(filename, fileScope);
+  }
+
+  public getImport(filename: string) {
+    return this.importsScope.get(filename);
+  }
+
+  public getStructure(identifier: string): Structure {
+    return this.structures.get(identifier);
+  }
+
+  public putStructure(identifier: string, structure: Structure): boolean {
+    if (this.structures.has(identifier)) return false;
+    this.structures.set(identifier, structure);
+    return true;
   }
 
   public createMethod(
