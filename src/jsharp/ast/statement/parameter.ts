@@ -13,8 +13,8 @@ export default class ParameterStm extends Statement {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: MethodScope): void {
-    let ok = scope.createVariable(this.identifier, this.type, false);
+  public createScope(scope: MethodScope): void {
+    let ok = scope.createVariableLocal(this.identifier, this.type, false);
     if (!ok) {
       scope.addError(
         new ErrorType(
@@ -26,6 +26,8 @@ export default class ParameterStm extends Statement {
       );
     }
   }
+
+  public checkScope(typeFactory: TypeFactory, scope: MethodScope): void {}
 
   public translate(
     typeFactory: TypeFactory,

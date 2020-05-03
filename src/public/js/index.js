@@ -97,5 +97,6 @@ btnDownload.addEventListener("click", () => {
 var btnClearTranslate = document.getElementById("btnClearTranslate");
 btnClearTranslate.addEventListener("click", () => {
   document.getElementById("body-errors-table").innerHTML = "";
+  document.getElementById("body-symbols-table").innerHTML = "";
   resultC3D.setValue("");
 });

@@ -24,7 +24,7 @@ export default class SubIf extends Statement {
     this.labelExit = label;
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     if (this.expression) {
       this.expression.verifyType(typeFactory, scope);
       let type = this.expression.type;
@@ -41,9 +41,9 @@ export default class SubIf extends Statement {
         }
       }
     }
-    this.nameScope = scope.createScope();
-    let localScope = scope.getScope(this.nameScope);
-    this.block.buildScope(typeFactory, localScope);
+    this.nameScope = scope.createBlockScope();
+    let localScope = scope.enterBlockScope(this.nameScope);
+    this.block.checkScope(typeFactory, localScope);
   }
 
   public translate(
@@ -55,7 +55,7 @@ export default class SubIf extends Statement {
       this.expression.translate(typeFactory, codeBuilder, scope);
     }
     codeBuilder.printTrueLabels();
-    let localScope = scope.getScope(this.nameScope);
+    let localScope = scope.enterBlockScope(this.nameScope);
     this.block.translate(typeFactory, codeBuilder, localScope);
     if (this.labelExit !== "") {
       codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);

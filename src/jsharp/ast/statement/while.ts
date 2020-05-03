@@ -7,7 +7,7 @@ import BlockStm from "./block";
 import Expression from "../expression/expression";
 
 export default class WhileStm extends Statement {
-  private nameScope: string;
+  private localScope: BlockScope;
 
   public constructor(
     nodeInfo: NodeInfo,
@@ -15,10 +15,14 @@ export default class WhileStm extends Statement {
     public block: BlockStm
   ) {
     super(nodeInfo);
-    this.nameScope = "";
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public createScope(scope: BlockScope): void {
+    this.localScope = scope.createBlockScope();
+    this.block.createScope(this.localScope);
+  }
+
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.expression.verifyType(typeFactory, scope);
     let type = this.expression.type;
     if (type instanceof ErrorType) {
@@ -33,9 +37,7 @@ export default class WhileStm extends Statement {
         );
       }
     }
-    this.nameScope = scope.createScope();
-    let localScope = scope.getScope(this.nameScope);
-    this.block.buildScope(typeFactory, localScope);
+    this.block.checkScope(typeFactory, this.localScope);
   }
 
   public translate(
@@ -47,8 +49,7 @@ export default class WhileStm extends Statement {
     codeBuilder.setTranslatedCode(`${labelReturn}:\n`);
     this.expression.translate(typeFactory, codeBuilder, scope);
     codeBuilder.printTrueLabels();
-    let localScope = scope.getScope(this.nameScope);
-    this.block.translate(typeFactory, codeBuilder, localScope);
+    this.block.translate(typeFactory, codeBuilder, this.localScope);
     codeBuilder.setTranslatedCode(`goto ${labelReturn};\n`);
     codeBuilder.printFalseLabels();
   }

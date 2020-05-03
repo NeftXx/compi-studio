@@ -3,7 +3,7 @@ import { logger } from "../utils/logger";
 import { Parser as JSharpParser } from "./grammar/grammar";
 import { TypeFactory, ErrorType } from "./scope/type";
 import CodeBuilder from "./scope/code_builder";
-import { GlobalScope } from "./scope/scope";
+import { SymbolTable } from "./scope/scope";
 
 export interface FileInformation {
   filename: string;
@@ -21,34 +21,36 @@ export class JSharp {
   public exec(data: Array<FileInformation>): JSharpResult {
     let currentFile = "";
     try {
-      let typeFactory = new TypeFactory();
-      let trees: Array<Ast> = [];
+      let typeFactory = new TypeFactory(); // controlador de tipos
+      let trees: Array<Ast> = []; // arreglo de AST
       let parser: any;
       for (let file of data) {
-        parser = new JSharpParser();
-        currentFile = file.filename;
-        parser.yy = { filename: currentFile, typeFactory: typeFactory };
+        // Si el contenido esta vacio no se analiza
         if (file.content !== "") {
+          parser = new JSharpParser();
+          currentFile = file.filename;
+          // enviando el nombre del archivo actual y el controlador de tipos al analizador
+          parser.yy = { filename: currentFile, typeFactory: typeFactory };
           trees.push(parser.parse(file.content));
         }
       }
-      let globalScope = this.createGlobalScope(trees);
-      this.buildScopes(trees, typeFactory, globalScope);
-      if (globalScope.errorsEmpty()) {
-        let codeBuilder = new CodeBuilder();
-        this.translate(trees, typeFactory, codeBuilder, globalScope);
-        return {
-          isError: false,
-          translate: codeBuilder.getCodeTranslate(),
-          symbolsTable: this.createSymbolTable(),
-          errorsTable: "",
-        };
-      } else {
+      let symbolTable = this.createSymbolTable(trees);
+      this.buildScopes(trees, typeFactory, symbolTable);
+      if (symbolTable.hasError()) {
         return {
           isError: true,
           translate: "",
-          symbolsTable: this.createSymbolTable(),
-          errorsTable: this.createErrorTable(globalScope.errorsList),
+          symbolsTable: symbolTable.getSymbolTable(),
+          errorsTable: this.createErrorTable(symbolTable.errorsList),
+        };
+      } else {
+        let codeBuilder = new CodeBuilder();
+        this.translate(trees, typeFactory, codeBuilder);
+        return {
+          isError: false,
+          translate: codeBuilder.getCodeTranslate(),
+          symbolsTable: symbolTable.getSymbolTable(),
+          errorsTable: "",
         };
       }
     } catch (error) {
@@ -77,7 +79,7 @@ export class JSharp {
           symbolsTable: "",
           errorsTable: `
     <tr>
-      <td>Ocurrio un error en el servidor</td>
+      <td>Ha ocurrido un error en el servidor</td>
       <td>0</td>
       <td>0</td>
       <td></td>
@@ -91,37 +93,32 @@ export class JSharp {
   private translate(
     trees: Array<Ast>,
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
-    globalScope: GlobalScope
+    codeBuilder: CodeBuilder
   ) {
     for (let tree of trees) {
-      // tree.translate(typeFactory, codeBuilder, globalScope);
+      tree.translate(typeFactory, codeBuilder);
     }
   }
 
   private buildScopes(
     trees: Array<Ast>,
     typeFactory: TypeFactory,
-    globalScope: GlobalScope
+    symbolTable: SymbolTable
   ): void {
     for (let tree of trees) {
-      tree.resolveImports(globalScope);
+      tree.createScope(symbolTable);
     }
     for (let tree of trees) {
-      tree.buildScope(typeFactory, globalScope);
+      tree.checkScope(typeFactory);
     }
   }
 
-  private createGlobalScope(trees: Array<Ast>): GlobalScope {
-    let globalScope = new GlobalScope();
+  private createSymbolTable(trees: Array<Ast>): SymbolTable {
+    let symbolTable = new SymbolTable();
     for (let ast of trees) {
-      globalScope.createFileScope(ast.filename);
+      symbolTable.createFileScope(ast.filename);
     }
-    return globalScope;
-  }
-
-  private createSymbolTable(): string {
-    return "";
+    return symbolTable;
   }
 
   private createErrorTable(errorsList: Array<ErrorType>): string {

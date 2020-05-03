@@ -15,13 +15,15 @@ export class VarDeclaration extends Statement {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public createScope(scope: BlockScope): void {}
+
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.exp.verifyType(typeFactory, scope);
     let type = this.exp.type;
     if (type instanceof ErrorType) {
       scope.addError(type);
     }
-    let ok = scope.createVariable(this.identifier, type, this.isConstant);
+    let ok = scope.createVariableLocal(this.identifier, type, this.isConstant);
     if (!ok) {
       scope.addError(
         new ErrorType(
@@ -48,14 +50,14 @@ export class VarDeclarationGlobal extends Statement {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.exp.verifyType(typeFactory, scope);
     let type = this.exp.type;
     if (type instanceof ErrorType) {
       scope.addError(type);
     }
     let globalScope = scope.getGlobal();
-    let ok = globalScope.createVariable(this.identifier, type, false);
+    let ok = globalScope.createVariableLocal(this.identifier, type, false);
     if (!ok) {
       scope.addError(
         new ErrorType(
@@ -79,7 +81,7 @@ export class VarDeclarationGlobal extends Statement {
       typeFactory.isString(this.exp.type)
     ) {
       codeBuilder.setTranslatedCode(
-        `stack[${variable.address}] = ${codeBuilder.getLastAddress()};\n`
+        `stack[${variable.ptr}] = ${codeBuilder.getLastAddress()};\n`
       );
     } else if (typeFactory.isBoolean(this.exp.type)) {
       let dir = codeBuilder.getNewTemporary();
@@ -89,7 +91,7 @@ export class VarDeclarationGlobal extends Statement {
       codeBuilder.setTranslatedCode(`goto ${LS};\n`);
       codeBuilder.printTrueLabels();
       codeBuilder.setTranslatedCode(`${dir} = 1;\n${LS}:\n`);
-      codeBuilder.setTranslatedCode(`stack[${variable.address}] = ${dir};\n`);
+      codeBuilder.setTranslatedCode(`stack[${variable.ptr}] = ${dir};\n`);
     }
   }
 }
@@ -104,7 +106,7 @@ export class VarDeclarationType extends Statement {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.exp.verifyType(typeFactory, scope);
     let typeExp = this.exp.type;
     if (typeExp instanceof ErrorType) {
@@ -125,7 +127,7 @@ export class VarDeclarationType extends Statement {
     }
     let ok: boolean;
     for (let identifier of this.idList) {
-      ok = scope.createVariable(identifier, this.type, false);
+      ok = scope.createVariableLocal(identifier, this.type, false);
       if (!ok) {
         scope.addError(
           new ErrorType(

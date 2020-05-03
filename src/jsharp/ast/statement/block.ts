@@ -9,9 +9,15 @@ export default class BlockStm extends Statement {
     super(nodeInfo);
   }
 
-  public buildScope(typeFactory: TypeFactory, scope: BlockScope): void {
+  public createScope(scope: BlockScope): void {
     for (let statement of this.statements) {
-      statement.buildScope(typeFactory, scope);
+      statement.createScope(scope);
+    }
+  }
+
+  public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
+    for (let statement of this.statements) {
+      statement.checkScope(typeFactory, scope);
     }
   }
 

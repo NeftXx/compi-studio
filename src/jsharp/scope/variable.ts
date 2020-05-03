@@ -4,7 +4,7 @@ export class Variable {
   public constructor(
     public identifier: string,
     public type: JType,
-    public address: number,
+    public ptr: number,
     public isConstant: boolean
   ) {}
 }

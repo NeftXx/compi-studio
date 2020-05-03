@@ -2,6 +2,12 @@ var socket = io();
 
 socket.on("translateResult", function (result) {
   document.getElementById("body-errors-table").innerHTML = result.errorsTable;
+  var symbols = document.getElementById("body-symbols-table");
+  symbols.innerHTML = result.symbolsTable;
+  $(document).ready(function () {
+    $(".collapsible").collapsible();
+  });
+
   resultC3D.setValue(result.translate);
   if (result.isError) {
     Toast.fire({

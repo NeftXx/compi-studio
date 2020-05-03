@@ -36,15 +36,15 @@ export default class Identifier extends Expression {
     if (variable) {
       let t1 = codeBuilder.getNewTemporary();
       let t2 = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${t1} = P + ${variable.address};
-${t2} = stack[${t1}];\n`);
+      codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
+${t2} = Stack[${t1}];\n`);
       codeBuilder.setLastAddress(t2);
     } else {
       let globalScope = scope.getGlobal();
       variable = globalScope.getVariableLocal(this.identifier);
       if (variable) {
         let t1 = codeBuilder.getNewTemporary();
-        codeBuilder.setTranslatedCode(`${t1} = stack[${variable.address}];\n`);
+        codeBuilder.setTranslatedCode(`${t1} = Heap[${variable.ptr}];\n`);
         codeBuilder.setLastAddress(t1);
       }
     }

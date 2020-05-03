@@ -2,7 +2,7 @@ import { Variable } from "./variable";
 import { ErrorType, JType } from "./type";
 import Structure from "../ast/statement/structure";
 
-export class GlobalScope {
+export class SymbolTable {
   public errorsList: Array<ErrorType>;
   public filesScope: Map<string, FileScope>;
 
@@ -12,19 +12,33 @@ export class GlobalScope {
   }
 
   public createFileScope(filename: string): void {
-    this.filesScope[filename] = new FileScope(filename, this.errorsList);
+    this.filesScope.set(filename, new FileScope(filename, this.errorsList));
   }
 
   public enterFileScope(filename: string): FileScope {
-    return this.filesScope[filename];
+    return this.filesScope.get(filename);
   }
 
-  public errorsEmpty(): boolean {
-    return this.errorsList.length === 0;
+  public hasError(): boolean {
+    return this.errorsList.length > 0;
   }
 
   public addError(error: ErrorType) {
     this.errorsList.push(error);
+  }
+
+  public getSymbolTable(): string {
+    let str: Array<string> = ['<ul class="collapsible">\n'];
+    this.filesScope.forEach((scope: FileScope, key: string) => {
+      str.push("<li>\n");
+      str.push(
+        `<div class="collapsible-header"><i class="material-icons">insert_drive_file</i>${key}</div>\n`
+      );
+      str.push(`<div class="collapsible-body">${scope.getSymbolTable()}</div>`);
+      str.push("</li>\n");
+    });
+    str.push("</ul>\n");
+    return str.join("");
   }
 }
 
@@ -32,13 +46,15 @@ export class BlockScope {
   private countScopes: number;
   protected globalScope: FileScope | undefined;
   public variables: Map<string, Variable>;
-  protected blocks: Map<string, BlockScope>;
+  public blocks: Map<string, BlockScope>;
 
   public constructor(
     protected previous: BlockScope | undefined,
     protected errorsList: Array<ErrorType>
   ) {
+    this.countScopes = 1;
     this.variables = new Map();
+    this.blocks = new Map();
   }
 
   public setGlobal(scope: FileScope) {
@@ -53,17 +69,18 @@ export class BlockScope {
     this.errorsList.push(error);
   }
 
-  public createScope(): string {
-    let nameScope = `Scope$${this.countScopes++}`;
-    this.blocks.set(nameScope, new BlockScope(this, this.errorsList));
-    return nameScope;
+  public createBlockScope(): BlockScope {
+    let nameScope = `Entorno$${this.countScopes++}`;
+    let block = new BlockScope(this, this.errorsList);
+    this.blocks.set(nameScope, block);
+    return block;
   }
 
-  public getScope(nameScope: string): BlockScope {
+  public enterBlockScope(nameScope: string): BlockScope {
     return this.blocks.get(nameScope);
   }
 
-  public createVariable(
+  public createVariableLocal(
     identifier: string,
     type: JType,
     isConstant: boolean
@@ -95,25 +112,108 @@ export class BlockScope {
 
   public changeReference(identifier: string, address: number): boolean {
     if (this.variables.has(identifier)) {
-      this.variables.get(identifier).address = address;
+      this.variables.get(identifier).ptr = address;
       return true;
     }
     return false;
   }
 
-  public updateAddress(methodScope: MethodScope) {
+  public getSymbolTable(): string {
+    let str: Array<string> = [];
+    str.push(`<table class="highlight">\n);
+<thead>
+  <tr>
+    <th>Identificador</th>
+    <th>Tipo</th>
+    <th>Apuntador</th>
+    <th>Es constante</th>
+  </tr>
+</thead>
+<tbody>
+`);
     this.variables.forEach((variable: Variable, key: string) => {
-      variable.address = variable.address + methodScope.size++;
+      str.push(`<tr>
+        <td>${variable.identifier}</td>
+        <td>${variable.type}</td>
+        <td>${variable.ptr}</td>
+        <td>${variable.isConstant}</td>
+      </tr>`);
     });
-    this.blocks.forEach((scope: BlockScope, key: string) => {
-      scope.updateAddress(methodScope);
+    str.push("</tbody>\n</table>");
+    str.push('<ul class="collapsible">\n');
+    this.blocks.forEach((scope: MethodScope, key: string) => {
+      str.push("<li>\n");
+      str.push(
+        `<div class="collapsible-header"><i class="material-icons">dynamic_feed</i>${key}</div>\n`
+      );
+      str.push(`<div class="collapsible-body">${scope.getSymbolTable()}</div>`);
+      str.push("</li>\n");
     });
+    str.push("</ul>\n");
+    return str.join("");
+  }
+}
+
+export class MethodScope extends BlockScope {
+  private size: number;
+  private nameMethod: string;
+
+  public constructor(
+    errorsList: Array<ErrorType>,
+    private identifier: string,
+    private paramNames: Array<string>,
+    private returnType: JType
+  ) {
+    super(undefined, errorsList);
+    // El tamaño es igual a 1, esta posicion es para el return
+    this.size = 1;
+    this.nameMethod = "";
+  }
+
+  public updateAddresses(): void {
+    this.update(this);
+  }
+
+  private update(currentScope: BlockScope): void {
+    currentScope.variables.forEach((variable: Variable) => {
+      variable.ptr = ++this.size;
+    });
+    currentScope.blocks.forEach((blockScope: BlockScope) => {
+      this.update(blockScope);
+    });
+  }
+
+  public getParamNames(): Array<string> {
+    return this.paramNames;
+  }
+
+  public getReturnType(): JType {
+    return this.returnType;
+  }
+
+  public getIdentifier(): string {
+    return this.identifier;
+  }
+
+  public setName(nameMethod: string) {
+    this.nameMethod = nameMethod;
+  }
+
+  public getName(): string {
+    if (this.nameMethod !== "") {
+      return this.nameMethod;
+    }
+    return this.identifier;
+  }
+
+  public getSize(): number {
+    return this.size;
   }
 }
 
 export class FileScope extends BlockScope {
+  private countError: number;
   public importsScope: Map<string, FileScope>;
-  public methods: Map<string, MethodScope>;
   public structures: Map<string, Structure>;
 
   public constructor(
@@ -122,8 +222,8 @@ export class FileScope extends BlockScope {
   ) {
     super(undefined, errorsList);
     this.importsScope = new Map();
-    this.methods = new Map();
     this.globalScope = this;
+    this.countError = 1;
   }
 
   public addImport(filename: string, fileScope: FileScope): void {
@@ -149,10 +249,7 @@ export class FileScope extends BlockScope {
     paramNames: Array<string>,
     type: JType
   ): boolean {
-    let methodTemp = this.methods.get(identifier);
-    if (methodTemp) {
-      let ok = true;
-    }
+    if (this.blocks.has(identifier)) return false;
     let methodScope = new MethodScope(
       this.errorsList,
       identifier,
@@ -160,58 +257,32 @@ export class FileScope extends BlockScope {
       type
     );
     methodScope.setGlobal(this);
-    this.methods.set(identifier, methodScope);
+    this.blocks.set(identifier, methodScope);
     return true;
   }
 
-  public getMethod(identifier: string): MethodScope {
-    return this.methods.get(identifier);
+  public createMethodError(
+    identifier: string,
+    paramNames: Array<string>,
+    type: JType
+  ): string {
+    identifier = `${identifier}_error${this.countError++}`;
+    let methodScope = new MethodScope(
+      this.errorsList,
+      identifier,
+      paramNames,
+      type
+    );
+    methodScope.setGlobal(this);
+    this.blocks.set(identifier, methodScope);
+    return identifier;
   }
 
-  public getSize(): number {
-    return this.variables.size;
-  }
-}
-
-export class MethodScope extends BlockScope {
-  public size: number;
-  private nameMethod: string;
-
-  public constructor(
-    errorsList: Array<ErrorType>,
-    private identifier: string,
-    private paramNames: Array<string>,
-    private returnType: JType
-  ) {
-    super(undefined, errorsList);
-    this.blocks = new Map();
-    this.size = 1;
-    this.nameMethod = "";
-  }
-
-  public updateAddresses(): void {
-    this.blocks.forEach((scope: BlockScope, key: string) => {
-      scope.updateAddress(this);
-    });
-  }
-
-  public setName(nameMethod: string) {
-    this.nameMethod = nameMethod;
-  }
-
-  public getName(): string {
-    return this.nameMethod;
-  }
-
-  public getReturnType(): JType {
-    return this.returnType;
-  }
-
-  public getIdentifier(): string {
-    return this.identifier;
-  }
-
-  public getSize(): number {
-    return this.size;
+  public enterMethod(identifier: string): MethodScope | undefined {
+    let scope = this.blocks.get(identifier);
+    if (scope instanceof MethodScope) {
+      return scope;
+    }
+    return undefined;
   }
 }

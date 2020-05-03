@@ -3,7 +3,7 @@ import NativeStringFunctions from "../core/native_string_functions";
 import { MethodScope } from "./scope";
 
 export default class CodeBuilder {
-  public ptrStack: number;
+  public ptrHeap: number;
   private temporaryCounter: number;
   private labelCounter: number;
   private translateCode: Array<string>;
@@ -32,7 +32,7 @@ export default class CodeBuilder {
     this.trueLabels = [];
     this.falseLabels = [];
     this.mainFunction = undefined;
-    this.ptrStack = 0;
+    this.ptrHeap = 0;
     this.globalVariables = [];
   }
 
@@ -151,7 +151,7 @@ var Heap[];  # Sección de Heap
 var Stack[]; # Sección de Stack
 
 ${this.globalVariables.join("")}
-P = ${this.ptrStack};
+H = ${this.ptrHeap};
 goto ${this.labelJumpMethods};
 `);
     return header.join("");

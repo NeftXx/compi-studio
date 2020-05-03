@@ -94,35 +94,7 @@ global_statement
 ;
 
 function_statement
-  : visibility type IDENTIFIER '(' parameter_list ')' block {
-    $$ = new FunctionStm(
-      new NodeInfo(
-        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), $2, $3, $5, $7
-    );
-  }
-  | visibility type IDENTIFIER '(' ')' block {
-    $$ = new FunctionStm(
-      new NodeInfo(
-        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), $2, $3, [], $6
-    );
-  }
-  | visibility 'void' IDENTIFIER '(' parameter_list ')' block {
-    $$ = new FunctionStm(
-      new NodeInfo(
-        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), yy.typeFactory.getVoid(), $3, $5, $7
-    );
-  }
-  | visibility 'void' IDENTIFIER '(' ')' block {
-    $$ = new FunctionStm(
-      new NodeInfo(
-        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), yy.typeFactory.getVoid(), $3, [], $6
-    );
-  }
-  | type IDENTIFIER '(' parameter_list ')' block {
+  : type IDENTIFIER '(' parameter_list ')' block {
     $$ = new FunctionStm(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
@@ -150,11 +122,6 @@ function_statement
       ), yy.typeFactory.getVoid(), $2, [], $5
     );
   }
-;
-
-visibility
-  : 'public'
-  | 'private'
 ;
 
 type

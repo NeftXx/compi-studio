@@ -1,4 +1,4 @@
-import { GlobalScope, FileScope, MethodScope } from "../scope/scope";
+import { SymbolTable, FileScope, MethodScope } from "../scope/scope";
 import { TypeFactory, ErrorType } from "../scope/type";
 import Statement from "./statement/statement";
 import CodeBuilder from "../scope/code_builder";
@@ -7,31 +7,42 @@ import FunctionStm from "./statement/function";
 import { Variable } from "../scope/variable";
 
 export default class Ast {
+  private fileScope: FileScope;
+
   public constructor(
     public readonly astNodes: Array<Statement>,
     public readonly filename: string,
     public readonly importList?: ImportStm
   ) {}
 
-  public resolveImports(globalScope: GlobalScope) {
+  public createScope(symbolTable: SymbolTable) {
+    let fileScope = symbolTable.enterFileScope(this.filename);
+    if (fileScope) {
+      this.fileScope = fileScope;
+      this.resolveImports(symbolTable);
+      this.saveMethods();
+      this.saveVariables();
+    }
+  }
+
+  private resolveImports(symbolTable: SymbolTable) {
     if (this.importList) {
-      let fileScope = globalScope.enterFileScope(this.filename);
       let currentImport: FileScope;
       for (let filenameImport of this.importList.filenames) {
-        currentImport = globalScope.enterFileScope(filenameImport);
+        currentImport = symbolTable.enterFileScope(filenameImport);
         if (currentImport) {
-          if (fileScope === currentImport) {
-            globalScope.errorsList.push(
+          if (this.fileScope === currentImport) {
+            symbolTable.errorsList.push(
               new ErrorType(
                 `Error esta intentando importar el mismo archivo ${filenameImport} en su entorno.`,
                 this.importList.nodeInfo
               )
             );
           } else {
-            fileScope.addImport(filenameImport, currentImport);
+            this.fileScope.addImport(filenameImport, currentImport);
           }
         } else {
-          globalScope.errorsList.push(
+          symbolTable.errorsList.push(
             new ErrorType(
               `Error no se encontro el archivo ${filenameImport}.`,
               this.importList.nodeInfo
@@ -42,37 +53,40 @@ export default class Ast {
     }
   }
 
-  public buildScope(typeFactory: TypeFactory, globalScope: GlobalScope): void {
-    let fileScope = globalScope.enterFileScope(this.filename);
+  private saveMethods() {
     for (let statement of this.astNodes) {
       if (statement instanceof FunctionStm) {
-        statement.buildScope(typeFactory, fileScope);
-      }
-    }
-    for (let statement of this.astNodes) {
-      if (!(statement instanceof FunctionStm)) {
-        statement.buildScope(typeFactory, fileScope);
+        statement.createScope(this.fileScope);
       }
     }
   }
 
-  public translate(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
-    globalScope: GlobalScope
-  ): void {
-    let fileScope = globalScope.enterFileScope(this.filename);
-    fileScope.variables.forEach((variable: Variable, key: string) => {
-      variable.address = codeBuilder.ptrStack++;
-      codeBuilder.setGlobalVariables(
-        `stack[${variable.address}] = ${variable.type.getValueDefault()};\n`
-      );
-    });
-    fileScope.methods.forEach((method: MethodScope, key: string) => {
-      method.updateAddresses();
-    });
+  private saveVariables() {
     for (let statement of this.astNodes) {
-      statement.translate(typeFactory, codeBuilder, fileScope);
+      statement.createScope(this.fileScope);
+    }
+  }
+
+  public checkScope(typeFactory: TypeFactory): void {
+    for (let statement of this.astNodes) {
+      statement.checkScope(typeFactory, this.fileScope);
+    }
+  }
+
+  public translate(typeFactory: TypeFactory, codeBuilder: CodeBuilder): void {
+    this.fileScope.variables.forEach((variable: Variable, key: string) => {
+      variable.ptr = codeBuilder.ptrHeap++;
+      codeBuilder.ptrHeap++;
+      codeBuilder.setGlobalVariables(`
+# declaracion de la variable global ${key}
+Heap[${variable.ptr}] = ${variable.type.getValueDefault()};
+Heap[${codeBuilder.ptrHeap}] = 0;`);
+    });
+    this.fileScope.blocks.forEach((method: MethodScope) =>
+      method.updateAddresses()
+    );
+    for (let statement of this.astNodes) {
+      statement.translate(typeFactory, codeBuilder, this.fileScope);
     }
   }
 }
