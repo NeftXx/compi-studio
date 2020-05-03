@@ -10,7 +10,7 @@ export default class CodeBuilder {
   private unusedTemporary: Array<string>;
   private nativeFunction: NativePrintFunction;
   private nativeStringFunctions: NativeStringFunctions;
-  private labelJumpMethods: string;
+  public readonly labelJumpMethods: string;
   private mainFunction: MethodScope | undefined;
   private lastAddress: string;
   private trueLabels: Array<string>;
@@ -91,7 +91,7 @@ export default class CodeBuilder {
   }
 
   public setMainFunction(method: MethodScope): void {
-    if (this.mainFunction) {
+    if (!this.mainFunction) {
       this.mainFunction = method;
     }
   }
@@ -119,19 +119,14 @@ export default class CodeBuilder {
       return (
         this.createHeader() +
         this.translateCode.join("") +
-        `${this.labelJumpMethods}:
-# Inicio de ejecucion del programa
+        `# Inicio de ejecucion del programa
 P = P + ${this.mainFunction.getSize()};
 call ${this.mainFunction.getName()};
 P = P - ${this.mainFunction.getSize()};
 `
       );
     }
-    return (
-      this.createHeader() +
-      this.translateCode.join("") +
-      `${this.labelJumpMethods}:\n`
-    );
+    return this.createHeader() + this.translateCode.join("");
   }
 
   private createHeader(): string {
@@ -152,7 +147,7 @@ var Stack[]; # Sección de Stack
 
 ${this.globalVariables.join("")}
 H = ${this.ptrHeap};
-goto ${this.labelJumpMethods};
+
 `);
     return header.join("");
   }

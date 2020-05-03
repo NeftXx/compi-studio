@@ -13,7 +13,7 @@ export default class ParameterStm extends Statement {
     super(nodeInfo);
   }
 
-  public createScope(scope: MethodScope): void {
+  public createScope(typeFactory: TypeFactory, scope: MethodScope): void {
     let ok = scope.createVariableLocal(this.identifier, this.type, false);
     if (!ok) {
       scope.addError(

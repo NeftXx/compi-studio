@@ -10,9 +10,9 @@ export default class IfStm extends Statement {
     super(nodeInfo);
   }
 
-  public createScope(scope: BlockScope): void {
+  public createScope(typeFactory: TypeFactory, scope: BlockScope): void {
     for (let subIf of this.subIfs) {
-      subIf.createScope(scope);
+      subIf.createScope(typeFactory, scope);
     }
   }
 

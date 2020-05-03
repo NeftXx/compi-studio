@@ -8,7 +8,7 @@ import BlockStm from "./block";
 
 export default class SubIf extends Statement {
   private labelExit: string;
-  private nameScope: string;
+  private localScope: BlockScope;
 
   public constructor(
     nodeInfo: NodeInfo,
@@ -17,11 +17,15 @@ export default class SubIf extends Statement {
   ) {
     super(nodeInfo);
     this.labelExit = "";
-    this.nameScope = "";
   }
 
   public setLabelExit(label: string) {
     this.labelExit = label;
+  }
+
+  public createScope(typeFactory: TypeFactory, scope: BlockScope): void {
+    this.localScope = scope.createBlockScope();
+    this.block.createScope(typeFactory, this.localScope);
   }
 
   public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
@@ -41,9 +45,7 @@ export default class SubIf extends Statement {
         }
       }
     }
-    this.nameScope = scope.createBlockScope();
-    let localScope = scope.enterBlockScope(this.nameScope);
-    this.block.checkScope(typeFactory, localScope);
+    this.block.checkScope(typeFactory, this.localScope);
   }
 
   public translate(
@@ -55,8 +57,7 @@ export default class SubIf extends Statement {
       this.expression.translate(typeFactory, codeBuilder, scope);
     }
     codeBuilder.printTrueLabels();
-    let localScope = scope.enterBlockScope(this.nameScope);
-    this.block.translate(typeFactory, codeBuilder, localScope);
+    this.block.translate(typeFactory, codeBuilder, this.localScope);
     if (this.labelExit !== "") {
       codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);
     }

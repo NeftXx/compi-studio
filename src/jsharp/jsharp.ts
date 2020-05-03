@@ -106,7 +106,7 @@ export class JSharp {
     symbolTable: SymbolTable
   ): void {
     for (let tree of trees) {
-      tree.createScope(symbolTable);
+      tree.createScope(typeFactory, symbolTable);
     }
     for (let tree of trees) {
       tree.checkScope(typeFactory);

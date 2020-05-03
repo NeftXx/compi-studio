@@ -17,9 +17,9 @@ export default class WhileStm extends Statement {
     super(nodeInfo);
   }
 
-  public createScope(scope: BlockScope): void {
+  public createScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.localScope = scope.createBlockScope();
-    this.block.createScope(this.localScope);
+    this.block.createScope(typeFactory, this.localScope);
   }
 
   public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {

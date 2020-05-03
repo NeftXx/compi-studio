@@ -20,14 +20,15 @@ export default class FunctionStm extends Statement {
     super(nodeInfo);
   }
 
-  public createScope(scope: FileScope) {
+  public createScope(typeFactory: TypeFactory, scope: FileScope) {
     let paramNames: Array<string> = [];
+    this.identifierReal = this.identifier;
     for (let parameter of this.parameters) {
       paramNames.push(parameter.identifier);
-      this.identifierReal = `${this.identifier}_${parameter.type}`;
+      this.identifierReal = `${this.identifierReal}_${parameter.type}`;
     }
     let ok = scope.createMethod(this.identifierReal, paramNames, this.type);
-    if (ok) {
+    if (!ok) {
       scope.addError(
         new ErrorType(
           `Error ya fue declarado el metodo ${this.identifierReal}.`,
@@ -46,9 +47,9 @@ export default class FunctionStm extends Statement {
     }`;
     this.methodScope.setName(nameFunction);
     for (let parameter of this.parameters) {
-      parameter.createScope(this.methodScope);
+      parameter.createScope(typeFactory, this.methodScope);
     }
-    this.block.createScope(this.methodScope);
+    this.block.createScope(typeFactory, this.methodScope);
   }
 
   public checkScope(typeFactory: TypeFactory, scope: FileScope): void {

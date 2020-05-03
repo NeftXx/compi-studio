@@ -10,7 +10,7 @@ export default class Print extends Statement {
     super(nodeInfo);
   }
 
-  public createScope(scope: BlockScope): void {}
+  public createScope(typeFactory: TypeFactory, scope: BlockScope): void {}
 
   public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     this.exp.verifyType(typeFactory, scope);
