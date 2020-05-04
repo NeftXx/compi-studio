@@ -11,7 +11,11 @@
   const { default: Arithmetic } = require("../ast/expression/arithmetic");
   const { default: Relational } = require("../ast/expression/relational");
   const { default: Comparator } = require("../ast/expression/comparator");
+  const { default: Cast } = require("../ast/expression/cast");
   const { default: And } = require("../ast/expression/and");
+  const { default: Or } = require("../ast/expression/or");
+  const { default: Xor } = require("../ast/expression/xor");
+  const { default: Not } = require("../ast/expression/not");
   const { default: UMenos } = require("../ast/expression/umenos");
   const { default: Literal } = require("../ast/expression/literal");
   const { default: FunctionStm } = require("../ast/statement/function");
@@ -35,12 +39,13 @@
 %left '++' '--'
 %left '||'
 %left '&&'
+%left '^'
 %left '!=' '=='
 %nonassoc '>=' '>' '<=' '<'
 %left '+' '-'
 %left '*' '/' '%'
 %right '^^'
-%right UMINUS '!'
+%right UMINUS NOT
 %left '(' ')' '[' ']'
 
 %% /* language grammar */
@@ -238,8 +243,8 @@ variable_declaration
 ;
 
 id_list
-  : id_list ',' IDENTIFIER
-  | IDENTIFIER
+  : id_list ',' IDENTIFIER { $$ = $1; $$.push($3); }
+  | IDENTIFIER { $$ = [$1]; }
 ;
 
 do_while_statement
@@ -327,6 +332,27 @@ expression
       ), $1, $3
     );
   }
+  | expression '||' expression {
+    $$ = new Or(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | expression '^' expression {
+    $$ = new Xor(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | '!' expression %prec NOT {
+    $$ = new Not(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2
+    );
+  }
   | expression '^^' expression {
     $$ = new Arithmetic(
       new NodeInfo(
@@ -411,6 +437,13 @@ expression
       ), $1, "!=", $3
     )
   }
+  | '(' primitive_type ')' expression {
+    $$ = new Cast(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $4
+    );
+  }
   | '(' expression ')' { $$ = $2; }
   | '-' expression %prec UMINUS {
     $$ = new UMenos(
@@ -418,6 +451,13 @@ expression
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $2
     )
+  }
+  | CHAR_LITERAL {
+    $$ = new Literal(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), yy.typeFactory.getChar(), $1
+    );
   }
   | STRING_LITERAL {
     $$ = new Literal(

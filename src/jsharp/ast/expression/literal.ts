@@ -1,6 +1,6 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import { BlockScope } from "../../scope/scope";
 import { JType, TypeFactory } from "../../scope/type";
 
@@ -23,7 +23,7 @@ export default class Literal extends Expression {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     if (typeof this.value === "string") {

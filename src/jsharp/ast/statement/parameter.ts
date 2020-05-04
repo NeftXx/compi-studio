@@ -1,4 +1,4 @@
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, JType, ErrorType } from "../../scope/type";
 import { MethodScope } from "../../scope/scope";
@@ -31,7 +31,7 @@ export default class ParameterStm extends Statement {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: MethodScope
   ): void {}
 }

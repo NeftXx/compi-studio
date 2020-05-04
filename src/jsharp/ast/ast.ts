@@ -1,7 +1,7 @@
 import { SymbolTable, FileScope, MethodScope } from "../scope/scope";
 import { TypeFactory, ErrorType } from "../scope/type";
 import Statement from "./statement/statement";
-import CodeBuilder from "../scope/code_builder";
+import CodeTranslator from "../scope/code_builder";
 import ImportStm from "./statement/import";
 import FunctionStm from "./statement/function";
 import { Variable } from "../scope/variable";
@@ -65,29 +65,36 @@ export default class Ast {
     }
   }
 
-  public translate(typeFactory: TypeFactory, codeBuilder: CodeBuilder): void {
+  public translateVariables(
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator
+  ) {
     this.fileScope.variables.forEach((variable: Variable, key: string) => {
       variable.ptr = codeBuilder.ptrHeap++;
       codeBuilder.setGlobalVariables(`
-# declaracion de la variable global ${key}
+# reservacion de memoria de la variable global ${key}
 Heap[${variable.ptr}] = ${variable.type.getValueDefault()};
 Heap[${codeBuilder.ptrHeap}] = 0;`);
       codeBuilder.ptrHeap++;
     });
-    this.fileScope.blocks.forEach((method: MethodScope) =>
-      method.updateAddresses()
-    );
     for (let statement of this.astNodes) {
       if (statement instanceof Declaration) {
         statement.translate(typeFactory, codeBuilder, this.fileScope);
       }
     }
-    codeBuilder.setTranslatedCode(`goto ${codeBuilder.labelJumpMethods};\n`);
+  }
+
+  public translateMethods(
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator
+  ): void {
+    this.fileScope.blocks.forEach((method: MethodScope) =>
+      method.updateAddresses()
+    );
     for (let statement of this.astNodes) {
       if (statement instanceof FunctionStm) {
         statement.translate(typeFactory, codeBuilder, this.fileScope);
       }
     }
-    codeBuilder.setTranslatedCode(`${codeBuilder.labelJumpMethods}:\n`);
   }
 }

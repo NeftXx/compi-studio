@@ -1,4 +1,4 @@
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
@@ -42,7 +42,7 @@ export default class DoWhileStm extends Statement {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     let labelReturn = codeBuilder.getNewLabel();

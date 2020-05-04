@@ -1,10 +1,10 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
 
-export default abstract class Or extends Expression {
+export default class Or extends Expression {
   public constructor(
     nodeInfo: NodeInfo,
     private expLeft: Expression,
@@ -38,7 +38,7 @@ export default abstract class Or extends Expression {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);

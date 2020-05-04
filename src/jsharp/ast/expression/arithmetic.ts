@@ -1,4 +1,4 @@
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
@@ -61,7 +61,7 @@ export default class Arithmetic extends Expression {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);

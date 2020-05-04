@@ -4,11 +4,10 @@ import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
 
-export default class Relational extends Expression {
+export default class Xor extends Expression {
   public constructor(
     nodeInfo: NodeInfo,
     private expLeft: Expression,
-    private operator: string,
     private expRight: Expression
   ) {
     super(nodeInfo);
@@ -16,8 +15,8 @@ export default class Relational extends Expression {
 
   public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
     this.expLeft.verifyType(typeFactory, scope);
-    let type1 = this.expLeft.type;
     this.expRight.verifyType(typeFactory, scope);
+    let type1 = this.expLeft.type;
     let type2 = this.expRight.type;
     if (typeFactory.isErrorType(type1)) {
       this.type = type1;
@@ -27,11 +26,11 @@ export default class Relational extends Expression {
       this.type = type2;
       return;
     }
-    if (typeFactory.isNumeric(type1) && typeFactory.isNumeric(type2)) {
+    if (typeFactory.isBoolean(type1) && typeFactory.isBoolean(type2)) {
       this.type = typeFactory.getBoolean();
     } else {
       this.type = typeFactory.getErrorType(
-        `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
+        `Error no se puede usar el operando <strong>'^'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
         this.nodeInfo
       );
     }
@@ -43,15 +42,25 @@ export default class Relational extends Expression {
     scope: BlockScope
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
-    let dir1 = codeBuilder.getLastAddress();
+    codeBuilder.printFalseLabels();
+    let tempTrueLabels = codeBuilder.tempTrueLabels();
     this.expRight.translate(typeFactory, codeBuilder, scope);
-    let dir2 = codeBuilder.getLastAddress();
-    let LV = codeBuilder.getNewLabel();
-    let LF = codeBuilder.getNewLabel();
-    codeBuilder.setTranslatedCode(
-      `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
-    );
-    codeBuilder.addTrueLabel(LV);
-    codeBuilder.addFalseLabel(LF);
+    this.printLabels(codeBuilder, tempTrueLabels);
+    tempTrueLabels = codeBuilder.tempTrueLabels();
+    let tempFalseLabels = codeBuilder.tempFalseLabels();
+    this.expRight.translate(typeFactory, codeBuilder, scope);
+    codeBuilder.swapLabels();
+    codeBuilder.addFalseLabels(tempFalseLabels);
+    codeBuilder.addTrueLabels(tempTrueLabels);
+  }
+
+  private printLabels(codeBuilder: CodeTranslator, labels: Array<string>) {
+    let length = labels.length;
+    if (length > 0) {
+      for (let i = 0; i < length; i++) {
+        codeBuilder.setTranslatedCode(`${labels.pop()}: `);
+      }
+      codeBuilder.setTranslatedCode("\n");
+    }
   }
 }

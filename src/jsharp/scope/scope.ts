@@ -3,12 +3,10 @@ import { ErrorType, JType } from "./type";
 import Structure from "../ast/statement/structure";
 
 export class SymbolTable {
-  public errorsList: Array<ErrorType>;
   public filesScope: Map<string, FileScope>;
 
-  public constructor() {
+  public constructor(public errorsList: Array<ErrorType>) {
     this.filesScope = new Map();
-    this.errorsList = [];
   }
 
   public createFileScope(filename: string): void {
@@ -73,6 +71,7 @@ export class BlockScope {
     let nameScope = `Entorno$${this.countScopes++}`;
     let block = new BlockScope(this, this.errorsList);
     this.blocks.set(nameScope, block);
+    block.setGlobal(this.globalScope);
     return block;
   }
 
@@ -120,7 +119,7 @@ export class BlockScope {
 
   public getSymbolTable(): string {
     let str: Array<string> = [];
-    str.push(`<table class="highlight">\n);
+    str.push(`<table class="highlight">
 <thead>
   <tr>
     <th>Identificador</th>
@@ -168,6 +167,10 @@ export class MethodScope extends BlockScope {
     // El tamaño es igual a 1, esta posicion es para el return
     this.size = 1;
     this.nameMethod = "";
+    this.variables.set(
+      "return",
+      new Variable("return", this.returnType, -1, false)
+    );
   }
 
   public updateAddresses(): void {
@@ -176,7 +179,7 @@ export class MethodScope extends BlockScope {
 
   private update(currentScope: BlockScope): void {
     currentScope.variables.forEach((variable: Variable) => {
-      variable.ptr = ++this.size;
+      variable.ptr = this.size++ - 1;
     });
     currentScope.blocks.forEach((blockScope: BlockScope) => {
       this.update(blockScope);

@@ -1,4 +1,4 @@
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
@@ -23,7 +23,7 @@ export default class BlockStm extends Statement {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     for (let statement of this.statements) {

@@ -1,15 +1,15 @@
-import CodeBuilder from "../scope/code_builder";
+import CodeTranslator from "../scope/code_builder";
 
 export default class NativeStringFunctions {
   public static readonly _instance: NativeStringFunctions = new NativeStringFunctions();
 
   private constructor() {}
 
-  public generete(codeBuilder: CodeBuilder) {
+  public generete(codeBuilder: CodeTranslator) {
     this.concatStringString(codeBuilder);
   }
 
-  private concatStringString(codeBuilder: CodeBuilder) {
+  private concatStringString(codeBuilder: CodeTranslator) {
     codeBuilder.setTranslatedCode("");
   }
 

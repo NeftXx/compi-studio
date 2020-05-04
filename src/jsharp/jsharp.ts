@@ -2,7 +2,7 @@ import Ast from "./ast/ast";
 import { logger } from "../utils/logger";
 import { Parser as JSharpParser } from "./grammar/grammar";
 import { TypeFactory, ErrorType } from "./scope/type";
-import CodeBuilder from "./scope/code_builder";
+import CodeTranslator from "./scope/code_builder";
 import { SymbolTable } from "./scope/scope";
 
 export interface FileInformation {
@@ -23,20 +23,30 @@ export class JSharp {
     try {
       let typeFactory = new TypeFactory(); // controlador de tipos
       let trees: Array<Ast> = []; // arreglo de AST
+      let errorsList: Array<ErrorType> = []; // arreglo de errores
       let parser: any;
       for (let file of data) {
         // Si el contenido esta vacio no se analiza
         if (file.content !== "") {
           parser = new JSharpParser();
           currentFile = file.filename;
-          // enviando el nombre del archivo actual y el controlador de tipos al analizador
-          parser.yy = { filename: currentFile, typeFactory: typeFactory };
+          // enviando el nombre del archivo actual, el controlador de tipos
+          // y el arreglo de errores al analizador
+          parser.yy = {
+            filename: currentFile,
+            typeFactory: typeFactory,
+            errorsList: errorsList,
+          };
           trees.push(parser.parse(file.content));
         }
       }
-      let symbolTable = this.createSymbolTable(trees);
+      // creando la tabla de simbolos
+      let symbolTable = this.createSymbolTable(trees, errorsList);
+      // construyendo la tabla
       this.buildScopes(trees, typeFactory, symbolTable);
+      // si existen errores
       if (symbolTable.hasError()) {
+        // no se traduce nada, y envio la tabla de errores y la tabla de simbolos
         return {
           isError: true,
           translate: "",
@@ -44,17 +54,22 @@ export class JSharp {
           errorsTable: this.createErrorTable(symbolTable.errorsList),
         };
       } else {
-        let codeBuilder = new CodeBuilder();
-        this.translate(trees, typeFactory, codeBuilder);
+        // creo un manejador que me ayuda a traducir el codigo de algo nivel
+        let codeTranslator = new CodeTranslator();
+        // realizo la traduccion
+        this.translate(trees, typeFactory, codeTranslator);
+        // retorno la traduccion y la tabla de simbolos
         return {
           isError: false,
-          translate: codeBuilder.getCodeTranslate(),
+          translate: codeTranslator.getCodeTranslate(),
           symbolsTable: symbolTable.getSymbolTable(),
           errorsTable: "",
         };
       }
     } catch (error) {
+      // Si ocurrio un error, verifico si fue del analizador o un error de codigo mio
       if (error.hash) {
+        // si es del analizador debulvo el error
         return {
           isError: true,
           translate: "",
@@ -72,7 +87,10 @@ export class JSharp {
     </tr>`,
         };
       } else {
+        // muestro el error en consola
         logger.error(error.message);
+        console.log(error);
+        // y reporte que hubo un error en el servidor
         return {
           isError: true,
           translate: "",
@@ -80,8 +98,8 @@ export class JSharp {
           errorsTable: `
     <tr>
       <td>Ha ocurrido un error en el servidor</td>
-      <td>0</td>
-      <td>0</td>
+      <td></td>
+      <td></td>
       <td></td>
     </tr>
     `,
@@ -90,31 +108,46 @@ export class JSharp {
     }
   }
 
-  private translate(
-    trees: Array<Ast>,
-    typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder
-  ) {
-    for (let tree of trees) {
-      tree.translate(typeFactory, codeBuilder);
-    }
-  }
-
   private buildScopes(
     trees: Array<Ast>,
     typeFactory: TypeFactory,
     symbolTable: SymbolTable
   ): void {
+    // creo los entornos de cada bloque y guardo las variables globales
     for (let tree of trees) {
       tree.createScope(typeFactory, symbolTable);
     }
+    // luego paso a comprobar los entornos, es decir miro si los tipos de las
+    // expresiones son validos y que las variables existan
     for (let tree of trees) {
       tree.checkScope(typeFactory);
     }
   }
 
-  private createSymbolTable(trees: Array<Ast>): SymbolTable {
-    let symbolTable = new SymbolTable();
+  private translate(
+    trees: Array<Ast>,
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator
+  ) {
+    // primero debo traducir las variables globales
+    for (let tree of trees) {
+      tree.translateVariables(typeFactory, codeBuilder);
+    }
+    // tengo que saltar las funciones, para este salto
+    codeBuilder.setTranslatedCode(`goto ${codeBuilder.labelJumpMethods};\n`);
+    // luego todas las funciones de cada archivo
+    for (let tree of trees) {
+      tree.translateMethods(typeFactory, codeBuilder);
+    }
+  }
+
+  private createSymbolTable(
+    trees: Array<Ast>,
+    errorsList: Array<ErrorType>
+  ): SymbolTable {
+    // al inicio la tabla de simbolos solo crea
+    // los entornos globales de los archivos
+    let symbolTable = new SymbolTable(errorsList);
     for (let ast of trees) {
       symbolTable.createFileScope(ast.filename);
     }

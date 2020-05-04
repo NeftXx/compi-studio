@@ -2,7 +2,7 @@ import NativePrintFunction from "../core/native_function";
 import NativeStringFunctions from "../core/native_string_functions";
 import { MethodScope } from "./scope";
 
-export default class CodeBuilder {
+export default class CodeTranslator {
   public ptrHeap: number;
   private temporaryCounter: number;
   private labelCounter: number;
@@ -25,9 +25,6 @@ export default class CodeBuilder {
     this.nativeFunction = NativePrintFunction.getInstance();
     this.nativeStringFunctions = NativeStringFunctions.getInstance();
     this.labelJumpMethods = this.getNewLabel();
-    this.nativeFunction.generete(this);
-    this.nativeStringFunctions.generete(this);
-    this.translateCode.push(`\n# Seccion de codigo de usuario\n`);
     this.lastAddress = "";
     this.trueLabels = [];
     this.falseLabels = [];
@@ -70,9 +67,30 @@ export default class CodeBuilder {
     return this.falseLabels.pop();
   }
 
+  public swapLabels() {
+    let trueLabels = this.falseLabels;
+    let falseLabels = this.trueLabels;
+    this.falseLabels = falseLabels;
+    this.trueLabels = trueLabels;
+  }
+
+  public addTrueLabels(labels: Array<string>): void {
+    let length = labels.length;
+    for (let i = 0; i < length; i++) {
+      this.trueLabels.push(labels.pop());
+    }
+  }
+
+  public addFalseLabels(labels: Array<string>): void {
+    let length = labels.length;
+    for (let i = 0; i < length; i++) {
+      this.falseLabels.push(labels.pop());
+    }
+  }
+
   public printTrueLabels(): void {
-    if (this.trueLabels.length > 0) {
-      let length = this.trueLabels.length;
+    let length = this.trueLabels.length;
+    if (length > 0) {
       for (let i = 0; i < length; i++) {
         this.translateCode.push(`${this.trueLabels.pop()}: `);
       }
@@ -81,13 +99,31 @@ export default class CodeBuilder {
   }
 
   public printFalseLabels(): void {
-    if (this.falseLabels.length > 0) {
-      let length = this.falseLabels.length;
+    let length = this.falseLabels.length;
+    if (length > 0) {
       for (let i = 0; i < length; i++) {
         this.translateCode.push(`${this.falseLabels.pop()}: `);
       }
       this.translateCode.push("\n");
     }
+  }
+
+  public tempFalseLabels(): Array<string> {
+    let falseLabels: Array<string> = [];
+    let length = this.falseLabels.length;
+    for (let i = 0; i < length; i++) {
+      falseLabels.push(this.falseLabels.pop());
+    }
+    return falseLabels;
+  }
+
+  public tempTrueLabels(): Array<string> {
+    let trueLabels: Array<string> = [];
+    let length = this.trueLabels.length;
+    for (let i = 0; i < length; i++) {
+      trueLabels.push(this.trueLabels.pop());
+    }
+    return trueLabels;
   }
 
   public setMainFunction(method: MethodScope): void {
@@ -115,18 +151,24 @@ export default class CodeBuilder {
   }
 
   public getCodeTranslate(): string {
+    this.nativeFunction.generete(this);
+    this.nativeStringFunctions.generete(this);
     if (this.mainFunction) {
       return (
         this.createHeader() +
         this.translateCode.join("") +
-        `# Inicio de ejecucion del programa
-P = P + ${this.mainFunction.getSize()};
+        `
+${this.labelJumpMethods}:
+# Inicio de ejecucion del programa
 call ${this.mainFunction.getName()};
-P = P - ${this.mainFunction.getSize()};
 `
       );
     }
-    return this.createHeader() + this.translateCode.join("");
+    return (
+      this.createHeader() +
+      this.translateCode.join("") +
+      `${this.labelJumpMethods}:`
+    );
   }
 
   private createHeader(): string {
@@ -134,7 +176,7 @@ P = P - ${this.mainFunction.getSize()};
     for (let i = 1; i <= this.temporaryCounter; i++) {
       header.push(`t${i}`);
       if (i !== this.temporaryCounter) {
-        if (i % 20 === 0) header.push(",\n");
+        if (i % 28 === 0) header.push(",\n");
         else header.push(", ");
       }
     }

@@ -1,4 +1,4 @@
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, JType, ErrorType } from "../../scope/type";
 import { FileScope, MethodScope } from "../../scope/scope";
@@ -61,7 +61,7 @@ export default class FunctionStm extends Statement {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: FileScope
   ): void {
     if (this.identifier === "principal") {

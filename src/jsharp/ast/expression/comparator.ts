@@ -1,7 +1,7 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
 
 export default class Comparator extends Expression {
@@ -50,7 +50,7 @@ export default class Comparator extends Expression {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     if (this.operator === "==" || this.operator === "!=") {

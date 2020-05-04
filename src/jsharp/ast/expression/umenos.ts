@@ -1,7 +1,7 @@
 import Expression from "./expression";
 import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
-import CodeBuilder from "../../scope/code_builder";
+import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 
 export default class UMenos extends Expression {
@@ -28,7 +28,7 @@ export default class UMenos extends Expression {
 
   public translate(
     typeFactory: TypeFactory,
-    codeBuilder: CodeBuilder,
+    codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);

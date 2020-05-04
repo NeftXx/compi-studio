@@ -1,18 +1,19 @@
-import CodeBuilder from "../scope/code_builder";
+import CodeTranslator from "../scope/code_builder";
 
 export default class NativePrintFunction {
   public static readonly _instance: NativePrintFunction = new NativePrintFunction();
 
   private constructor() {}
 
-  public generete(codeBuilder: CodeBuilder) {
+  public generete(codeBuilder: CodeTranslator) {
     this.printString(codeBuilder);
     this.printBoolean(codeBuilder);
     this.pow(codeBuilder);
     this.printGlobalVariableError(codeBuilder);
+    this.printGlobalGetVariableError(codeBuilder);
   }
 
-  private printString(codeBuilder: CodeBuilder): void {
+  private printString(codeBuilder: CodeTranslator): void {
     let t1 = codeBuilder.getNewTemporary();
     let t2 = codeBuilder.getNewTemporary();
     let t3 = codeBuilder.getNewTemporary();
@@ -34,7 +35,7 @@ end
 `);
   }
 
-  private printBoolean(codeBuilder: CodeBuilder): void {
+  private printBoolean(codeBuilder: CodeTranslator): void {
     let t1 = codeBuilder.getNewTemporary();
     let t2 = codeBuilder.getNewTemporary();
     let L1 = codeBuilder.getNewLabel();
@@ -62,7 +63,7 @@ end
 `);
   }
 
-  private pow(codeBuilder: CodeBuilder): void {
+  private pow(codeBuilder: CodeTranslator): void {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary(),
@@ -158,7 +159,7 @@ end
 `);
   }
 
-  private printGlobalVariableError(codeBuilder: CodeBuilder) {
+  private printGlobalVariableError(codeBuilder: CodeTranslator) {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary(),
@@ -170,9 +171,7 @@ end
       t9 = codeBuilder.getNewTemporary(),
       t10 = codeBuilder.getNewTemporary(),
       t11 = codeBuilder.getNewTemporary(),
-      t12 = codeBuilder.getNewTemporary(),
-      t13 = codeBuilder.getNewTemporary(),
-      t14 = codeBuilder.getNewTemporary();
+      t12 = codeBuilder.getNewTemporary();
     codeBuilder.setTranslatedCode(`
 proc native_print_global_variable_error begin
   print("%c",  69);
@@ -210,9 +209,10 @@ proc native_print_global_variable_error begin
   print("%c", 110);
   print("%c", 101);
   print("%c",  97);
+  print("%c",  32);
   ${t5} = P + 1;
   ${t6} = Stack[${t5}];
-  ${t7} = ${t6} + 48;
+  print("%i", ${t6});
   print("%c",  32);
   print("%c", 121);
   print("%c",  32);
@@ -224,9 +224,9 @@ proc native_print_global_variable_error begin
   print("%c", 110);
   print("%c",  97);
   print("%c",  32);
-  ${t8} = P + 2;
-  ${t9} = Stack[${t8}];
-  ${t10} = ${t9} + 48;
+  ${t7} = P + 2;
+  ${t8} = Stack[${t7}];
+  print("%i", ${t8});
   print("%c",  46);
   print("%c",  32);
   print("%c",  76);
@@ -248,14 +248,16 @@ proc native_print_global_variable_error begin
   print("%c",  97);
   print("%c", 108);
   print("%c",  32);
-  ${t11} = P + 3;
-  ${t12} = Stack[${t11}];
-  ${t13} = P + 1;
-  ${t14} = ${t13} + 0;
-  Stack[${t14}] = ${t12};
+  print("%c",  91);
+  ${t9} = P + 3;
+  ${t10} = Stack[${t9}];
+  ${t11} = P + 1;
+  ${t12} = ${t11} + 0;
+  Stack[${t12}] = ${t10};
   P = P + 1;
   call native_print_string;
   P = P - 1;
+  print("%c",  93);
   print("%c",  32);
   print("%c", 121);
   print("%c",  97);
@@ -278,6 +280,136 @@ proc native_print_global_variable_error begin
   print("%c", 100);
   print("%c",  97);
   print("%c",  46); 
+  print("%c",  10); 
+end
+`);
+  }
+
+  private printGlobalGetVariableError(codeBuilder: CodeTranslator) {
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
+      t4 = codeBuilder.getNewTemporary(),
+      t5 = codeBuilder.getNewTemporary(),
+      t6 = codeBuilder.getNewTemporary(),
+      t7 = codeBuilder.getNewTemporary(),
+      t8 = codeBuilder.getNewTemporary(),
+      t9 = codeBuilder.getNewTemporary(),
+      t10 = codeBuilder.getNewTemporary(),
+      t11 = codeBuilder.getNewTemporary(),
+      t12 = codeBuilder.getNewTemporary();
+    codeBuilder.setTranslatedCode(`
+proc native_print_get_global_variable_error begin
+  print("%c",  69);
+  print("%c", 114);
+  print("%c", 114);
+  print("%c", 111);
+  print("%c", 114);
+  print("%c",  32);
+  print("%c", 101);
+  print("%c", 110);
+  print("%c",  32);
+  print("%c", 101);
+  print("%c", 108);
+  print("%c",  32);
+  print("%c",  97);
+  print("%c", 114);
+  print("%c",  99);
+  print("%c", 104);
+  print("%c", 105);
+  print("%c", 118);
+  print("%c", 111);
+  print("%c",  32);
+  ${t1} = P + 0;
+  ${t2} = Stack[${t1}];
+  ${t3} = P + 1;
+  ${t4} = ${t3} + 0;
+  Stack[${t4}] = ${t2};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  44);
+  print("%c",  32);
+  print("%c", 108);
+  print("%c", 105);
+  print("%c", 110);
+  print("%c", 101);
+  print("%c",  97);
+  print("%c",  32);
+  ${t5} = P + 1;
+  ${t6} = Stack[${t5}];
+  print("%i", ${t6});
+  print("%c",  32);
+  print("%c", 121);
+  print("%c",  32);
+  print("%c",  99);
+  print("%c", 111);
+  print("%c", 108);
+  print("%c", 117);
+  print("%c", 109);
+  print("%c", 110);
+  print("%c",  97);
+  print("%c",  32);
+  ${t7} = P + 2;
+  ${t8} = Stack[${t7}];
+  print("%i", ${t8});
+  print("%c",  46);
+  print("%c",  32);
+  print("%c",  76);
+  print("%c",  97);
+  print("%c",  32);
+  print("%c", 118);
+  print("%c",  97);
+  print("%c", 114);
+  print("%c", 105);
+  print("%c",  97);
+  print("%c",  98);
+  print("%c", 108);
+  print("%c", 101);
+  print("%c",  32);
+  print("%c", 103);
+  print("%c", 108);
+  print("%c", 111);
+  print("%c",  98);
+  print("%c",  97);
+  print("%c", 108);
+  print("%c",  32);
+  print("%c",  91);
+  ${t9} = P + 3;
+  ${t10} = Stack[${t9}];
+  ${t11} = P + 1;
+  ${t12} = ${t11} + 0;
+  Stack[${t12}] = ${t10};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  93);
+  print("%c",  32);
+  print("%c", 110);
+  print("%c", 111);
+  print("%c",  32);
+  print("%c", 104);
+  print("%c",  97);
+  print("%c",  32);
+  print("%c", 115);
+  print("%c", 105);
+  print("%c", 100);
+  print("%c", 111);
+  print("%c",  32);
+  print("%c", 100);
+  print("%c", 101);
+  print("%c",  99);
+  print("%c", 108);
+  print("%c",  97);
+  print("%c", 114);
+  print("%c",  97);
+  print("%c", 100);
+  print("%c",  97);
+  print("%c",  32);
+  print("%c",  97);
+  print("%c", 117);
+  print("%c", 110);
+  print("%c",  46);
   print("%c",  10); 
 end
 `);
