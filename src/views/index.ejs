@@ -1,58 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <%- include('partials/head') -%>
+    <link rel="stylesheet" href="css/lib/codemirror.css" />
+    <link rel="stylesheet" href="css/lib/dialog.css" />
+    <link rel="stylesheet" href="css/lib/matchesonscrollbar.css" />
+    <link rel="stylesheet" href="css/lib/show-hint.css" />
+    <link rel="stylesheet" href="css/lib/eclipse.css" />
+    <link rel="stylesheet" href="css/lib/darcula.css" />
+    <link rel="stylesheet" href="css/index.css" />
+  </head>
 
-<head>
-  <%- include('partials/head') -%>
-  <link rel="stylesheet" href="css/lib/codemirror.css" />
-  <link rel="stylesheet" href="css/lib/dialog.css" />
-  <link rel="stylesheet" href="css/lib/matchesonscrollbar.css" />
-  <link rel="stylesheet" href="css/lib/show-hint.css" />
-  <link rel="stylesheet" href="css/lib/eclipse.css" />
-  <link rel="stylesheet" href="css/lib/darcula.css" />
-  <link rel="stylesheet" href="css/index.css" />
-</head>
-
-<body>
-  <%- include('partials/menu') -%>
-  <main>
-    <div class="container" style="width: 95%;">
-      <div style="padding-top: 1em;">
-        <ul id="tabs-swipe" class="tabs grey lighten-2">
-          <li class="tab col s3">
-            <a class="active" href="#swipe-1">Código J#</a>
-          </li>
-          <li class="tab col s3"><a href="#swipe-2">Código 3D</a></li>
-        </ul>
-        <div id="swipe-1" class="col s12">
-          <%- include('partials/jsharp') -%>
-        </div>
-        <div id="swipe-2" class="col s12">
-          <%- include('partials/c3d') -%>
+  <body>
+    <%- include('partials/menu') -%>
+    <main>
+      <div class="container" style="width: 95%;">
+        <div style="padding-top: 1em;">
+          <ul id="tabs-swipe" class="tabs grey lighten-2">
+            <li class="tab col s3">
+              <a class="active" href="#swipe-1">Código J#</a>
+            </li>
+            <li class="tab col s3"><a href="#swipe-2">Código 3D</a></li>
+          </ul>
+          <div id="swipe-1" class="col s12">
+            <%- include('partials/jsharp') -%>
+          </div>
+          <div id="swipe-2" class="col s12">
+            <%- include('partials/c3d') -%>
+          </div>
         </div>
       </div>
-    </div>
-  </main>
-  <%- include('partials/footer') -%>
-</body>
-<%- include('partials/script') -%>
-<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="js/lib/codemirror.js"></script>
-<script type="text/javascript" src="js/lib/active-line.js"></script>
-<script type="text/javascript" src="js/lib/annotatescrollbar.js"></script>
-<script type="text/javascript" src="js/lib/closebrackets.js"></script>
-<script type="text/javascript" src="js/lib/dialog.js"></script>
-<script type="text/javascript" src="js/lib/jump-to-line.js"></script>
-<script type="text/javascript" src="js/lib/matchbrackets.js"></script>
-<script type="text/javascript" src="js/lib/matchesonscrollbar.js"></script>
-<script type="text/javascript" src="js/lib/searchcursor.js"></script>
-<script type="text/javascript" src="js/lib/simple.js"></script>
-<script type="text/javascript" src="js/lib/show-hint.js"></script>
-<script type="text/javascript" src="js/mode/jsharp.js"></script>
-<script type="text/javascript" src="js/mode/cd3.js"></script>
-<script type="text/javascript" src="js/mode/console.js"></script>
-<script type="text/javascript" src="js/config.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
-<script type="text/javascript" src="js/buffers.js"></script>
-<script type="text/javascript" src="js/sockets.js"></script>
-
+    </main>
+    <%- include('partials/footer') -%>
+  </body>
+  <%- include('partials/script') -%>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="js/lib/codemirror.js"></script>
+  <script type="text/javascript" src="js/lib/active-line.js"></script>
+  <script type="text/javascript" src="js/lib/annotatescrollbar.js"></script>
+  <script type="text/javascript" src="js/lib/closebrackets.js"></script>
+  <script type="text/javascript" src="js/lib/dialog.js"></script>
+  <script type="text/javascript" src="js/lib/jump-to-line.js"></script>
+  <script type="text/javascript" src="js/lib/matchbrackets.js"></script>
+  <script type="text/javascript" src="js/lib/matchesonscrollbar.js"></script>
+  <script type="text/javascript" src="js/lib/searchcursor.js"></script>
+  <script type="text/javascript" src="js/lib/simple.js"></script>
+  <script type="text/javascript" src="js/lib/show-hint.js"></script>
+  <script type="text/javascript" src="js/lib/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+  <script type="text/javascript" src="js/mode/jsharp.js"></script>
+  <script type="text/javascript" src="js/mode/cd3.js"></script>
+  <script type="text/javascript" src="js/mode/console.js"></script>
+  <script type="text/javascript" src="js/config.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="js/buffers.js"></script>
+  <script type="text/javascript" src="js/sockets.js"></script>
 </html>

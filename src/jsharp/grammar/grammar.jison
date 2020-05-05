@@ -25,6 +25,7 @@
   const { default: SubIf } = require("../ast/statement/sub_if");
   const { default: WhileStm } = require("../ast/statement/while");
   const { default: DoWhileStm } = require("../ast/statement/do_while");
+  const { Structure, Attribute } = require("../ast/statement/structure");
   const {
     VarDeclaration,
     VarDeclarationGlobal,
@@ -95,6 +96,7 @@ global_statements_list
 global_statement
   : function_statement { $$ = $1; }
   | variable_declaration { $$ = $1; }
+  | struct_definition { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
 ;
 
@@ -132,6 +134,7 @@ function_statement
 type
   : primitive_type { $$ = $1; }
   | reference_type { $$ = $1; }
+  | array_type
 ;
 
 primitive_type
@@ -142,13 +145,13 @@ primitive_type
 ;
 
 reference_type
-  : IDENTIFIER
+  : IDENTIFIER { $$ = yy.typeFactory.createNewStructure(yy.filename, $1); }
 ;
 
 array_type
   : array_type '[' ']'
   | primitive_type '[' ']'
-  | IDENTIFIER '[' ']'
+  | reference_type '[' ']'
 ;
 
 parameter_list
@@ -200,8 +203,58 @@ statement
   | while_statement { $$ = $1; }
   | do_while_statement { $$ = $1; }
   | variable_declaration { $$ = $1; }
+  | struct_definition { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
   | error ';'
+;
+
+struct_definition
+  : 'define' IDENTIFIER 'as' '[' attribute_list ']' {
+    $$ = new Structure(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $5
+    );
+  }
+  | 'define' IDENTIFIER 'as' '[' attribute_list ']' ';' {
+    $$ = new Structure(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2, $5
+    );
+  }
+;
+
+struct_declaration
+  : 'strc' IDENTIFIER list_cor
+  | 'strc' IDENTIFIER '(' ')'
+;
+
+list_cor
+  : list_cor '[' ']'
+  | '[' ']'
+;
+
+attribute_list
+  : attribute_list ',' attribute { $$ = $1; $$.push($3); }
+  | attribute { $$ = [$1]; }
+;
+
+attribute
+  : type IDENTIFIER {
+    $$ = new Attribute(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
+  | type IDENTIFIER '=' expression {
+    $$ = new Attribute(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2, $4
+    );
+  }
 ;
 
 variable_declaration
@@ -452,6 +505,7 @@ expression
       ), $2
     )
   }
+  | struct_declaration { $$ = $1; }
   | CHAR_LITERAL {
     $$ = new Literal(
       new NodeInfo(

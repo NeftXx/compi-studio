@@ -1,7 +1,7 @@
 import Ast from "./ast/ast";
 import { logger } from "../utils/logger";
 import { Parser as JSharpParser } from "./grammar/grammar";
-import { TypeFactory, ErrorType } from "./scope/type";
+import { TypeFactory, ErrorType, StructureType } from "./scope/type";
 import CodeTranslator from "./scope/code_builder";
 import { SymbolTable } from "./scope/scope";
 
@@ -129,12 +129,28 @@ export class JSharp {
     typeFactory: TypeFactory,
     codeBuilder: CodeTranslator
   ) {
-    // primero debo traducir las variables globales
+    // primero debo traducir las estructuras
+    let structures = typeFactory.structures;
+    codeBuilder.setGlobalVariables(`# Banderas para las estructuras\n`);
+    structures.forEach((strc: StructureType) => {
+      strc.enablePointer = codeBuilder.ptrHeap++;
+      codeBuilder.setGlobalVariables(`Heap[${strc.enablePointer}] = 0;\n`);
+    });
+    for (let tree of trees) {
+      tree.translateStructure(typeFactory, codeBuilder);
+    }
+    // luego traducir las variables globales
     for (let tree of trees) {
       tree.translateVariables(typeFactory, codeBuilder);
     }
     // tengo que saltar las funciones, para este salto
     codeBuilder.setTranslatedCode(`goto ${codeBuilder.labelJumpMethods};\n`);
+    // Traducir los contructores de las estructuras
+    structures.forEach((strc: StructureType, key: string) => {
+      if (strc.structure) {
+        strc.structure.translateConctructor(key, codeBuilder);
+      }
+    });
     // luego todas las funciones de cada archivo
     for (let tree of trees) {
       tree.translateMethods(typeFactory, codeBuilder);

@@ -1,7 +1,8 @@
 import NodeInfo from "./node_info";
+import { Structure } from "../ast/statement/structure";
 
 export abstract class JType {
-  constructor(public readonly name: string) {}
+  constructor(public readonly nameType: string) {}
 
   public getValueDefault(): any {
     return -1;
@@ -10,7 +11,7 @@ export abstract class JType {
   public abstract isEquals(otherType: JType): boolean;
 
   public toString(): string {
-    return this.name;
+    return this.nameType;
   }
 }
 
@@ -77,7 +78,50 @@ export class ErrorType extends JType {
   }
 }
 
+export class StructureType extends JType {
+  public enablePointer: number;
+  public structure: Structure;
+
+  public constructor(nameType: string, public nameReal: string) {
+    super(nameType);
+    this.enablePointer = -1;
+    this.structure = undefined;
+  }
+
+  public isEquals(otherType: JType): boolean {
+    return this === otherType;
+  }
+
+  public setStructure(structure: Structure) {
+    this.structure = structure;
+  }
+
+  public getStructure() {
+    return this.structure;
+  }
+}
+
 export class TypeFactory {
+  public structures: Map<string, StructureType>;
+
+  public constructor() {
+    this.structures = new Map();
+  }
+
+  public createNewStructure(filename: string, nameType: string) {
+    let realName = `strc_${filename.replace(/[.]|[-]/gi, "_")}_${nameType}`;
+    let structure = this.structures.get(realName);
+    if (structure) return structure;
+    structure = new StructureType(nameType, realName);
+    this.structures.set(realName, structure);
+    return structure;
+  }
+
+  public getStructure(filename: string, nameType: string) {
+    let realName = `strc_${filename.replace(/[.]|[-]/gi, "_")}_${nameType}`;
+    return this.structures.get(realName);
+  }
+
   public getInteger(): JType {
     return BaseType.INTEGER;
   }

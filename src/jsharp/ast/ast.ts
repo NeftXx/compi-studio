@@ -6,6 +6,7 @@ import ImportStm from "./statement/import";
 import FunctionStm from "./statement/function";
 import { Variable } from "../scope/variable";
 import { Declaration } from "./statement/variable_declaration";
+import { Structure } from "./statement/structure";
 
 export default class Ast {
   private fileScope: FileScope;
@@ -62,6 +63,17 @@ export default class Ast {
   public checkScope(typeFactory: TypeFactory): void {
     for (let statement of this.astNodes) {
       statement.checkScope(typeFactory, this.fileScope);
+    }
+  }
+
+  public translateStructure(
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator
+  ) {
+    for (let statement of this.astNodes) {
+      if (statement instanceof Structure) {
+        statement.translate(typeFactory, codeBuilder, this.fileScope);
+      }
     }
   }
 

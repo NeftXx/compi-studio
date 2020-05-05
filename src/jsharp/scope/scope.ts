@@ -1,6 +1,6 @@
 import { Variable } from "./variable";
 import { ErrorType, JType } from "./type";
-import Structure from "../ast/statement/structure";
+import { Structure } from "../ast/statement/structure";
 
 export class SymbolTable {
   public filesScope: Map<string, FileScope>;

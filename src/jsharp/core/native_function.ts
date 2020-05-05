@@ -11,6 +11,8 @@ export default class NativePrintFunction {
     this.pow(codeBuilder);
     this.printGlobalVariableError(codeBuilder);
     this.printGlobalGetVariableError(codeBuilder);
+    this.printErrorDeclStruct(codeBuilder);
+    this.printErrorGetStruct(codeBuilder);
   }
 
   private printString(codeBuilder: CodeTranslator): void {
@@ -410,7 +412,245 @@ proc native_print_get_global_variable_error begin
   print("%c", 117);
   print("%c", 110);
   print("%c",  46);
-  print("%c",  10); 
+  print("%c",  10);
+end
+`);
+  }
+
+  private printErrorDeclStruct(codeBuilder: CodeTranslator) {
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
+      t4 = codeBuilder.getNewTemporary(),
+      t5 = codeBuilder.getNewTemporary(),
+      t6 = codeBuilder.getNewTemporary(),
+      t7 = codeBuilder.getNewTemporary(),
+      t8 = codeBuilder.getNewTemporary(),
+      t9 = codeBuilder.getNewTemporary(),
+      t10 = codeBuilder.getNewTemporary(),
+      t11 = codeBuilder.getNewTemporary(),
+      t12 = codeBuilder.getNewTemporary();
+    codeBuilder.setTranslatedCode(`
+proc native_print_error_decl_struct begin
+  print("%c",  69); # E
+  print("%c", 114); # r
+  print("%c", 114); # r
+  print("%c", 111); # o
+  print("%c", 114); # r
+  print("%c",  32); #
+  print("%c", 101); # e
+  print("%c", 110); # n
+  print("%c",  32); #
+  print("%c", 101); # e
+  print("%c", 108); # l
+  print("%c",  32); #
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  99); # c
+  print("%c", 104); # h
+  print("%c", 105); # i
+  print("%c", 118); # v
+  print("%c", 111); # o
+  print("%c",  32); #
+  ${t1} = P + 0;
+  ${t2} = Stack[${t1}];
+  ${t3} = P + 1;
+  ${t4} = ${t3} + 0;
+  Stack[${t4}] = ${t2};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  44); # ,
+  print("%c",  32); # 
+  print("%c", 108); # l
+  print("%c", 105); # i
+  print("%c", 110); # n
+  print("%c", 101); # e
+  print("%c",  97); # a
+  print("%c",  32); # 
+  ${t5} = P + 1;
+  ${t6} = Stack[${t5}];
+  print("%i", ${t6});
+  print("%c",  32); #
+  print("%c", 121); # y
+  print("%c",  32); #
+  print("%c",  99); # c
+  print("%c", 111); # o
+  print("%c", 108); # l
+  print("%c", 117); # u
+  print("%c", 109); # m
+  print("%c", 110); # n
+  print("%c",  97); # a
+  print("%c",  32); #
+  ${t7} = P + 2;
+  ${t8} = Stack[${t7}];
+  print("%i", ${t8});
+  print("%c",  46); # .
+  print("%c",  32); #
+  print("%c",  76); # L
+  print("%c",  97); # a
+  print("%c",  32); #
+  print("%c", 101); # e
+  print("%c", 115); # s
+  print("%c", 116); # t
+  print("%c", 114); # r
+  print("%c", 117); # u
+  print("%c",  99); # c
+  print("%c", 116); # t
+  print("%c", 117); # u
+  print("%c", 114); # r
+  print("%c",  97); # a
+  print("%c",  32); #
+  ${t9} = P + 3;
+  ${t10} = Stack[${t9}];
+  ${t11} = P + 1;
+  ${t12} = ${t11} + 0;
+  Stack[${t12}] = ${t10};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  32); #
+  print("%c", 121); # y
+  print("%c",  97); # a
+  print("%c",  32); #
+  print("%c", 102); # f
+  print("%c", 117); # u
+  print("%c", 101); # e
+  print("%c",  32); #
+  print("%c", 100); # d
+  print("%c", 101); # e
+  print("%c",  99); # c
+  print("%c", 108); # l
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  97); # a
+  print("%c", 100); # d
+  print("%c",  97); # a
+  print("%c",  46); # .
+  print("%c",  10); # 
+end
+`);
+  }
+
+  private printErrorGetStruct(codeBuilder: CodeTranslator) {
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
+      t4 = codeBuilder.getNewTemporary(),
+      t5 = codeBuilder.getNewTemporary(),
+      t6 = codeBuilder.getNewTemporary(),
+      t7 = codeBuilder.getNewTemporary(),
+      t8 = codeBuilder.getNewTemporary(),
+      t9 = codeBuilder.getNewTemporary(),
+      t10 = codeBuilder.getNewTemporary(),
+      t11 = codeBuilder.getNewTemporary(),
+      t12 = codeBuilder.getNewTemporary();
+    codeBuilder.setTranslatedCode(`
+proc native_print_error_get_struct begin
+  print("%c",  69); # E
+  print("%c", 114); # r
+  print("%c", 114); # r
+  print("%c", 111); # o
+  print("%c", 114); # r
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 110); # n
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 108); # l
+  print("%c",  32); # 
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  99); # c
+  print("%c", 104); # h
+  print("%c", 105); # i
+  print("%c", 118); # v
+  print("%c", 111); # o
+  print("%c",  32); # 
+  ${t1} = P + 0;
+  ${t2} = Stack[${t1}];
+  ${t3} = P + 1;
+  ${t4} = ${t3} + 0;
+  Stack[${t4}] = ${t2};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  44); # ,
+  print("%c",  32); # 
+  print("%c", 108); # l
+  print("%c", 105); # i
+  print("%c", 110); # n
+  print("%c", 101); # e
+  print("%c",  97); # a
+  print("%c",  32); # 
+  ${t5} = P + 1;
+  ${t6} = Stack[${t5}];
+  print("%i", ${t6});
+  print("%c",  32); # 
+  print("%c", 121); # y
+  print("%c",  32); # 
+  print("%c",  99); # c
+  print("%c", 111); # o
+  print("%c", 108); # l
+  print("%c", 117); # u
+  print("%c", 109); # m
+  print("%c", 110); # n
+  print("%c",  97); # a
+  print("%c",  32); # 
+  ${t7} = P + 2;
+  ${t8} = Stack[${t7}];
+  print("%i", ${t8});
+  print("%c",  46); # .
+  print("%c",  32); #
+  print("%c",  76); # L
+  print("%c",  97); # a
+  print("%c",  32); #
+  print("%c", 101); # e
+  print("%c", 115); # s
+  print("%c", 116); # t
+  print("%c", 114); # r
+  print("%c", 117); # u
+  print("%c",  99); # c
+  print("%c", 116); # t
+  print("%c", 117); # u
+  print("%c", 114); # r
+  print("%c",  97); # a
+  print("%c",  32); #
+  ${t9} = P + 3;
+  ${t10} = Stack[${t9}];
+  ${t11} = P + 1;
+  ${t12} = ${t11} + 0;
+  Stack[${t12}] = ${t10};
+  P = P + 1;
+  call native_print_string;
+  P = P - 1;
+  print("%c",  32); # 
+  print("%c", 110); # n
+  print("%c", 111); # o
+  print("%c",  32); # 
+  print("%c", 104); # h
+  print("%c",  97); # a
+  print("%c",  32); # 
+  print("%c", 115); # s
+  print("%c", 105); # i
+  print("%c", 100); # d
+  print("%c", 111); # o
+  print("%c",  32); # 
+  print("%c", 100); # d
+  print("%c", 101); # e
+  print("%c",  99); # c
+  print("%c", 108); # l
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  97); # a
+  print("%c", 100); # d
+  print("%c", 111); # o
+  print("%c",  32); # 
+  print("%c",  97); # a
+  print("%c", 117); # u
+  print("%c", 110); # n
+  print("%c",  46); # .
+  print("%c",  10); #   
 end
 `);
   }
