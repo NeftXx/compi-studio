@@ -154,13 +154,20 @@ export default class CodeTranslator {
     this.nativeFunction.generete(this);
     this.nativeStringFunctions.generete(this);
     if (this.mainFunction) {
+      let t1 = this.getNewTemporary(),
+        t2 = this.getNewTemporary();
       return (
         this.createHeader() +
         this.translateCode.join("") +
         `
 ${this.labelJumpMethods}:
 # Inicio de ejecucion del programa
+${t1} = P + 0; # Cambio simulado de ambito
+${t2} = ${t1} + 0;
+Stack[${t2}] = 0;
+P = P + 0;
 call ${this.mainFunction.getName()};
+P = P - 0;
 `
       );
     }

@@ -41,6 +41,7 @@ ${t2} = Stack[${t1}];\n`);
       codeBuilder.setLastAddress(t2);
     } else {
       let globalScope = scope.getGlobal();
+      let size = globalScope.size;
       variable = globalScope.getVariableLocal(this.identifier);
       if (variable) {
         let LV = codeBuilder.getNewLabel(),
@@ -55,7 +56,7 @@ if (${t1} == 0) goto ${LV};
 ${t2} = Heap[${variable.ptr}];
 goto ${LF};
 ${LV}:
-${t3} = P + 4; # Cambio simulado de ambito
+${t3} = P + ${size}; # Cambio simulado de ambito
 `);
         this.translateStr(codeBuilder, this.nodeInfo.filename);
         codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0;
@@ -68,9 +69,9 @@ Stack[${t4}] = ${this.nodeInfo.column};
         this.translateStr(codeBuilder, this.identifier);
         codeBuilder.setTranslatedCode(`${t4} = ${t3} + 3;
 Stack[${t4}] = ${codeBuilder.getLastAddress()};
-P = P + 4;
+P = P + ${size};
 call native_print_get_global_variable_error;
-P = P - 4;
+P = P - ${size};
 E = 3;
 ${LF}:
 `);

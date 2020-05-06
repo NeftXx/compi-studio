@@ -46,8 +46,9 @@ export default class Print extends Statement {
       codeBuilder.printTrueLabels();
       codeBuilder.setTranslatedCode(`${dir} = 1;\n${LTemp}:\n`);
       let t1 = codeBuilder.getNewTemporary();
+      let size = scope.size;
       codeBuilder.setTranslatedCode(
-        `${t1} = P + 1; # Cambio simulado de ambito\n`
+        `${t1} = P + ${size}; # Cambio simulado de ambito\n`
       );
       let t2 = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${t2} = ${t1} + 0; # indice parametro\n`);
@@ -55,13 +56,14 @@ export default class Print extends Statement {
         `Stack[${t2}] = ${dir}; # asignacion de parametro\n`
       );
       codeBuilder.setTranslatedCode(
-        "P = P + 1;\ncall native_print_boolean;\nP = P - 1;\n"
+        `P = P + ${size};\ncall native_print_boolean;\nP = P - ${size};\n`
       );
     } else if (typeFactory.isString(this.exp.type)) {
       let dirLast = codeBuilder.getLastAddress();
       let t1 = codeBuilder.getNewTemporary();
+      let size = scope.size;
       codeBuilder.setTranslatedCode(
-        `${t1} = P + 1; # Cambio simulado de ambito\n`
+        `${t1} = P + ${size}; # Cambio simulado de ambito\n`
       );
       let t2 = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${t2} = ${t1} + 0; # indice parametro\n`);
@@ -69,7 +71,7 @@ export default class Print extends Statement {
         `Stack[${t2}] = ${dirLast}; # asignacion de parametro\n`
       );
       codeBuilder.setTranslatedCode(
-        "P = P + 1;\ncall native_print_string;\nP = P - 1;\n"
+        `P = P + ${size};\ncall native_print_string;\nP = P - ${size};\n`
       );
     }
   }

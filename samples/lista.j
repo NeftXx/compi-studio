@@ -4,5 +4,6 @@ define Nodo as [
 ];
 
 void principal() {
+  Nodo nodo = strc Nodo();
   print("Hola prro!");
 }

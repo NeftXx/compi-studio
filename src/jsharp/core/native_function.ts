@@ -24,16 +24,17 @@ export default class NativePrintFunction {
     codeBuilder.setTranslatedCode(`
 # Procedimiento para imprimir una cadena
 proc native_print_string begin
-  ${t1} = P + 0;
-  ${t2} = Stack[${t1}];
+  ${t1} = P + 0; # Posicion de parametro
+  ${t2} = Stack[${t1}]; # Obteniendo direccion de la cadena
 ${L2}:
-  ${t3} = Heap[${t2}];
-  if (${t3} == 0) goto ${L1};
-  print("%c", ${t3});
-  ${t2} = ${t2} + 1;
-  goto ${L2};
-${L1}:
+  ${t3} = Heap[${t2}]; # Obteniendo letra por letra
+  if (${t3} == 0) goto ${L1}; # Mientras no sea nulo
+  print("%c", ${t3}); # Imprimir letra
+  ${t2} = ${t2} + 1; # Aumentado el contador
+  goto ${L2}; # Regresear a evaluar
+${L1}: # Salir
 end
+
 `);
   }
 
@@ -45,9 +46,9 @@ end
     codeBuilder.setTranslatedCode(`
 # Procedimiento para imprimir un booleano
 proc native_print_boolean begin
-  ${t1} = P + 0;
-  ${t2} = Stack[${t1}];
-  if (${t2} == 0) goto ${L1};
+  ${t1} = P + 0; # Obteniendo direccion del parametro
+  ${t2} = Stack[${t1}]; # Valor del parametro
+  if (${t2} == 0) goto ${L1}; # Si es falso
   print("%c", 116); # t
   print("%c", 114); # r
   print("%c", 117); # u
@@ -176,113 +177,113 @@ end
       t12 = codeBuilder.getNewTemporary();
     codeBuilder.setTranslatedCode(`
 proc native_print_global_variable_error begin
-  print("%c",  69);
-  print("%c", 114);
-  print("%c", 114);
-  print("%c", 111);
-  print("%c", 114);
-  print("%c",  32);
-  print("%c", 101);
-  print("%c", 110);
-  print("%c",  32);
-  print("%c", 101);
-  print("%c", 108);
-  print("%c",  32);
-  print("%c",  97);
-  print("%c", 114);
-  print("%c",  99);
-  print("%c", 104);
-  print("%c", 105);
-  print("%c", 118);
-  print("%c", 111);
-  print("%c",  32);
-  ${t1} = P + 0;
-  ${t2} = Stack[${t1}];
-  ${t3} = P + 1;
-  ${t4} = ${t3} + 0;
-  Stack[${t4}] = ${t2};
-  P = P + 1;
+  print("%c",  69); # E
+  print("%c", 114); # r
+  print("%c", 114); # r
+  print("%c", 111); # o
+  print("%c", 114); # r
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 110); # n
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 108); # l
+  print("%c",  32); # 
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  99); # c
+  print("%c", 104); # h
+  print("%c", 105); # i
+  print("%c", 118); # v
+  print("%c", 111); # o
+  print("%c",  32); #
+  ${t1} = P + 0; # Acceso a parametro
+  ${t2} = Stack[${t1}]; # Obteniendo la direccion del nombre del archivo
+  ${t3} = P + 4; # cambio simulado de ambito
+  ${t4} = ${t3} + 0; # posicion del parametro
+  Stack[${t4}] = ${t2}; # Enviando parametro
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
-  print("%c",  44);
-  print("%c",  32);
-  print("%c", 108);
-  print("%c", 105);
-  print("%c", 110);
-  print("%c", 101);
-  print("%c",  97);
-  print("%c",  32);
+  P = P - 4;
+  print("%c",  44); # ,
+  print("%c",  32); #
+  print("%c", 108); # l
+  print("%c", 105); # i
+  print("%c", 110); # n
+  print("%c", 101); # e
+  print("%c",  97); # a
+  print("%c",  32); #
   ${t5} = P + 1;
   ${t6} = Stack[${t5}];
   print("%i", ${t6});
-  print("%c",  32);
-  print("%c", 121);
-  print("%c",  32);
-  print("%c",  99);
-  print("%c", 111);
-  print("%c", 108);
-  print("%c", 117);
-  print("%c", 109);
-  print("%c", 110);
-  print("%c",  97);
-  print("%c",  32);
+  print("%c",  32); # 
+  print("%c", 121); # y
+  print("%c",  32); # 
+  print("%c",  99); # c
+  print("%c", 111); # o
+  print("%c", 108); # l
+  print("%c", 117); # u
+  print("%c", 109); # m
+  print("%c", 110); # n
+  print("%c",  97); # a
+  print("%c",  32); # 
   ${t7} = P + 2;
   ${t8} = Stack[${t7}];
   print("%i", ${t8});
-  print("%c",  46);
-  print("%c",  32);
-  print("%c",  76);
-  print("%c",  97);
-  print("%c",  32);
-  print("%c", 118);
-  print("%c",  97);
-  print("%c", 114);
-  print("%c", 105);
-  print("%c",  97);
-  print("%c",  98);
-  print("%c", 108);
-  print("%c", 101);
-  print("%c",  32);
-  print("%c", 103);
-  print("%c", 108);
-  print("%c", 111);
-  print("%c",  98);
-  print("%c",  97);
-  print("%c", 108);
-  print("%c",  32);
-  print("%c",  91);
-  ${t9} = P + 3;
-  ${t10} = Stack[${t9}];
-  ${t11} = P + 1;
-  ${t12} = ${t11} + 0;
-  Stack[${t12}] = ${t10};
-  P = P + 1;
+  print("%c",  46); # .
+  print("%c",  32); # 
+  print("%c",  76); # L
+  print("%c",  97); # a
+  print("%c",  32); # 
+  print("%c", 118); # v
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c", 105); # i
+  print("%c",  97); # a
+  print("%c",  98); # b
+  print("%c", 108); # l
+  print("%c", 101); # e
+  print("%c",  32); # 
+  print("%c", 103); # g
+  print("%c", 108); # l
+  print("%c", 111); # o
+  print("%c",  98); # b
+  print("%c",  97); # a
+  print("%c", 108); # l
+  print("%c",  32); # 
+  print("%c",  91); # [
+  ${t9} = P + 3; # Posicion del nombre de la variable
+  ${t10} = Stack[${t9}]; # Obtiniendo nombre
+  ${t11} = P + 4; # Cambio simulado de ambito
+  ${t12} = ${t11} + 0; # Posicion para enviar la cadena
+  Stack[${t12}] = ${t10}; # Enviando la cadena
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
-  print("%c",  93);
-  print("%c",  32);
-  print("%c", 121);
-  print("%c",  97);
-  print("%c",  32);
-  print("%c", 104);
-  print("%c",  97);
-  print("%c",  32);
-  print("%c", 115);
-  print("%c", 105);
-  print("%c", 100);
-  print("%c", 111);
-  print("%c",  32);
-  print("%c", 100);
-  print("%c", 101);
-  print("%c",  99);
-  print("%c", 108);
-  print("%c",  97);
-  print("%c", 114);
-  print("%c",  97);
-  print("%c", 100);
-  print("%c",  97);
-  print("%c",  46); 
-  print("%c",  10); 
+  P = P - 4;
+  print("%c",  93); # ]
+  print("%c",  32); #
+  print("%c", 121); # n
+  print("%c",  97); # o
+  print("%c",  32); #
+  print("%c", 104); # h
+  print("%c",  97); # a
+  print("%c",  32); #
+  print("%c", 115); # s
+  print("%c", 105); # i
+  print("%c", 100); # d
+  print("%c", 111); # o
+  print("%c",  32); #
+  print("%c", 100); # d
+  print("%c", 101); # e
+  print("%c",  99); # c
+  print("%c", 108); # l
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  97); # a
+  print("%c", 100); # d
+  print("%c",  97); # o
+  print("%c",  46); # .
+  print("%c",  10); #
 end
 `);
   }
@@ -302,34 +303,34 @@ end
       t12 = codeBuilder.getNewTemporary();
     codeBuilder.setTranslatedCode(`
 proc native_print_get_global_variable_error begin
-  print("%c",  69);
-  print("%c", 114);
-  print("%c", 114);
-  print("%c", 111);
-  print("%c", 114);
-  print("%c",  32);
-  print("%c", 101);
-  print("%c", 110);
-  print("%c",  32);
-  print("%c", 101);
-  print("%c", 108);
-  print("%c",  32);
-  print("%c",  97);
-  print("%c", 114);
-  print("%c",  99);
-  print("%c", 104);
-  print("%c", 105);
-  print("%c", 118);
-  print("%c", 111);
-  print("%c",  32);
+  print("%c",  69); # E
+  print("%c", 114); # r
+  print("%c", 114); # r
+  print("%c", 111); # o
+  print("%c", 114); # r
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 110); # n
+  print("%c",  32); # 
+  print("%c", 101); # e
+  print("%c", 108); # l
+  print("%c",  32); # 
+  print("%c",  97); # a
+  print("%c", 114); # r
+  print("%c",  99); # c
+  print("%c", 104); # h
+  print("%c", 105); # i
+  print("%c", 118); # v
+  print("%c", 111); # o
+  print("%c",  32); #
   ${t1} = P + 0;
   ${t2} = Stack[${t1}];
-  ${t3} = P + 1;
+  ${t3} = P + 4;
   ${t4} = ${t3} + 0;
   Stack[${t4}] = ${t2};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  44);
   print("%c",  32);
   print("%c", 108);
@@ -379,12 +380,12 @@ proc native_print_get_global_variable_error begin
   print("%c",  91);
   ${t9} = P + 3;
   ${t10} = Stack[${t9}];
-  ${t11} = P + 1;
+  ${t11} = P + 4;
   ${t12} = ${t11} + 0;
   Stack[${t12}] = ${t10};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  93);
   print("%c",  32);
   print("%c", 110);
@@ -454,12 +455,12 @@ proc native_print_error_decl_struct begin
   print("%c",  32); #
   ${t1} = P + 0;
   ${t2} = Stack[${t1}];
-  ${t3} = P + 1;
+  ${t3} = P + 4;
   ${t4} = ${t3} + 0;
   Stack[${t4}] = ${t2};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  44); # ,
   print("%c",  32); # 
   print("%c", 108); # l
@@ -503,12 +504,12 @@ proc native_print_error_decl_struct begin
   print("%c",  32); #
   ${t9} = P + 3;
   ${t10} = Stack[${t9}];
-  ${t11} = P + 1;
+  ${t11} = P + 4;
   ${t12} = ${t11} + 0;
   Stack[${t12}] = ${t10};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  32); #
   print("%c", 121); # y
   print("%c",  97); # a
@@ -569,12 +570,12 @@ proc native_print_error_get_struct begin
   print("%c",  32); # 
   ${t1} = P + 0;
   ${t2} = Stack[${t1}];
-  ${t3} = P + 1;
+  ${t3} = P + 4;
   ${t4} = ${t3} + 0;
   Stack[${t4}] = ${t2};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  44); # ,
   print("%c",  32); # 
   print("%c", 108); # l
@@ -618,12 +619,12 @@ proc native_print_error_get_struct begin
   print("%c",  32); #
   ${t9} = P + 3;
   ${t10} = Stack[${t9}];
-  ${t11} = P + 1;
+  ${t11} = P + 4;
   ${t12} = ${t11} + 0;
   Stack[${t12}] = ${t10};
-  P = P + 1;
+  P = P + 4;
   call native_print_string;
-  P = P - 1;
+  P = P - 4;
   print("%c",  32); # 
   print("%c", 110); # n
   print("%c", 111); # o

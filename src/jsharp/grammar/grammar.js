@@ -231,6 +231,15 @@ case 44:
     );
   
 break;
+case 46:
+
+    this.$ = new StructDeclaration(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $$[$0-2]
+    );
+  
+break;
 case 51:
 
     this.$ = new Attribute(
@@ -864,6 +873,7 @@ _handle_error:
   const { default: SubIf } = require("../ast/statement/sub_if");
   const { default: WhileStm } = require("../ast/statement/while");
   const { default: DoWhileStm } = require("../ast/statement/do_while");
+  const { StructDeclaration } = require("../ast/expression/struct_declaration");
   const { Structure, Attribute } = require("../ast/statement/structure");
   const {
     VarDeclaration,

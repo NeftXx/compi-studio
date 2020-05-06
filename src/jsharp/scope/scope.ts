@@ -41,6 +41,7 @@ export class SymbolTable {
 }
 
 export class BlockScope {
+  public size: number;
   private countScopes: number;
   protected globalScope: FileScope | undefined;
   public variables: Map<string, Variable>;
@@ -50,6 +51,7 @@ export class BlockScope {
     protected previous: BlockScope | undefined,
     protected errorsList: Array<ErrorType>
   ) {
+    this.size = 0;
     this.countScopes = 1;
     this.variables = new Map();
     this.blocks = new Map();
@@ -154,7 +156,6 @@ export class BlockScope {
 }
 
 export class MethodScope extends BlockScope {
-  private size: number;
   private nameMethod: string;
 
   public constructor(
@@ -164,8 +165,6 @@ export class MethodScope extends BlockScope {
     private returnType: JType
   ) {
     super(undefined, errorsList);
-    // El tamaño es igual a 1, esta posicion es para el return
-    this.size = 1;
     this.nameMethod = "";
     this.variables.set(
       "return",
@@ -175,14 +174,22 @@ export class MethodScope extends BlockScope {
 
   public updateAddresses(): void {
     this.update(this);
+    this.updateSize(this);
   }
 
   private update(currentScope: BlockScope): void {
     currentScope.variables.forEach((variable: Variable) => {
-      variable.ptr = this.size++ - 1;
+      variable.ptr = this.size++;
     });
     currentScope.blocks.forEach((blockScope: BlockScope) => {
       this.update(blockScope);
+    });
+  }
+
+  private updateSize(currentScope: BlockScope) {
+    currentScope.blocks.forEach((blockScope: BlockScope) => {
+      blockScope.size = this.size;
+      this.updateSize(blockScope);
     });
   }
 
@@ -207,10 +214,6 @@ export class MethodScope extends BlockScope {
       return this.nameMethod;
     }
     return this.identifier;
-  }
-
-  public getSize(): number {
-    return this.size;
   }
 }
 

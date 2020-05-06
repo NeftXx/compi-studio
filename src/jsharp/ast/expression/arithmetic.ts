@@ -68,11 +68,12 @@ export default class Arithmetic extends Expression {
     let dir1 = codeBuilder.getLastAddress();
     this.expRight.translate(typeFactory, codeBuilder, scope);
     let dir2 = codeBuilder.getLastAddress();
+    let size = scope.size;
     if (typeFactory.isNumeric(this.type)) {
       if (this.operator === "^^") {
         let t3 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
-          `${t3} = P + 5; # Cambio simulado de ambito\n`
+          `${t3} = P + ${size}; # Cambio simulado de ambito\n`
         );
 
         let t4 = codeBuilder.getNewTemporary();
@@ -92,7 +93,7 @@ export default class Arithmetic extends Expression {
         );
 
         codeBuilder.setTranslatedCode(
-          "P = P + 5;\ncall native_potencia;\nP = P - 5;\n"
+          `P = P + ${size};\ncall native_potencia;\nP = P - ${size};\n`
         );
         t4 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0; # indice return\n`);

@@ -124,8 +124,9 @@ Heap[${variable.ptr + 1}] = 1;
     codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
     let t2 = codeBuilder.getNewTemporary();
     let t3 = codeBuilder.getNewTemporary();
+    let size = globalScope.size;
     codeBuilder.setTranslatedCode(
-      `${t2} = P + 4; # Cambio simulado de ambito\n`
+      `${t2} = P + ${size}; # Cambio simulado de ambito\n`
     );
     this.translateStr(codeBuilder, this.nodeInfo.filename);
     codeBuilder.setTranslatedCode(
@@ -142,7 +143,7 @@ Heap[${variable.ptr + 1}] = 1;
       `${t3} = ${t2} + 3;\nStack[${t3}] = ${codeBuilder.getLastAddress()};\n`
     );
     codeBuilder.setTranslatedCode(
-      `P = P + 4;\ncall native_print_global_variable_error;\nP = P - 4;\nE = 3;\n`
+      `P = P + ${size};\ncall native_print_global_variable_error;\nP = P - ${size};\nE = 3;\n`
     );
     codeBuilder.setTranslatedCode(`${LF}:\n`);
     codeBuilder.setTranslatedCode(
@@ -220,8 +221,9 @@ Heap[${variable.ptr + 1}] = 1;
     codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
     let t2 = codeBuilder.getNewTemporary();
     let t3 = codeBuilder.getNewTemporary();
+    let size = globalScope.size;
     codeBuilder.setTranslatedCode(
-      `${t2} = P + 4; # Cambio simulado de ambito\n`
+      `${t2} = P + ${size}; # Cambio simulado de ambito\n`
     );
     this.translateStr(codeBuilder, this.nodeInfo.filename);
     codeBuilder.setTranslatedCode(
@@ -238,7 +240,7 @@ Heap[${variable.ptr + 1}] = 1;
       `${t3} = ${t2} + 3;\nStack[${t3}] = ${codeBuilder.getLastAddress()};\n`
     );
     codeBuilder.setTranslatedCode(
-      `P = P + 4;\ncall native_print_global_variable_error;\nP = P - 4;\nE = 3;\n`
+      `P = P + ${size};\ncall native_print_global_variable_error;\nP = P - ${size};\nE = 3;\n`
     );
     codeBuilder.setTranslatedCode(`${LF}:\n`);
     codeBuilder.setTranslatedCode(
@@ -325,8 +327,8 @@ export class VarDeclarationType extends Declaration {
     let t1 = codeBuilder.getNewTemporary();
     this.idList.forEach((id) => {
       let variable = scope.getVariableLocal(id);
-      codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
-Stack[${t1}] = ${dir};
+      codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr}; # Direccion de variable  ${id}
+Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
 `);
     });
   }
@@ -370,8 +372,9 @@ Stack[${t1}] = ${dir};
       codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
       let t2 = codeBuilder.getNewTemporary();
       let t3 = codeBuilder.getNewTemporary();
+      let size = globalScope.size;
       codeBuilder.setTranslatedCode(
-        `${t2} = P + 4; # Cambio simulado de ambito\n`
+        `${t2} = P + ${size}; # Cambio simulado de ambito\n`
       );
       this.translateStr(codeBuilder, this.nodeInfo.filename);
       codeBuilder.setTranslatedCode(
@@ -388,7 +391,7 @@ Stack[${t1}] = ${dir};
         `${t3} = ${t2} + 3;\nStack[${t3}] = ${codeBuilder.getLastAddress()};\n`
       );
       codeBuilder.setTranslatedCode(
-        `P = P + 4;\ncall native_print_global_variable_error;\nP = P - 4;\nE = 3;\n`
+        `P = P + ${size};\ncall native_print_global_variable_error;\nP = P - ${size};\nE = 3;\n`
       );
       codeBuilder.setTranslatedCode(`${LF}:\n`);
       codeBuilder.setTranslatedCode(

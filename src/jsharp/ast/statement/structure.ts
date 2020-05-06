@@ -115,7 +115,7 @@ if (${t1} == 1) goto ${L1};
 Heap[${this.type.enablePointer}] = 1;
 goto ${L2};
 ${L1}:
-${t2} = P + 4; # Cambio simulado de ambito
+${t2} = P + ${scope.size}; # Cambio simulado de ambito
 `);
       this.translateStr(codeBuilder, this.nodeInfo.filename);
       codeBuilder.setTranslatedCode(`${t3} = ${t2} + 0;
@@ -150,6 +150,7 @@ ${L2}:
     let L1 = codeBuilder.getNewLabel(),
       L2 = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(`
+# Constructor de la estructura ${this.identifier}
 proc ${nameReal} begin
   ${t1} = -1;
   ${t2} = Heap[${this.type.enablePointer}];
@@ -166,7 +167,7 @@ proc ${nameReal} begin
 
     codeBuilder.setTranslatedCode(`  goto ${L2};
 ${L1}:
-  ${t4} = P + 4; # Cambio simulado de ambito
+  ${t4} = P + 3; # Cambio simulado de ambito
 `);
     this.translateStr(codeBuilder, this.nodeInfo.filename);
     codeBuilder.setTranslatedCode(`${t5} = ${t4} + 0;
@@ -183,14 +184,15 @@ Stack[${t5}] = ${t7};
     this.translateStr(codeBuilder, this.identifier);
     codeBuilder.setTranslatedCode(`${t5} = ${t4} + 3;
 Stack[${t5}] = ${codeBuilder.getLastAddress()};
-P = P + 4;
+P = P + 3;
 call native_print_error_get_struct;
-P = P - 4;
+P = P - 3;
 E = 3;
 ${L2}:
 ${t8} = P + 0;
 Stack[${t8}] = ${t1};
 end
+
 `);
   }
 
