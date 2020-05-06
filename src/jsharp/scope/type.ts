@@ -197,4 +197,8 @@ export class TypeFactory {
       type === BaseType.DOUBLE
     );
   }
+
+  public isStructure(type1: JType) {
+    return type1 instanceof StructureType;
+  }
 }
