@@ -1,7 +1,7 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import CodeTranslator from "../../scope/code_builder";
-import { BlockScope } from "../../scope/scope";
+import { BlockScope, FileScope } from "../../scope/scope";
 import { TypeFactory, ErrorType } from "../../scope/type";
 
 export default class Identifier extends Expression {
@@ -32,25 +32,38 @@ export default class Identifier extends Expression {
     codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
-    let variable = scope.getVariable(this.identifier);
-    if (variable) {
-      let t1 = codeBuilder.getNewTemporary();
-      let t2 = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
-${t2} = Stack[${t1}];\n`);
-      codeBuilder.setLastAddress(t2);
+    if (scope instanceof FileScope) {
+      this.getVariableGlobal(typeFactory, codeBuilder, scope);
     } else {
-      let globalScope = scope.getGlobal();
-      let size = globalScope.size;
-      variable = globalScope.getVariableLocal(this.identifier);
+      let variable = scope.getVariable(this.identifier);
       if (variable) {
-        let LV = codeBuilder.getNewLabel(),
-          LF = codeBuilder.getNewLabel();
-        let t1 = codeBuilder.getNewTemporary(),
-          t2 = codeBuilder.getNewTemporary(),
-          t3 = codeBuilder.getNewTemporary(),
-          t4 = codeBuilder.getNewTemporary();
-        codeBuilder.setTranslatedCode(`${t1} = Heap[${variable.ptr + 1}];
+        let t1 = codeBuilder.getNewTemporary();
+        let t2 = codeBuilder.getNewTemporary();
+        codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
+  ${t2} = Stack[${t1}];\n`);
+        codeBuilder.setLastAddress(t2);
+      } else {
+        this.getVariableGlobal(typeFactory, codeBuilder, scope);
+      }
+    }
+  }
+
+  private getVariableGlobal(
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator,
+    scope: BlockScope
+  ) {
+    let globalScope = scope.getGlobal();
+    let size = globalScope.size;
+    let variable = globalScope.getVariableLocal(this.identifier);
+    if (variable) {
+      let LV = codeBuilder.getNewLabel(),
+        LF = codeBuilder.getNewLabel();
+      let t1 = codeBuilder.getNewTemporary(),
+        t2 = codeBuilder.getNewTemporary(),
+        t3 = codeBuilder.getNewTemporary(),
+        t4 = codeBuilder.getNewTemporary();
+      codeBuilder.setTranslatedCode(`${t1} = Heap[${variable.ptr + 1}];
 ${t2} = -1;
 if (${t1} == 0) goto ${LV};
 ${t2} = Heap[${variable.ptr}];
@@ -58,16 +71,16 @@ goto ${LF};
 ${LV}:
 ${t3} = P + ${size}; # Cambio simulado de ambito
 `);
-        this.translateStr(codeBuilder, this.nodeInfo.filename);
-        codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0;
+      this.translateStr(codeBuilder, this.nodeInfo.filename);
+      codeBuilder.setTranslatedCode(`${t4} = ${t3} + 0;
 Stack[${t4}] = ${codeBuilder.getLastAddress()};
 ${t4} = ${t3} + 1;
 Stack[${t4}] = ${this.nodeInfo.line};
 ${t4} = ${t3} + 2;
 Stack[${t4}] = ${this.nodeInfo.column};
 `);
-        this.translateStr(codeBuilder, this.identifier);
-        codeBuilder.setTranslatedCode(`${t4} = ${t3} + 3;
+      this.translateStr(codeBuilder, this.identifier);
+      codeBuilder.setTranslatedCode(`${t4} = ${t3} + 3;
 Stack[${t4}] = ${codeBuilder.getLastAddress()};
 P = P + ${size};
 call native_print_get_global_variable_error;
@@ -75,8 +88,7 @@ P = P - ${size};
 E = 3;
 ${LF}:
 `);
-        codeBuilder.setLastAddress(t2);
-      }
+      codeBuilder.setLastAddress(t2);
     }
   }
 

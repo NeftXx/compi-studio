@@ -8,7 +8,7 @@ IntegerLiteral        [0-9]+
 DoubleLiteral         [0-9]+(\.[0-9]+)
 BooleanLiteral        "true"|"false"
 NullLiteral           "null"
-File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)+(\.[j])
+File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 
 
 %x END_OF_LINE_COMMENT

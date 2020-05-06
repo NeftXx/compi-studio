@@ -7,6 +7,7 @@ import Expression from "../expression/expression";
 
 export class Structure extends Statement {
   private type: StructureType;
+  private scopeDefinition: BlockScope;
 
   public constructor(
     nodeInfo: NodeInfo,
@@ -39,6 +40,7 @@ export class Structure extends Statement {
           }
         }
         this.type.setStructure(this);
+        this.scopeDefinition = scope;
       }
     }
   }
@@ -110,12 +112,15 @@ export class Structure extends Statement {
         t3 = codeBuilder.getNewTemporary();
       let L1 = codeBuilder.getNewLabel(),
         L2 = codeBuilder.getNewLabel();
+
+      let size = scope.size;
+
       codeBuilder.setTranslatedCode(`${t1} = Heap[${this.type.enablePointer}];
 if (${t1} == 1) goto ${L1};
 Heap[${this.type.enablePointer}] = 1;
 goto ${L2};
 ${L1}:
-${t2} = P + ${scope.size}; # Cambio simulado de ambito
+${t2} = P + ${size}; # Cambio simulado de ambito
 `);
       this.translateStr(codeBuilder, this.nodeInfo.filename);
       codeBuilder.setTranslatedCode(`${t3} = ${t2} + 0;
@@ -128,16 +133,20 @@ Stack[${t3}] = ${this.nodeInfo.column};
       this.translateStr(codeBuilder, this.identifier);
       codeBuilder.setTranslatedCode(`${t3} = ${t2} + 3;
 Stack[${t3}] = ${codeBuilder.getLastAddress()};
-P = P + 4;
+P = P + ${size};
 call native_print_error_decl_struct;
-P = P - 4;
+P = P - ${size};
 E = 3;
 ${L2}:
 `);
     }
   }
 
-  public translateConctructor(nameReal: string, codeBuilder: CodeTranslator) {
+  public translateConctructor(
+    nameReal: string,
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator
+  ) {
     let size = this.attributeList.length;
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary(),
@@ -160,9 +169,15 @@ proc ${nameReal} begin
 `);
 
     for (let i = 0; i < size; i++) {
-      codeBuilder.setTranslatedCode(`  ${t3} = ${t1} + ${i};
-  Heap[${t3}] = ${this.attributeList[i].type.getValueDefault()};
-`);
+      codeBuilder.setTranslatedCode(`  ${t3} = ${t1} + ${i};\n`);
+      this.attributeList[i].translate(
+        typeFactory,
+        codeBuilder,
+        this.scopeDefinition
+      );
+      codeBuilder.setTranslatedCode(
+        `  Heap[${t3}] = ${codeBuilder.getLastAddress()};\n`
+      );
     }
 
     codeBuilder.setTranslatedCode(`  goto ${L2};
@@ -245,5 +260,21 @@ export class Attribute extends Statement {
     typeFactory: TypeFactory,
     codeBuilder: CodeTranslator,
     scope: BlockScope
-  ): void {}
+  ): void {
+    if (this.exp) {
+      this.exp.translate(typeFactory, codeBuilder, scope);
+      if (typeFactory.isBoolean(this.exp.type)) {
+        let dir = codeBuilder.getNewTemporary();
+        codeBuilder.printFalseLabels();
+        codeBuilder.setTranslatedCode(`${dir} = 0;\n`);
+        let LTemp = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(`goto ${LTemp};\n`);
+        codeBuilder.printTrueLabels();
+        codeBuilder.setTranslatedCode(`${dir} = 1\n${LTemp}:\n`);
+        codeBuilder.setLastAddress(dir);
+      }
+    } else {
+      codeBuilder.setLastAddress(this.type.getValueDefault());
+    }
+  }
 }

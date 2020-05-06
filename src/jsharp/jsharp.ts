@@ -148,7 +148,7 @@ export class JSharp {
     // Traducir los contructores de las estructuras
     structures.forEach((strc: StructureType, key: string) => {
       if (strc.structure) {
-        strc.structure.translateConctructor(key, codeBuilder);
+        strc.structure.translateConctructor(key, typeFactory, codeBuilder);
       }
     });
     // luego todas las funciones de cada archivo

@@ -183,7 +183,7 @@ P = P - 0;
     for (let i = 1; i <= this.temporaryCounter; i++) {
       header.push(`t${i}`);
       if (i !== this.temporaryCounter) {
-        if (i % 28 === 0) header.push(",\n");
+        if (i % 24 === 0) header.push(",\n");
         else header.push(", ");
       }
     }
