@@ -12,25 +12,25 @@ const Toast = Swal.mixin({
 });
 const SELECT_FILE = document.getElementById("currentFile");
 
-var buffers = {};
+let buffers = {};
 
 function openBuffer(name, text) {
   buffers[name] = CodeMirror.Doc(text, "jsharp");
-  var opt = document.createElement("option");
+  let opt = document.createElement("option");
   opt.appendChild(document.createTextNode(name));
   SELECT_FILE.appendChild(opt);
 }
 
 function selectBuffer(editor, name) {
-  var buf = buffers[name];
+  let buf = buffers[name];
   if (buf) {
     if (buf.getEditor()) buf = buf.linkedDoc({ sharedHist: true });
-    var old = editor.swapDoc(buf);
-    var linked = old.iterLinkedDocs(function (doc) {
+    let old = editor.swapDoc(buf);
+    let linked = old.iterLinkedDocs(function (doc) {
       linked = doc;
     });
     if (linked) {
-      for (var name in buffers)
+      for (let name in buffers)
         if (buffers[name] == old) buffers[name] = linked;
       old.unlinkDoc(linked);
     }
@@ -54,7 +54,7 @@ async function getNameNewBuffer() {
 }
 
 async function newBufffer(editor) {
-  var name = await getNameNewBuffer();
+  let name = await getNameNewBuffer();
   if (name == null) return;
   name = name + ".j";
   if (buffers.hasOwnProperty(name)) {
@@ -82,42 +82,44 @@ CodeMirror.on(SELECT_FILE, "change", () => {
   );
 });
 
-openBuffer(INIT_FILE, "");
-selectBuffer(editorCode, INIT_FILE);
-M.FormSelect.init(SELECT_FILE);
-
-var btnNewBuffer = document.getElementById("btnNewBuffer");
+let btnNewBuffer = document.getElementById("btnNewBuffer");
 btnNewBuffer.addEventListener(
   "click",
   async () => await newBufffer(editorCode)
 );
-var btnUpFile = document.getElementById("btnUpFile");
+
+let btnUpFile = document.getElementById("btnUpFile");
 btnUpFile.addEventListener("click", async () => {
   const result = await Swal.fire({
-    title: "Selecciona tu archivo J#",
+    title: "Selecciona tus archivos J#",
     input: "file",
     showCancelButton: true,
     inputAttributes: {
       accept: "*.*",
-      "aria-label": "Sube tu archivo J#",
+      multiple: "multiple",
+      "aria-label": "Sube tus archivos J#",
     },
   });
-  let file = result.value;
+  let filesList = result.value;
 
-  if (file) {
-    const name = file.name;
-    const reader = new FileReader();
-    reader.onload = () => {
-      Toast.fire({
-        icon: "success",
-        title: "¡Tu archivo ha sido cargado con éxito!",
-      });
-      openBuffer(name, reader.result);
-      selectBuffer(editorCode, name);
-      SELECT_FILE.value = name;
-      M.FormSelect.init(SELECT_FILE);
-    };
-    reader.readAsText(file);
+  if (filesList) {
+    const files = [...filesList];
+    const length = files.length;
+    for (let i = 0; i < length; i++) {
+      const reader = new FileReader();
+      const name = files[i].name;
+      reader.onload = () => {
+        openBuffer(name, reader.result);
+        selectBuffer(editorCode, name);
+        SELECT_FILE.value = name;
+        M.FormSelect.init(SELECT_FILE);
+      };
+      reader.readAsText(files[i]);
+    }
+    Toast.fire({
+      icon: "success",
+      title: "¡Tu archivos han sido cargado con éxito!",
+    });
   }
 });
 
@@ -135,19 +137,19 @@ async function getWarning(confirmText) {
   return result;
 }
 
-var btnClearBuffer = document.getElementById("btnClearBuffer");
+let btnClearBuffer = document.getElementById("btnClearBuffer");
 btnClearBuffer.addEventListener("click", async () => {
-  var nameFile = SELECT_FILE.options[SELECT_FILE.selectedIndex].text;
-  var buf = buffers[nameFile];
+  let nameFile = SELECT_FILE.options[SELECT_FILE.selectedIndex].text;
+  let buf = buffers[nameFile];
   if (buf) {
     buf.setValue("");
     buf.clearHistory();
   }
 });
 
-var btnDeleteBuffer = document.getElementById("btnDeleteBuffer");
+let btnDeleteBuffer = document.getElementById("btnDeleteBuffer");
 btnDeleteBuffer.addEventListener("click", async () => {
-  var nameFile = SELECT_FILE.options[SELECT_FILE.selectedIndex].text;
+  let nameFile = SELECT_FILE.options[SELECT_FILE.selectedIndex].text;
   if (nameFile !== INIT_FILE) {
     const res = await getWarning("¡Si, deseo borrar el archivo!");
     if (res) {
@@ -166,3 +168,37 @@ btnDeleteBuffer.addEventListener("click", async () => {
     });
   }
 });
+
+let btnClearProject = document.getElementById("btnClearProject");
+btnClearProject.addEventListener("click", () => {
+  clearProject();
+  Toast.fire({
+    icon: "success",
+    title: "¡Se ha limpiado el proyecto exitosamente!",
+  });
+});
+
+let btnCreateZip = document.getElementById("btnCreateZip");
+btnCreateZip.addEventListener("click", () => {
+  let zip = new JSZip();
+  for (let key in buffers) {
+    zip.file(key, buffers[key].getValue());
+  }
+  zip.generateAsync({ type: "blob" }).then(function (content) {
+    saveAs(content, "Projecto.zip");
+  });
+});
+
+function clearProject() {
+  buffers = {};
+  SELECT_FILE.innerHTML = "";
+  init();
+}
+
+function init() {
+  openBuffer(INIT_FILE, "");
+  selectBuffer(editorCode, INIT_FILE);
+  M.FormSelect.init(SELECT_FILE);
+}
+
+init();

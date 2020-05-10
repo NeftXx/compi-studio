@@ -16,23 +16,34 @@ export default class NativePrintFunction {
   }
 
   private printString(codeBuilder: CodeTranslator): void {
-    let t1 = codeBuilder.getNewTemporary();
-    let t2 = codeBuilder.getNewTemporary();
-    let t3 = codeBuilder.getNewTemporary();
-    let L1 = codeBuilder.getNewLabel();
-    let L2 = codeBuilder.getNewLabel();
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
+      t4 = codeBuilder.getNewTemporary();
+    let L1 = codeBuilder.getNewLabel(),
+      L2 = codeBuilder.getNewLabel(),
+      L3 = codeBuilder.getNewLabel(),
+      L4 = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(`
 # Procedimiento para imprimir una cadena
 proc native_print_string begin
   ${t1} = P + 0; # Posicion de parametro
   ${t2} = Stack[${t1}]; # Obteniendo direccion de la cadena
+  if (${t2} == -1) goto ${L1};
+  goto ${L2};
+${L1}:
+  print("%c", 110); print("%c", 117); print("%c", 108); print("%c", 108);
+  goto ${L3};
 ${L2}:
-  ${t3} = Heap[${t2}]; # Obteniendo letra por letra
-  if (${t3} == 0) goto ${L1}; # Mientras no sea nulo
-  print("%c", ${t3}); # Imprimir letra
-  ${t2} = ${t2} + 1; # Aumentado el contador
-  goto ${L2}; # Regresear a evaluar
-${L1}: # Salir
+  ${t3} = ${t2} + 1;
+${L4}:
+  ${t4} = Heap[${t3}]; # Obteniendo letra por letra
+  if (${t4} == 0) goto ${L3}; # Mientras no sea nulo
+  print("%c", ${t4}); # Imprimir letra
+  ${t3} = ${t3} + 1; # Aumentado el contador
+  goto ${L4}; # Regresear a evaluar
+# Salir
+${L3}: 
 end
 
 `);

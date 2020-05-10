@@ -1,20 +1,15 @@
-import Expression from "./expression";
-import NodeInfo from "../../scope/node_info";
-import { BlockScope } from "../../scope/scope";
-import CodeTranslator from "../../scope/code_builder";
-import {
-  TypeFactory,
-  StructureType,
-  ErrorType,
-  ArrayType,
-} from "../../scope/type";
+import Access from "./access";
+import { TypeFactory, StructureType, ErrorType } from "../../../scope/type";
+import CodeTranslator from "../../../scope/code_builder";
+import { BlockScope } from "../../../scope/scope";
+import NodeInfo from "../../../scope/node_info";
 
-export default class AccessAttribute extends Expression {
+export default class AttributeAccess extends Access {
   private dir: number;
 
   public constructor(
     nodeInfo: NodeInfo,
-    public exp: Expression,
+    public exp: Access,
     public identifier: string
   ) {
     super(nodeInfo);
@@ -42,16 +37,7 @@ export default class AccessAttribute extends Expression {
       } else {
         this.type = structure.attributeList[this.dir].type;
         this.dir += 1;
-      }
-    } else if (type instanceof ArrayType) {
-      if (this.identifier === "length") {
-        this.dir = 0;
-        this.type = typeFactory.getInteger();
-      } else {
-        this.type = new ErrorType(
-          `Error no existe el atributo ${this.identifier} en una arreglo.`,
-          this.nodeInfo
-        );
+        this.itsHeap = true;
       }
     } else {
       this.type = new ErrorType(
@@ -61,7 +47,6 @@ export default class AccessAttribute extends Expression {
     }
   }
 
-  // TODO: atributo length de arreglo y validar null pointer
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeTranslator,
@@ -71,8 +56,8 @@ export default class AccessAttribute extends Expression {
     let lastDir = codeBuilder.getLastAddress();
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
-    codeBuilder.setTranslatedCode(`${t1} = ${lastDir} + ${this.dir};
-${t2} = Heap[${t1}];
+    codeBuilder.setTranslatedCode(`${t1} = Heap[${lastDir}];
+${t2} = ${t1} + ${this.dir};
 `);
     codeBuilder.setLastAddress(t2);
   }

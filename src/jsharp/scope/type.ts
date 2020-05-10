@@ -27,6 +27,9 @@ export class BaseType extends JType {
   }
 
   public isEquals(otherType: JType): boolean {
+    if (otherType === AuxiliarType.NULL) {
+      return this === BaseType.STRING;
+    }
     return this === otherType;
   }
 
@@ -48,6 +51,14 @@ export class AuxiliarType extends JType {
   }
 
   public isEquals(otherType: JType): boolean {
+    if (this === AuxiliarType.NULL) {
+      return (
+        otherType === BaseType.STRING ||
+        otherType instanceof StructureType ||
+        otherType instanceof ArrayType ||
+        this === otherType
+      );
+    }
     return this === otherType;
   }
 }
@@ -89,7 +100,7 @@ export class StructureType extends JType {
   }
 
   public isEquals(otherType: JType): boolean {
-    return this === otherType;
+    return this === otherType || otherType === AuxiliarType.NULL;
   }
 
   public setStructure(structure: Structure) {
@@ -98,6 +109,19 @@ export class StructureType extends JType {
 
   public getStructure() {
     return this.structure;
+  }
+}
+
+export class ArrayType extends JType {
+  public constructor(public type: JType, public size: number) {
+    super(`${type.nameType}${`[]`.repeat(size)}`);
+  }
+
+  public isEquals(otherType: JType): boolean {
+    if (otherType instanceof ArrayType) {
+      return this.type === otherType.type && this.size === otherType.size;
+    }
+    return otherType === AuxiliarType.NULL;
   }
 }
 
@@ -120,6 +144,10 @@ export class TypeFactory {
   public getStructure(filename: string, nameType: string) {
     let realName = `strc_${filename.replace(/[.]|[-]/gi, "_")}_${nameType}`;
     return this.structures.get(realName);
+  }
+
+  public createArrayType(type: JType, size: number) {
+    return new ArrayType(type, size);
   }
 
   public getInteger(): JType {
@@ -200,5 +228,9 @@ export class TypeFactory {
 
   public isStructure(type1: JType) {
     return type1 instanceof StructureType;
+  }
+
+  public isArrayType(type1: JType) {
+    return type1 instanceof ArrayType;
   }
 }

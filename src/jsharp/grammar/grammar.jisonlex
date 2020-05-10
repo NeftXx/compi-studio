@@ -63,6 +63,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 "boolean"                         { return "boolean"; }
 
 /* Literals */
+{NullLiteral}                     { return "NULL_LITERAL";      }
 {BooleanLiteral}                  { return "BOOLEAN_LITERAL";   }
 {DoubleLiteral}                   { return "DOUBLE_LITERAL";    }
 {IntegerLiteral}                  { return "INTEGER_LITERAL";   }
@@ -104,7 +105,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 {File}                            { return "FILE"; }
 
 /* Names */
-{Identifier}                      { return "IDENTIFIER"; }
+{Identifier}                      { yytext = yytext.toLowerCase(); return "IDENTIFIER"; }
 
 
 /* Separators */

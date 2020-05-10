@@ -30,11 +30,14 @@ export default class Literal extends Expression {
       codeBuilder.setTranslatedCode(`# Inicio de cadena\n`);
       let tempStart = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${tempStart} = H;\n`);
-      for (let i = 0; i < this.value.length; i++) {
-        codeBuilder.setTranslatedCode(
-          `Heap[H] = ${this.value.charCodeAt(i)};\n`
-        );
-        codeBuilder.setTranslatedCode("H = H + 1;\n");
+      let length = this.value.length;
+      codeBuilder.setTranslatedCode(`Heap[H] = ${length};
+H = H + 1;
+`);
+      for (let i = 0; i < length; i++) {
+        codeBuilder.setTranslatedCode(`Heap[H] = ${this.value.charCodeAt(i)};
+H = H + 1;
+`);
       }
       codeBuilder.setTranslatedCode(`Heap[H] = 0;\n`);
       codeBuilder.setTranslatedCode("H = H + 1;\n");

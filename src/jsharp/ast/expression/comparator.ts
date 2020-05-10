@@ -58,6 +58,14 @@ export default class Comparator extends Expression {
       let dir1 = codeBuilder.getLastAddress();
       this.expRight.translate(typeFactory, codeBuilder, scope);
       let dir2 = codeBuilder.getLastAddress();
+      if (
+        typeFactory.isString(this.expLeft.type) &&
+        typeFactory.isString(this.expRight.type)
+      ) {
+        codeBuilder.setTranslatedCode(`
+`);
+        dir2 = "0";
+      }
       let LV = codeBuilder.getNewLabel();
       let LF = codeBuilder.getNewLabel();
       codeBuilder.setTranslatedCode(
@@ -66,6 +74,7 @@ export default class Comparator extends Expression {
       codeBuilder.addTrueLabel(LV);
       codeBuilder.addFalseLabel(LF);
       return;
+    } else if (this.operator === "===") {
     }
   }
 }

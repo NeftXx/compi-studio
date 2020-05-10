@@ -165,11 +165,12 @@ proc ${nameReal} begin
   ${t2} = Heap[${this.type.enablePointer}];
   if (${t2} == 0) goto ${L1};
   ${t1} = H;
-  H = H + ${size};
+  H = H + ${size + 1};
+  Heap[${t1}] = ${size};
 `);
 
     for (let i = 0; i < size; i++) {
-      codeBuilder.setTranslatedCode(`  ${t3} = ${t1} + ${i};\n`);
+      codeBuilder.setTranslatedCode(`  ${t3} = ${t1} + ${i + 1};\n`);
       this.attributeList[i].translate(
         typeFactory,
         codeBuilder,

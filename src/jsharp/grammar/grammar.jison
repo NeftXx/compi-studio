@@ -26,8 +26,14 @@
   const { default: WhileStm } = require("../ast/statement/while");
   const { default: DoWhileStm } = require("../ast/statement/do_while");
   const { default: AccessAttribute } = require("../ast/expression/access_attribute");
-  const { StructDeclaration } = require("../ast/expression/struct_declaration");
+  const { default: AccessArray } = require("../ast/expression/access_array");
+  const { default: OwnFunctions } = require("../ast/expression/ow_function");
+  const { StructDeclaration, StructDeclarationArray } = require("../ast/expression/struct_declaration");
   const { Structure, Attribute } = require("../ast/statement/structure");
+  const { default: ArrayAccess } = require("../ast/statement/var_assignment/array_access");
+  const { default: AttributeAccess } = require("../ast/statement/var_assignment/attribute_access");
+  const { default: IdentifierAccess } = require("../ast/statement/var_assignment/identifier_access");
+  const { default: VarAssignment } = require("../ast/statement/var_assignment/var_assignment");
   const {
     VarDeclaration,
     VarDeclarationGlobal,
@@ -97,8 +103,8 @@ global_statements_list
 
 global_statement
   : function_statement { $$ = $1; }
-  | variable_declaration { $$ = $1; }
   | struct_definition { $$ = $1; }
+  | variable_declaration { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
 ;
 
@@ -135,8 +141,25 @@ function_statement
 
 type
   : primitive_type { $$ = $1; }
-  | reference_type { $$ = $1; }
-  | array_type
+  | IDENTIFIER     {
+    if ($1 === "string") {
+      $$ = yy.typeFactory.getString();
+    } else {
+      $$ = yy.typeFactory.createNewStructure(yy.filename, $1);
+    }
+  }
+  | primitive_type '[' ']' { $$ = yy.typeFactory.createArrayType($1, 1); }
+  | IDENTIFIER '[' ']' {
+    if ($1 === "string") {
+      $$ = yy.typeFactory.createArrayType(
+        yy.typeFactory.getString(), 1
+      );
+    } else {
+      $$ = yy.typeFactory.createArrayType(
+        yy.typeFactory.createNewStructure(yy.filename, $1), 1
+      );
+    }
+  }
 ;
 
 primitive_type
@@ -144,16 +167,6 @@ primitive_type
   | 'double'  { $$ = yy.typeFactory.getDouble();  }
   | 'char'    { $$ = yy.typeFactory.getChar();    }
   | 'boolean' { $$ = yy.typeFactory.getBoolean(); }
-;
-
-reference_type
-  : IDENTIFIER { $$ = yy.typeFactory.createNewStructure(yy.filename, $1); }
-;
-
-array_type
-  : array_type '[' ']'
-  | primitive_type '[' ']'
-  | reference_type '[' ']'
 ;
 
 parameter_list
@@ -204,8 +217,10 @@ statement
   | if_statement { $$ = $1; }
   | while_statement { $$ = $1; }
   | do_while_statement { $$ = $1; }
-  | variable_declaration { $$ = $1; }
   | struct_definition { $$ = $1; }
+  | var_assignment { $$ = $1; }
+  | variable_declaration { $$ = $1; }
+  | var_assignment ';' { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
 ;
 
@@ -227,7 +242,24 @@ struct_definition
 ;
 
 struct_declaration
-  : 'strc' IDENTIFIER list_cor
+  : 'strc' primitive_type '[' expression ']' {
+    let typeArray1 = yy.typeFactory.createArrayType($2, 1);
+    $$ = new StructDeclarationArray(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), typeArray1, $4
+    );
+  }
+  | 'strc' IDENTIFIER '[' expression ']' {
+    let typeArray2 = yy.typeFactory.createArrayType(
+      yy.typeFactory.createNewStructure(yy.filename, $2), 1
+    );
+    $$ = new StructDeclarationArray(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), typeArray2, $4
+    );
+  }
   | 'strc' IDENTIFIER '(' ')' {
     $$ = new StructDeclaration(
       new NodeInfo(
@@ -235,11 +267,6 @@ struct_declaration
       ), $2
     );
   }
-;
-
-list_cor
-  : list_cor '[' ']'
-  | '[' ']'
 ;
 
 attribute_list
@@ -305,6 +332,93 @@ variable_declaration
 id_list
   : id_list ',' IDENTIFIER { $$ = $1; $$.push($3); }
   | IDENTIFIER { $$ = [$1]; }
+;
+
+var_assignment
+  : access_list '=' expression {
+    $$ = new VarAssignment(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | IDENTIFIER '=' expression {
+    let tempId = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    $$ = new VarAssignment(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempId, $3
+    );
+  }
+  | IDENTIFIER '[' expression ']' '=' expression {
+    let idTemp = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    let tempArray = new ArrayAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), idTemp, $3
+    );
+    $$ = new VarAssignment(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempArray, $6
+    );
+  }  
+;
+
+access_list
+  : access_list '.' IDENTIFIER {
+    $$ = new AttributeAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | access_list '[' expression ']' {
+    $$ = new ArrayAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | IDENTIFIER '.' IDENTIFIER '[' expression ']' {
+    let idTemp1= new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+
+    let attAccess = new AttributeAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), idTemp1, $3
+    );
+
+    $$ = new ArrayAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), attAccess, $5
+    );
+  }
+  | IDENTIFIER '.' IDENTIFIER {
+    let idTemp2 = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    $$ = new AttributeAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), idTemp2, $3
+    );
+  }
 ;
 
 do_while_statement
@@ -512,6 +626,27 @@ expression
       ), $1, $3
     );
   }
+  | expression '.' IDENTIFIER '(' ')' {
+    $$ = new OwnFunctions(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | expression '.' IDENTIFIER '(' expression ')' {
+    $$ = new OwnFunctions(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3, $5
+    );
+  }
+  | expression '[' expression ']' {
+    $$ = new AccessArray(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
   | '-' expression %prec UMINUS {
     $$ = new UMenos(
       new NodeInfo(
@@ -553,6 +688,13 @@ expression
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), yy.typeFactory.getBoolean(), $1.toLowerCase() === "true"
+    );
+  }
+  | NULL_LITERAL {
+    $$ = new Literal(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), yy.typeFactory.getNull(), -1
     );
   }
   | IDENTIFIER {

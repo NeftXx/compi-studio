@@ -262,23 +262,25 @@ export class VarDeclarationType extends Declaration {
   public createScope(typeFactory: TypeFactory, scope: BlockScope): void {}
 
   public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
-    this.exp.verifyType(typeFactory, scope);
-    let typeExp = this.exp.type;
-    if (typeExp instanceof ErrorType) {
-      scope.addError(typeExp);
-    }
-    let verify =
-      (typeFactory.isDouble(this.type) && typeFactory.isNumeric(typeExp)) ||
-      (typeFactory.isInteger(this.type) &&
-        (typeFactory.isInteger(typeExp) || typeFactory.isChar(typeExp))) ||
-      this.type.isEquals(typeExp);
-    if (!verify) {
-      scope.addError(
-        new ErrorType(
-          `Error no se puede asignar una expresion de tipo ${typeExp} en una declaracion de variables de tipo ${this.type}.`,
-          this.nodeInfo
-        )
-      );
+    if (this.exp) {
+      this.exp.verifyType(typeFactory, scope);
+      let typeExp = this.exp.type;
+      if (typeExp instanceof ErrorType) {
+        scope.addError(typeExp);
+      }
+      let verify =
+        (typeFactory.isDouble(this.type) && typeFactory.isNumeric(typeExp)) ||
+        (typeFactory.isInteger(this.type) &&
+          (typeFactory.isInteger(typeExp) || typeFactory.isChar(typeExp))) ||
+        this.type.isEquals(typeExp);
+      if (!verify) {
+        scope.addError(
+          new ErrorType(
+            `Error no se puede asignar una expresion de tipo ${typeExp} en una declaracion de variables de tipo ${this.type}.`,
+            this.nodeInfo
+          )
+        );
+      }
     }
     let ok: boolean;
     for (let identifier of this.idList) {
@@ -311,18 +313,22 @@ export class VarDeclarationType extends Declaration {
     codeBuilder: CodeTranslator,
     scope: BlockScope
   ) {
-    this.exp.translate(typeFactory, codeBuilder, scope);
     let dir: string;
-    if (typeFactory.isBoolean(this.exp.type)) {
-      dir = codeBuilder.getNewTemporary();
-      codeBuilder.printFalseLabels();
-      codeBuilder.setTranslatedCode(`${dir} = 0;\n`);
-      let LS = codeBuilder.getNewLabel();
-      codeBuilder.setTranslatedCode(`goto ${LS};\n`);
-      codeBuilder.printTrueLabels();
-      codeBuilder.setTranslatedCode(`${dir} = 1;\n${LS}:\n`);
+    if (this.exp) {
+      this.exp.translate(typeFactory, codeBuilder, scope);
+      if (typeFactory.isBoolean(this.exp.type)) {
+        dir = codeBuilder.getNewTemporary();
+        codeBuilder.printFalseLabels();
+        codeBuilder.setTranslatedCode(`${dir} = 0;\n`);
+        let LS = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(`goto ${LS};\n`);
+        codeBuilder.printTrueLabels();
+        codeBuilder.setTranslatedCode(`${dir} = 1;\n${LS}:\n`);
+      } else {
+        dir = codeBuilder.getLastAddress();
+      }
     } else {
-      dir = codeBuilder.getLastAddress();
+      dir = this.type.getValueDefault();
     }
     let t1 = codeBuilder.getNewTemporary();
     this.idList.forEach((id) => {
@@ -338,8 +344,13 @@ Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
     codeBuilder: CodeTranslator,
     scope: BlockScope
   ) {
-    this.exp.translate(typeFactory, codeBuilder, scope);
-    let dirExp = codeBuilder.getLastAddress();
+    let dirExp: string;
+    if (this.exp) {
+      this.exp.translate(typeFactory, codeBuilder, scope);
+      dirExp = codeBuilder.getLastAddress();
+    } else {
+      dirExp = this.type.getValueDefault();
+    }
     this.idList.forEach((id) => {
       codeBuilder.setTranslatedCode(
         `# Inicio declaracion de la variable global ${id}\n`
