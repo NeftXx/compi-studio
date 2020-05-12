@@ -39,6 +39,7 @@ export default class Comparator extends Expression {
           this.nodeInfo
         );
       }
+      this.operator = this.operator === "!=" ? "<>" : this.operator;
     } else if (this.operator === "===" || this.operator === "!==") {
     } else {
       this.type = typeFactory.getErrorType(
@@ -62,9 +63,22 @@ export default class Comparator extends Expression {
         typeFactory.isString(this.expLeft.type) &&
         typeFactory.isString(this.expRight.type)
       ) {
-        codeBuilder.setTranslatedCode(`
+        let t1 = codeBuilder.getNewTemporary(),
+          t2 = codeBuilder.getNewTemporary(),
+          t3 = codeBuilder.getNewTemporary();
+        let size = scope.size;
+        codeBuilder.setTranslatedCode(`${t1} = P + ${size};
+${t2} = ${t1} + 1;
+Stack[${t2}] = ${dir1};
+${t2} = ${t1} + 2;
+Stack[${t2}] = ${dir2};
+P = P + ${size};
+call native_comparar_cadenas;
+P = P - ${size};
+${t3} = Stack[${t1}];
 `);
-        dir2 = "0";
+        dir1 = t3;
+        dir2 = "1";
       }
       let LV = codeBuilder.getNewLabel();
       let LF = codeBuilder.getNewLabel();

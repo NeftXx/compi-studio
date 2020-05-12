@@ -114,7 +114,7 @@ export class StructureType extends JType {
 
 export class ArrayType extends JType {
   public constructor(public type: JType, public size: number) {
-    super(`${type.nameType}${`[]`.repeat(size)}`);
+    super(`${type.nameType}_array`);
   }
 
   public isEquals(otherType: JType): boolean {

@@ -5,16 +5,24 @@ import CodeTranslator from "../../../scope/code_builder";
 import Access from "./access";
 
 export default class IdentifierAccess extends Access {
+  public isConstant: boolean;
+
   public constructor(nodeInfo: NodeInfo, public identifier: string) {
     super(nodeInfo);
+    this.isConstant = false;
   }
 
   public verifyType(typeFactory: TypeFactory, scope: BlockScope): void {
     let variable = scope.getVariable(this.identifier);
-    if (!variable) {
+    if (variable) {
+      this.isConstant = variable.isConstant;
+      this.itsHeap = false;
+      this.type = variable.type;
+    } else {
       let globalScope = scope.getGlobal();
       variable = globalScope.getVariableLocal(this.identifier);
       if (variable) {
+        this.isConstant = variable.isConstant;
         this.itsHeap = true;
         this.type = variable.type;
       } else {
@@ -23,9 +31,6 @@ export default class IdentifierAccess extends Access {
           this.nodeInfo
         );
       }
-    } else {
-      this.itsHeap = false;
-      this.type = variable.type;
     }
   }
 

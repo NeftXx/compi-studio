@@ -61,7 +61,6 @@ export default class AccessAttribute extends Expression {
     }
   }
 
-  // TODO: atributo length de arreglo y validar null pointer
   public translate(
     typeFactory: TypeFactory,
     codeBuilder: CodeTranslator,
@@ -69,11 +68,44 @@ export default class AccessAttribute extends Expression {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     let lastDir = codeBuilder.getLastAddress();
-    let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary();
-    codeBuilder.setTranslatedCode(`${t1} = ${lastDir} + ${this.dir};
-${t2} = Heap[${t1}];
+    if (typeFactory.isArrayType(this.exp.type)) {
+      let t1 = codeBuilder.getNewTemporary();
+      let L1 = codeBuilder.getNewLabel(),
+        L2 = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+${t1} = Heap[${lastDir}];
+goto ${L2};
+${L1}:
+E = 4;
+${t1} = 0;
+${L2}:
 `);
-    codeBuilder.setLastAddress(t2);
+      codeBuilder.setLastAddress(t1);
+    } else {
+      let t1 = codeBuilder.getNewTemporary(),
+        t2 = codeBuilder.getNewTemporary();
+      let L1 = codeBuilder.getNewLabel(),
+        L2 = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+${t1} = ${lastDir} + ${this.dir};
+${t2} = Heap[${t1}];
+goto ${L2};
+${L1}:
+E = 4;
+${t2} = -1;
+${L2}:
+`);
+      if (typeFactory.isBoolean(this.type)) {
+        let LV = codeBuilder.getNewLabel(),
+          LF = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(`if (${t2} == 1) goto ${LV};
+goto ${LF};
+`);
+        codeBuilder.addTrueLabel(LV);
+        codeBuilder.addFalseLabel(LF);
+      } else {
+        codeBuilder.setLastAddress(t2);
+      }
+    }
   }
 }

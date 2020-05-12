@@ -5,6 +5,7 @@ import { TypeFactory, ErrorType } from "../../../scope/type";
 import { BlockScope } from "../../../scope/scope";
 import CodeTranslator from "../../../scope/code_builder";
 import Access from "./access";
+import IdentifierAccess from "./identifier_access";
 
 export default class VarAssignment extends Statement {
   public constructor(
@@ -22,6 +23,16 @@ export default class VarAssignment extends Statement {
     let type1 = this.access.type;
     if (type1 instanceof ErrorType) {
       scope.addError(type1);
+    }
+    if (this.access instanceof IdentifierAccess) {
+      if (this.access.isConstant) {
+        scope.addError(
+          new ErrorType(
+            `Error no se le puede asignar un nuevo valor a la variable ${this.access.identifier} ya que es una constante.`,
+            this.nodeInfo
+          )
+        );
+      }
     }
     this.exp.verifyType(typeFactory, scope);
     let type2 = this.exp.type;

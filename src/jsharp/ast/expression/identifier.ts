@@ -41,7 +41,17 @@ export default class Identifier extends Expression {
           t2 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
 ${t2} = Stack[${t1}];\n`);
-        codeBuilder.setLastAddress(t2);
+        if (typeFactory.isBoolean(this.type)) {
+          let LV = codeBuilder.getNewLabel(),
+            LF = codeBuilder.getNewLabel();
+          codeBuilder.setTranslatedCode(`if (${t2} == 1) goto ${LV};
+goto ${LF};
+`);
+          codeBuilder.addTrueLabel(LV);
+          codeBuilder.addFalseLabel(LF);
+        } else {
+          codeBuilder.setLastAddress(t2);
+        }
       } else {
         this.getVariableGlobal(typeFactory, codeBuilder, scope);
       }
@@ -88,7 +98,17 @@ P = P - ${size};
 E = 3;
 ${LF}:
 `);
-      codeBuilder.setLastAddress(t2);
+      if (typeFactory.isBoolean(this.type)) {
+        let LV = codeBuilder.getNewLabel(),
+          LF = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(`if (${t2} == 1) goto ${LV};
+goto ${LF};
+`);
+        codeBuilder.addTrueLabel(LV);
+        codeBuilder.addFalseLabel(LF);
+      } else {
+        codeBuilder.setLastAddress(t2);
+      }
     }
   }
 

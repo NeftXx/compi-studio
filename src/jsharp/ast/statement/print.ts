@@ -4,6 +4,8 @@ import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
+import Identifier from "../expression/identifier";
+import AccessArray from "../expression/access_array";
 
 export default class Print extends Statement {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {

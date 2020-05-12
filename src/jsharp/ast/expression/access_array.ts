@@ -68,6 +68,16 @@ ${L2}:
 E = 2;
 ${L5}:
 `);
-    codeBuilder.setLastAddress(t4);
+    if (typeFactory.isBoolean(this.type)) {
+      let LV = codeBuilder.getNewLabel(),
+        LF = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`if (${t4} == 1) goto ${LV};
+goto ${LF};
+`);
+      codeBuilder.addTrueLabel(LV);
+      codeBuilder.addFalseLabel(LF);
+    } else {
+      codeBuilder.setLastAddress(t4);
+    }
   }
 }
