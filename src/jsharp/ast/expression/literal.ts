@@ -41,9 +41,9 @@ H = H + 1;
       }
       codeBuilder.setTranslatedCode(`Heap[H] = 0;\n`);
       codeBuilder.setTranslatedCode("H = H + 1;\n");
-      codeBuilder.removeUnusedTemporary(tempStart);
       codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
       codeBuilder.setLastAddress(tempStart);
+      codeBuilder.addUnusedTemporary(tempStart);
     } else if (typeof this.value === "number") {
       codeBuilder.setLastAddress(this.value.toString());
     } else if (typeof this.value === "boolean") {

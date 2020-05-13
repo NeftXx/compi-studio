@@ -33,9 +33,10 @@ export default class UMenos extends Expression {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     let dir = codeBuilder.getNewTemporary();
-    codeBuilder.setTranslatedCode(
-      `${dir} = -${codeBuilder.getLastAddress()};\n`
-    );
+    let last = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(last);
+    codeBuilder.setTranslatedCode(`${dir} = -${last};\n`);
     codeBuilder.setLastAddress(dir);
+    codeBuilder.addUnusedTemporary(dir);
   }
 }

@@ -41,10 +41,11 @@ export default class Cast extends Expression {
       typeFactory.isNumeric(this.exp.type)
     ) {
       let dir = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(
-        `${dir} = ${codeBuilder.getLastAddress()} * 1.0;\n`
-      );
+      let last = codeBuilder.getLastAddress();
+      codeBuilder.setTranslatedCode(`${dir} = ${last} * 1.0;\n`);
+      codeBuilder.removeUnusedTemporary(last);
       codeBuilder.setLastAddress(dir);
+      codeBuilder.addUnusedTemporary(dir);
     } else if (
       typeFactory.isNumeric(this.type) &&
       typeFactory.isDouble(this.exp.type)
@@ -57,7 +58,9 @@ export default class Cast extends Expression {
 ${dir} = ${last} - ${t1};
 `
       );
+      codeBuilder.removeUnusedTemporary(last);
       codeBuilder.setLastAddress(dir);
+      codeBuilder.addUnusedTemporary(dir);
     }
   }
 }

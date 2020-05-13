@@ -83,7 +83,7 @@ export default class Arithmetic extends Expression {
         codeBuilder.setTranslatedCode(
           `Stack[${t4}] = ${dir1}; # asignacion de parametro\n`
         );
-
+        codeBuilder.removeUnusedTemporary(dir1);
         t4 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t4} = ${t3} + 2; # indice parametro\n`
@@ -91,7 +91,7 @@ export default class Arithmetic extends Expression {
         codeBuilder.setTranslatedCode(
           `Stack[${t4}] = ${dir2}; # asignacion de parametro\n`
         );
-
+        codeBuilder.removeUnusedTemporary(dir2);
         codeBuilder.setTranslatedCode(
           `P = P + ${size};\ncall native_potencia;\nP = P - ${size};\n`
         );
@@ -102,12 +102,16 @@ export default class Arithmetic extends Expression {
           `${dir} = stack[${t4}]; # asignacion del resultado del return\n`
         );
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else {
         let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${dir} = ${dir1} ${this.operator} ${dir2};\n`
         );
+        codeBuilder.removeUnusedTemporary(dir1);
+        codeBuilder.removeUnusedTemporary(dir2);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       }
     } else if (typeFactory.isString(this.type)) {
       let type1 = this.expLeft.type;
@@ -115,8 +119,10 @@ export default class Arithmetic extends Expression {
       if (typeFactory.isString(type1) && typeFactory.isString(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let t3 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t3} = P + ${size}; # Cambio simulado de ambito\n`
@@ -148,9 +154,11 @@ export default class Arithmetic extends Expression {
           `${dir} = stack[${t4}]; # asignacion del resultado del return\n`
         );
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (typeFactory.isString(type1) && typeFactory.isBoolean(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t3 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t3} = P + ${size}; # Cambio simulado de ambito\n`
@@ -172,6 +180,7 @@ export default class Arithmetic extends Expression {
           `${t4} = ${t3} + 2; # indice de parametro\n`
         );
         codeBuilder.setTranslatedCode(`Stack[${t4}] = ${dir2};\n`);
+        codeBuilder.removeUnusedTemporary(dir2);
         codeBuilder.setTranslatedCode(
           `P = P + ${size};\ncall native_concatenar_string_boolean;\nP = P - ${size};\n`
         );
@@ -180,9 +189,11 @@ export default class Arithmetic extends Expression {
           `${dir} = Stack[${t3}]; # asignacion del resultado del return\n`
         );
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (typeFactory.isBoolean(type1) && typeFactory.isString(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getNewTemporary();
+        codeBuilder.removeUnusedTemporary(dir1);
         codeBuilder.printFalseLabels();
         codeBuilder.setTranslatedCode(`${dir1} = 0;\n`);
         let LTemp = codeBuilder.getNewLabel();
@@ -206,6 +217,7 @@ export default class Arithmetic extends Expression {
         codeBuilder.setTranslatedCode(
           `Stack[${t4}] = ${dir2}; # asignacion de parametro\n`
         );
+        codeBuilder.removeUnusedTemporary(dir2);
         codeBuilder.setTranslatedCode(
           `P = P + ${size};\ncall native_concatenar_boolean_string;\nP = P - ${size};\n`
         );
@@ -214,9 +226,11 @@ export default class Arithmetic extends Expression {
           `${dir} = Stack[${t3}]; # asignacion del resultado del return\n`
         );
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (typeFactory.isChar(type1) && typeFactory.isChar(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t1 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t1} = P + ${size}; # Cambio simulado de ambito\n`
@@ -227,6 +241,7 @@ Stack[${t2}] = ${dir1}; # asignacion de parametro
 `);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t2} = ${t1} + 2;
 Stack[${t2}] = ${dir2}; # asignacion de parametro
@@ -236,9 +251,11 @@ P = P - ${size};
 ${dir} = Stack[${t1}]; # asignacion del resultado del return
 `);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (typeFactory.isChar(type1) && typeFactory.isString(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t1 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t1} = P + ${size}; # Cambio simulado de ambito\n`
@@ -249,6 +266,7 @@ Stack[${t2}] = ${dir1}; # asignacion de parametro
 `);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t2} = ${t1} + 2;
 Stack[${t2}] = ${dir2}; # asignacion de parametro
@@ -258,9 +276,11 @@ P = P - ${size};
 ${dir} = Stack[${t1}]; # asignacion del resultado del return
 `);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (typeFactory.isString(type1) && typeFactory.isChar(type2)) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t1 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t1} = P + ${size}; # Cambio simulado de ambito\n`
@@ -271,6 +291,7 @@ Stack[${t2}] = ${dir1}; # asignacion de parametro
 `);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let dir = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(`${t2} = ${t1} + 2;
 Stack[${t2}] = ${dir2}; # asignacion de parametro
@@ -280,12 +301,14 @@ P = P - ${size};
 ${dir} = Stack[${t1}]; # asignacion del resultado del return
 `);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (
         (typeFactory.isInteger(type1) || typeFactory.isDouble(type1)) &&
         typeFactory.isString(type2)
       ) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t1 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t1} = P + ${size}; # Cambio simulado de ambito\n`
@@ -296,6 +319,7 @@ Stack[${t2}] = ${dir1}; # asignacion de parametro
 `);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let dir = codeBuilder.getNewTemporary();
         let cond = typeFactory.isDouble(type1) ? 1 : 0;
         codeBuilder.setTranslatedCode(`${t2} = ${t1} + 2;
@@ -308,12 +332,14 @@ P = P - ${size};
 ${dir} = Stack[${t1}]; # asignacion del resultado del return
 `);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       } else if (
         typeFactory.isString(type1) &&
         (typeFactory.isInteger(type2) || typeFactory.isDouble(type2))
       ) {
         this.expLeft.translate(typeFactory, codeBuilder, scope);
         let dir1 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir1);
         let t1 = codeBuilder.getNewTemporary();
         codeBuilder.setTranslatedCode(
           `${t1} = P + ${size}; # Cambio simulado de ambito\n`
@@ -324,8 +350,9 @@ Stack[${t2}] = ${dir1}; # asignacion de parametro
 `);
         this.expRight.translate(typeFactory, codeBuilder, scope);
         let dir2 = codeBuilder.getLastAddress();
+        codeBuilder.removeUnusedTemporary(dir2);
         let dir = codeBuilder.getNewTemporary();
-        let cond = typeFactory.isDouble(type1) ? 1 : 0;
+        let cond = typeFactory.isDouble(type2) ? 1 : 0;
         codeBuilder.setTranslatedCode(`${t2} = ${t1} + 2;
 Stack[${t2}] = ${dir2}; # asignacion de parametro
 ${t2} = ${t1} + 3;
@@ -336,6 +363,7 @@ P = P - ${size};
 ${dir} = Stack[${t1}]; # asignacion del resultado del return
 `);
         codeBuilder.setLastAddress(dir);
+        codeBuilder.addUnusedTemporary(dir);
       }
     }
   }

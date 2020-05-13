@@ -1,5 +1,5 @@
 import { Variable } from "./variable";
-import { ErrorType, JType } from "./type";
+import { ErrorType, JType, AuxiliarType } from "./type";
 import { Structure } from "../ast/statement/structure";
 
 export class SymbolTable {
@@ -46,11 +46,13 @@ export class BlockScope {
   protected globalScope: FileScope | undefined;
   public variables: Map<string, Variable>;
   public blocks: Map<string, BlockScope>;
+  public returnType: JType;
 
   public constructor(
     protected previous: BlockScope | undefined,
     protected errorsList: Array<ErrorType>
   ) {
+    this.returnType = undefined;
     this.size = 0;
     this.countScopes = 1;
     this.variables = new Map();
@@ -74,6 +76,7 @@ export class BlockScope {
     let block = new BlockScope(this, this.errorsList);
     this.blocks.set(nameScope, block);
     block.setGlobal(this.globalScope);
+    block.returnType = this.returnType;
     return block;
   }
 
@@ -162,14 +165,21 @@ export class MethodScope extends BlockScope {
     errorsList: Array<ErrorType>,
     private identifier: string,
     private paramNames: Array<string>,
-    private returnType: JType
+    returnType: JType
   ) {
     super(undefined, errorsList);
+    this.returnType = returnType;
     this.nameMethod = "";
     this.variables.set(
       "return",
       new Variable("return", this.returnType, -1, false)
     );
+  }
+
+  public createBlockScope(): BlockScope {
+    let scope = super.createBlockScope();
+    scope.returnType = this.returnType;
+    return scope;
   }
 
   public updateAddresses(): void {
@@ -227,6 +237,7 @@ export class FileScope extends BlockScope {
     errorsList: Array<ErrorType>
   ) {
     super(undefined, errorsList);
+    this.returnType = undefined;
     this.importsScope = new Map();
     this.globalScope = this;
     this.countError = 1;
@@ -288,6 +299,15 @@ export class FileScope extends BlockScope {
     let scope = this.blocks.get(identifier);
     if (scope instanceof MethodScope) {
       return scope;
+    }
+    return this.enterMethodImport(identifier);
+  }
+
+  private enterMethodImport(identifier: string): MethodScope | undefined {
+    let found: MethodScope;
+    for (let [id, scopeCurrent] of this.importsScope.entries()) {
+      found = scopeCurrent.enterMethod(identifier);
+      if (found) return found;
     }
     return undefined;
   }

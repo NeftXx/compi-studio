@@ -45,6 +45,8 @@ export default class SubIf extends Statement {
         }
       }
     }
+    this.block.continueCounter = this.continueCounter;
+    this.block.breksCounter = this.breksCounter;
     this.block.checkScope(typeFactory, this.localScope);
   }
 
@@ -57,6 +59,8 @@ export default class SubIf extends Statement {
       this.expression.translate(typeFactory, codeBuilder, scope);
     }
     codeBuilder.printTrueLabels();
+    this.block.breakLabel = this.breakLabel;
+    this.block.continueLabel = this.continueLabel;
     this.block.translate(typeFactory, codeBuilder, this.localScope);
     if (this.labelExit !== "") {
       codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);

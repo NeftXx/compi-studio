@@ -51,6 +51,7 @@ goto ${LF};
           codeBuilder.addFalseLabel(LF);
         } else {
           codeBuilder.setLastAddress(t2);
+          codeBuilder.addUnusedTemporary(t2);
         }
       } else {
         this.getVariableGlobal(typeFactory, codeBuilder, scope);
@@ -108,6 +109,7 @@ goto ${LF};
         codeBuilder.addFalseLabel(LF);
       } else {
         codeBuilder.setLastAddress(t2);
+        codeBuilder.addUnusedTemporary(t2);
       }
     }
   }

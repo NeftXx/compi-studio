@@ -56,9 +56,9 @@ export default class Comparator extends Expression {
   ): void {
     if (this.operator === "==" || this.operator === "!=") {
       this.expLeft.translate(typeFactory, codeBuilder, scope);
-      let dir1 = codeBuilder.getLastAddress();
+      let dir1 = this.getDir(typeFactory, codeBuilder, this.expLeft);
       this.expRight.translate(typeFactory, codeBuilder, scope);
-      let dir2 = codeBuilder.getLastAddress();
+      let dir2 = this.getDir(typeFactory, codeBuilder, this.expRight);
       if (
         typeFactory.isString(this.expLeft.type) &&
         typeFactory.isString(this.expRight.type)
@@ -90,5 +90,26 @@ ${t3} = Stack[${t1}];
       return;
     } else if (this.operator === "===") {
     }
+  }
+
+  private getDir(
+    typeFactory: TypeFactory,
+    codeBuilder: CodeTranslator,
+    exp: Expression
+  ) {
+    let dirExp: string;
+    if (typeFactory.isBoolean(exp.type)) {
+      dirExp = codeBuilder.getNewTemporary();
+      codeBuilder.printFalseLabels();
+      codeBuilder.setTranslatedCode(`${dirExp} = 0;\n`);
+      let LS = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`goto ${LS};\n`);
+      codeBuilder.printTrueLabels();
+      codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
+    } else {
+      dirExp = codeBuilder.getLastAddress();
+      codeBuilder.removeUnusedTemporary(dirExp);
+    }
+    return dirExp;
   }
 }

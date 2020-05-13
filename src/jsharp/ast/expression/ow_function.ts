@@ -156,8 +156,10 @@ export default class OwnFunctions extends Expression {
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir);
     this.param.translate(typeFactory, codeBuilder, scope);
     let dirParam = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dirParam);
     let size = scope.size;
     codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
 ${t2} = ${t1} + 1;
@@ -170,6 +172,7 @@ P = P - ${size};
 ${t3} = Stack[${t1}];
 `);
     codeBuilder.setLastAddress(t3);
+    codeBuilder.addUnusedTemporary(t3);
   }
 
   private toUpperCase(
@@ -181,6 +184,7 @@ ${t3} = Stack[${t1}];
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
     codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
 ${t2} = ${t1} + 1;
@@ -191,6 +195,7 @@ P = P - ${size};
 ${t3} = Stack[${t1}];
 `);
     codeBuilder.setLastAddress(t3);
+    codeBuilder.addUnusedTemporary(t3);
   }
 
   private toLowerCase(
@@ -202,6 +207,7 @@ ${t3} = Stack[${t1}];
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
     codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
 ${t2} = ${t1} + 1;
@@ -212,6 +218,7 @@ P = P - ${size};
 ${t3} = Stack[${t1}];
 `);
     codeBuilder.setLastAddress(t3);
+    codeBuilder.addUnusedTemporary(t3);
   }
 
   private lengthString(
@@ -223,6 +230,7 @@ ${t3} = Stack[${t1}];
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
     codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
 ${t2} = ${t1} + 1;
@@ -233,6 +241,7 @@ P = P - ${size};
 ${t3} = Stack[${t1}];
 `);
     codeBuilder.setLastAddress(t3);
+    codeBuilder.addUnusedTemporary(t3);
   }
 
   private toCharArray(
@@ -244,6 +253,7 @@ ${t3} = Stack[${t1}];
       t2 = codeBuilder.getNewTemporary(),
       t3 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
     codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
 ${t2} = ${t1} + 1;
@@ -254,5 +264,6 @@ P = P - ${size};
 ${t3} = Stack[${t1}];
 `);
     codeBuilder.setLastAddress(t3);
+    codeBuilder.addUnusedTemporary(t3);
   }
 }

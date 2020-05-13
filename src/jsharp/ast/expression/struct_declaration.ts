@@ -59,6 +59,7 @@ ${t5} = ${t1} + 0;
 ${t6} = Stack[${t5}];
 `);
       codeBuilder.setLastAddress(t6);
+      codeBuilder.addUnusedTemporary(t6);
     }
   }
 }
@@ -147,6 +148,7 @@ ${L4}:
 ${L2}:
 `);
     codeBuilder.setLastAddress(t1);
+    codeBuilder.addUnusedTemporary(t1);
   }
 
   private translateStructureType(

@@ -18,6 +18,8 @@ export default class IfStm extends Statement {
 
   public checkScope(typeFactory: TypeFactory, scope: BlockScope): void {
     for (let subIf of this.subIfs) {
+      subIf.continueCounter = this.continueCounter;
+      subIf.breksCounter = this.breksCounter;
       subIf.checkScope(typeFactory, scope);
     }
   }
@@ -29,6 +31,8 @@ export default class IfStm extends Statement {
   ): void {
     let labelExit = codeBuilder.getNewLabel();
     for (let subIf of this.subIfs) {
+      subIf.breakLabel = this.breakLabel;
+      subIf.continueLabel = this.continueLabel;
       subIf.setLabelExit(labelExit);
       subIf.translate(typeFactory, codeBuilder, scope);
     }

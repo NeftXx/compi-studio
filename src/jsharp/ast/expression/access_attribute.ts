@@ -68,6 +68,7 @@ export default class AccessAttribute extends Expression {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     let lastDir = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(lastDir);
     if (typeFactory.isArrayType(this.exp.type)) {
       let t1 = codeBuilder.getNewTemporary();
       let L1 = codeBuilder.getNewLabel(),
@@ -81,6 +82,7 @@ ${t1} = 0;
 ${L2}:
 `);
       codeBuilder.setLastAddress(t1);
+      codeBuilder.addUnusedTemporary(t1);
     } else {
       let t1 = codeBuilder.getNewTemporary(),
         t2 = codeBuilder.getNewTemporary();
@@ -105,6 +107,7 @@ goto ${LF};
         codeBuilder.addFalseLabel(LF);
       } else {
         codeBuilder.setLastAddress(t2);
+        codeBuilder.addUnusedTemporary(t2);
       }
     }
   }

@@ -100,34 +100,34 @@ end
   private concatStringNumber(codeBuilder: CodeTranslator) {
     let t0 = codeBuilder.getNewTemporary(),
       t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary(),
-      t4 = codeBuilder.getNewTemporary(),
+      ptrString = codeBuilder.getNewTemporary(),
+      num = codeBuilder.getNewTemporary(),
+      bandera = codeBuilder.getNewTemporary(),
       t5 = codeBuilder.getNewTemporary(),
       t6 = codeBuilder.getNewTemporary();
     codeBuilder.setTranslatedCode(`proc native_concatenar_string_numero begin
   ${t1} = P + 1;
-  ${t2} = Stack[${t1}];
+  ${ptrString} = Stack[${t1}];
   ${t1} = P + 2;
-  ${t3} = Stack[${t1}];
+  ${num} = Stack[${t1}];
   ${t1} = P + 3;
-  ${t4} = Stack[${t1}];
+  ${bandera} = Stack[${t1}];
   ${t1} = P + 4;
   ${t5} = ${t1} + 1;
-  Stack[${t5}] = ${t3};
+  Stack[${t5}] = ${num};
   ${t5} = ${t1} + 2;
-  Stack[${t5}] = ${t4};
+  Stack[${t5}] = ${bandera};
   P = P + 4;
   call native_integer_to_string;
   P = P - 4;
   ${t6} = Stack[${t1}];
   ${t5} = ${t1} + 1;
-  Stack[${t5}] = ${t2};
+  Stack[${t5}] = ${ptrString};
   ${t5} = ${t1} + 2;
   Stack[${t5}] = ${t6};
-  P = P + 3;
+  P = P + 4;
   call native_concatenar_cadenas;
-  P = P - 3;
+  P = P - 4;
   ${t0} = Stack[${t1}];
   Stack[P] = ${t0};
 end
@@ -162,9 +162,9 @@ end
   ${t6} = Stack[${t5}];
   ${t4} = ${t1} + 2;
   Stack[${t4}] = ${t6};
-  P = P + 3;
+  P = P + 4;
   call native_concatenar_cadenas;
-  P = P - 3;
+  P = P - 4;
   ${t0} = Stack[${t1}];
   Stack[P] = ${t0};
 end
@@ -367,6 +367,7 @@ end
     let t0 = codeBuilder.getNewTemporary(),
       tCont = codeBuilder.getNewTemporary(),
       dirAux = codeBuilder.getNewTemporary(),
+      bandera = codeBuilder.getNewTemporary(),
       num = codeBuilder.getNewTemporary(),
       t1 = codeBuilder.getNewTemporary(),
       tc = codeBuilder.getNewTemporary(),
@@ -400,7 +401,8 @@ end
   ${num} = -${num};
 ${L1}:
   ${dirAux} = P + 2;
-  if (${dirAux} == 0) goto ${L2};
+  ${bandera} = Stack[${dirAux}];
+  if (${bandera} == 0) goto ${L2};
   ${t1} = ${num} % 1;
   ${tc} = P + 3;
   ${tt} = ${num} - ${t1};

@@ -50,8 +50,10 @@ export default class AccessArray extends Expression {
       L4 = codeBuilder.getNewLabel(),
       L5 = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(`${t1} = Heap[${dir}];`);
+    codeBuilder.removeUnusedTemporary(dir);
     this.access.translate(typeFactory, codeBuilder, scope);
     let value = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(value);
     codeBuilder.setTranslatedCode(`
 if (${value} > -1) goto ${L1};
 goto ${L2};
@@ -78,6 +80,7 @@ goto ${LF};
       codeBuilder.addFalseLabel(LF);
     } else {
       codeBuilder.setLastAddress(t4);
+      codeBuilder.addUnusedTemporary(t4);
     }
   }
 }

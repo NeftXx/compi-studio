@@ -37,6 +37,8 @@ export default class DoWhileStm extends Statement {
         );
       }
     }
+    this.block.continueCounter = ++this.continueCounter;
+    this.block.breksCounter = ++this.breksCounter;
     this.block.checkScope(typeFactory, this.localScope);
   }
 
@@ -45,12 +47,15 @@ export default class DoWhileStm extends Statement {
     codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
-    let labelReturn = codeBuilder.getNewLabel();
-    codeBuilder.setTranslatedCode(`${labelReturn}:\n`);
+    this.continueLabel = codeBuilder.getNewLabel();
+    this.breakLabel = codeBuilder.getNewLabel();
+    codeBuilder.setTranslatedCode(`${this.continueLabel}:\n`);
     this.block.translate(typeFactory, codeBuilder, this.localScope);
     this.expression.translate(typeFactory, codeBuilder, scope);
     codeBuilder.printTrueLabels();
-    codeBuilder.setTranslatedCode(`goto ${labelReturn};\n`);
+    codeBuilder.setTranslatedCode(`goto ${this.continueLabel};
+${this.breakLabel}:
+`);
     codeBuilder.printFalseLabels();
   }
 }

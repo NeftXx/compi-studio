@@ -56,6 +56,8 @@ export default class FunctionStm extends Statement {
     for (let parameter of this.parameters) {
       parameter.checkScope(typeFactory, this.methodScope);
     }
+    this.block.continueCounter = this.continueCounter;
+    this.block.breksCounter = this.breksCounter;
     this.block.checkScope(typeFactory, this.methodScope);
   }
 
@@ -71,6 +73,7 @@ export default class FunctionStm extends Statement {
 proc ${this.methodScope.getName()}  begin
 `);
     this.block.translate(typeFactory, codeBuilder, this.methodScope);
+    codeBuilder.printReturnLabels();
     codeBuilder.setTranslatedCode("end\n# Fin de procedimiento\n");
   }
 }

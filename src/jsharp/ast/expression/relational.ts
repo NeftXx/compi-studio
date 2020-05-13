@@ -44,8 +44,10 @@ export default class Relational extends Expression {
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
     let dir1 = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir1);
     this.expRight.translate(typeFactory, codeBuilder, scope);
     let dir2 = codeBuilder.getLastAddress();
+    codeBuilder.removeUnusedTemporary(dir2);
     let LV = codeBuilder.getNewLabel();
     let LF = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(

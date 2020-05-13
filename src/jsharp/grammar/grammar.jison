@@ -24,6 +24,7 @@
   const { default: IfStm } = require("../ast/statement/if_statement");
   const { default: SubIf } = require("../ast/statement/sub_if");
   const { default: WhileStm } = require("../ast/statement/while");
+  const { default: ForStm } = require("../ast/statement/for_stm");
   const { default: DoWhileStm } = require("../ast/statement/do_while");
   const { default: AccessAttribute } = require("../ast/expression/access_attribute");
   const { default: AccessArray } = require("../ast/expression/access_array");
@@ -34,6 +35,12 @@
   const { default: AttributeAccess } = require("../ast/statement/var_assignment/attribute_access");
   const { default: IdentifierAccess } = require("../ast/statement/var_assignment/identifier_access");
   const { default: VarAssignment } = require("../ast/statement/var_assignment/var_assignment");
+  const { default: BreakStm } = require("../ast/statement/break_stm");
+  const { default: ContinueStm } = require("../ast/statement/continue_stm");
+  const { default: ReturnStm } = require("../ast/statement/return_stm");
+  const { default: SwitchStm } = require("../ast/statement/switch_stm");
+  const { default: CaseStm } = require("../ast/statement/case_stm");
+  const { default: CallFunction } = require("../ast/expression/call_function");
   const {
     VarDeclaration,
     VarDeclarationGlobal,
@@ -215,13 +222,69 @@ block_statement
 statement
   : print_statement { $$ = $1; }
   | if_statement { $$ = $1; }
+  | switch_statement { $$ = $1; }
   | while_statement { $$ = $1; }
   | do_while_statement { $$ = $1; }
   | struct_definition { $$ = $1; }
   | var_assignment { $$ = $1; }
   | variable_declaration { $$ = $1; }
+  | break_statement { $$ = $1; }
+  | continue_statement { $$ = $1; }
+  | return_statement { $$ = $1; }
+  | for_statement { $$ = $1; }
   | var_assignment ';' { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
+;
+
+break_statement
+  : 'break' {
+    $$ = new BreakStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      )
+    );
+  }
+  | 'break' ';' {
+    $$ = new BreakStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      )
+    );
+  }
+;
+
+continue_statement
+  : 'continue' {
+    $$ = new ContinueStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      )
+    );
+  }
+  | 'continue' ';' {
+    $$ = new ContinueStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      )
+    );
+  }
+;
+
+return_statement
+  : 'return' ';'  {
+    $$ = new ReturnStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      )
+    )
+  }
+  | 'return' expression ';' {
+    $$ = new ReturnStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2
+    )
+  }
 ;
 
 struct_definition
@@ -481,6 +544,85 @@ if_list
   }
 ;
 
+switch_statement
+  : 'switch' '(' expression ')' '{' switch_labels '}' {
+    $$ = new SwitchStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $3, $6
+    );
+  }
+  | 'switch' '(' expression ')' '{' '}' {
+    $$ = new SwitchStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $3, []
+    );
+  }
+;
+
+switch_labels
+  : switch_labels switch_label { $$ = $1; $$.push($2); }
+  | switch_label { $$ = [$1]; }
+;
+
+switch_label
+  : 'case' expression ':' block_statement {
+    $$ = new CaseStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $4, $2
+    );
+  }
+  | 'case' expression ':' {
+    $$ = new CaseStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), [], $2
+    );
+  }
+  | 'default' ':' block_statement {
+    $$ = new CaseStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $3
+    );
+  }
+  | 'default' ':' {
+    $$ = new CaseStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), []
+    );
+  }
+;
+
+for_statement
+  : 'for' '(' for_init ';' for_conditional ';' for_final ')' block {
+    $$ = new ForStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $9, $3, $5, $7
+    );
+  }
+;
+
+for_init
+  : variable_declaration { $$ = $1; }
+  | var_assignment { $$ = $1; }
+  | /* epsilon */ { $$ = undefined; }
+;
+
+for_conditional
+  : expression { $$ = $1; }
+  | /* epsilon */ { $$ = undefined; }
+;
+
+for_final
+  : var_assignment { $$ = $1; }
+  | /* epsilon */ { $$ = undefined; }
+;
+
 print_statement
   : 'print' '(' expression ')' {
     $$ = new Print(
@@ -496,6 +638,28 @@ print_statement
       ), $3
     );
   }
+;
+
+call_function_expression
+  : IDENTIFIER '(' argument_list ')' {
+    $$ = new CallFunction(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $3
+    );
+  }
+  | IDENTIFIER '('')' {
+    $$ = new CallFunction(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, []
+    );
+  }
+;
+
+argument_list
+  : argument_list ',' expression { $$ = $1; $$.push($3); }
+  | expression { $$ = [$1]; }
 ;
 
 expression
@@ -654,6 +818,7 @@ expression
       ), $2
     )
   }
+  | call_function_expression { $$ = $1; }
   | struct_declaration { $$ = $1; }
   | CHAR_LITERAL {
     $$ = new Literal(

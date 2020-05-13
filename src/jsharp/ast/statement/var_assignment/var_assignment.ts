@@ -63,7 +63,18 @@ export default class VarAssignment extends Statement {
     this.access.translate(typeFactory, codeBuilder, scope);
     let dirAccess = codeBuilder.getLastAddress();
     this.exp.translate(typeFactory, codeBuilder, scope);
-    let dirExp = codeBuilder.getLastAddress();
+    let dirExp: string;
+    if (typeFactory.isBoolean(this.exp.type)) {
+      dirExp = codeBuilder.getNewTemporary();
+      codeBuilder.printFalseLabels();
+      codeBuilder.setTranslatedCode(`${dirExp} = 0;`);
+      let LS = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`goto ${LS};\n`);
+      codeBuilder.printTrueLabels();
+      codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
+    } else {
+      dirExp = codeBuilder.getLastAddress();
+    }
     if (this.access.itsHeap) {
       codeBuilder.setTranslatedCode(`Heap[${dirAccess}] = ${dirExp};\n`);
     } else {

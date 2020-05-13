@@ -15,6 +15,7 @@ export default class CodeTranslator {
   private lastAddress: string;
   private trueLabels: Array<string>;
   private falseLabels: Array<string>;
+  private returnLabels: Array<string>;
   private globalVariables: Array<string>;
 
   public constructor() {
@@ -22,6 +23,7 @@ export default class CodeTranslator {
     this.labelCounter = 0;
     this.translateCode = [];
     this.unusedTemporary = [];
+    this.returnLabels = [];
     this.nativeFunction = NativePrintFunction.getInstance();
     this.nativeStringFunctions = NativeStringFunctions.getInstance();
     this.labelJumpMethods = this.getNewLabel();
@@ -59,12 +61,20 @@ export default class CodeTranslator {
     this.falseLabels.push(label);
   }
 
+  public addReturnLabel(label: string) {
+    this.returnLabels.push(label);
+  }
+
   public getTrueLabel(): string {
     return this.trueLabels.pop();
   }
 
   public getFalseLabel(): string {
     return this.falseLabels.pop();
+  }
+
+  public getUnusedTemporary() {
+    return this.unusedTemporary;
   }
 
   public swapLabels() {
@@ -103,6 +113,16 @@ export default class CodeTranslator {
     if (length > 0) {
       for (let i = 0; i < length; i++) {
         this.translateCode.push(`${this.falseLabels.pop()}: `);
+      }
+      this.translateCode.push("\n");
+    }
+  }
+
+  public printReturnLabels(): void {
+    let length = this.returnLabels.length;
+    if (length > 0) {
+      for (let i = 0; i < length; i++) {
+        this.translateCode.push(`${this.returnLabels.pop()}: `);
       }
       this.translateCode.push("\n");
     }
