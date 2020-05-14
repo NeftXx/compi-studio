@@ -41,6 +41,8 @@
   const { default: SwitchStm } = require("../ast/statement/switch_stm");
   const { default: CaseStm } = require("../ast/statement/case_stm");
   const { default: CallFunction } = require("../ast/expression/call_function");
+  const { default: CallFunctionStm } = require("../ast/statement/call_function_stm");
+  const { default: ArrayValues } = require("../ast/expression/array_values");
   const {
     VarDeclaration,
     VarDeclarationGlobal,
@@ -232,6 +234,8 @@ statement
   | continue_statement { $$ = $1; }
   | return_statement { $$ = $1; }
   | for_statement { $$ = $1; }
+  | call_function_statement { $$ = $1; }
+  | call_function_statement ';' { $$ = $1; }
   | var_assignment ';' { $$ = $1; }
   | variable_declaration ';' { $$ = $1; }
 ;
@@ -640,8 +644,18 @@ print_statement
   }
 ;
 
+call_function_statement
+  : call_function_expression {
+    $$ = new CallFunctionStm(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+  }
+;
+
 call_function_expression
-  : IDENTIFIER '(' argument_list ')' {
+  : IDENTIFIER '(' expression_list ')' {
     $$ = new CallFunction(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
@@ -657,9 +671,19 @@ call_function_expression
   }
 ;
 
-argument_list
-  : argument_list ',' expression { $$ = $1; $$.push($3); }
+expression_list
+  : expression_list ',' expression { $$ = $1; $$.push($3); }
   | expression { $$ = [$1]; }
+;
+
+array_values
+  : '{' expression_list '}' {
+    $$ = new ArrayValues(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2
+    );
+  }
 ;
 
 expression
@@ -818,6 +842,7 @@ expression
       ), $2
     )
   }
+  | array_values { $$ = $1; }
   | call_function_expression { $$ = $1; }
   | struct_declaration { $$ = $1; }
   | CHAR_LITERAL {

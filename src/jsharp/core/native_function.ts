@@ -181,11 +181,7 @@ end
       t5 = codeBuilder.getNewTemporary(),
       t6 = codeBuilder.getNewTemporary(),
       t7 = codeBuilder.getNewTemporary(),
-      t8 = codeBuilder.getNewTemporary(),
-      t9 = codeBuilder.getNewTemporary(),
-      t10 = codeBuilder.getNewTemporary(),
-      t11 = codeBuilder.getNewTemporary(),
-      t12 = codeBuilder.getNewTemporary();
+      t8 = codeBuilder.getNewTemporary();
     codeBuilder.setTranslatedCode(`
 proc native_print_global_variable_error begin
   print("%c",  69); # E
@@ -210,12 +206,10 @@ proc native_print_global_variable_error begin
   print("%c",  32); #
   ${t1} = P + 0; # Acceso a parametro
   ${t2} = Stack[${t1}]; # Obteniendo la direccion del nombre del archivo
-  ${t3} = P + 4; # cambio simulado de ambito
-  ${t4} = ${t3} + 0; # posicion del parametro
-  Stack[${t4}] = ${t2}; # Enviando parametro
-  P = P + 4;
+  P = P + 4; # Cambio de ambito
+  Stack[P] = ${t2}; # Enviando parametro
   call native_print_string;
-  P = P - 4;
+  P = P - 4; # Regresando a ambito actual
   print("%c",  44); # ,
   print("%c",  32); #
   print("%c", 108); # l
@@ -224,9 +218,9 @@ proc native_print_global_variable_error begin
   print("%c", 101); # e
   print("%c",  97); # a
   print("%c",  32); #
-  ${t5} = P + 1;
-  ${t6} = Stack[${t5}];
-  print("%i", ${t6});
+  ${t3} = P + 1;
+  ${t4} = Stack[${t3}];
+  print("%i", ${t4});
   print("%c",  32); # 
   print("%c", 121); # y
   print("%c",  32); # 
@@ -238,9 +232,9 @@ proc native_print_global_variable_error begin
   print("%c", 110); # n
   print("%c",  97); # a
   print("%c",  32); # 
-  ${t7} = P + 2;
-  ${t8} = Stack[${t7}];
-  print("%i", ${t8});
+  ${t5} = P + 2;
+  ${t6} = Stack[${t5}];
+  print("%i", ${t6});
   print("%c",  46); # .
   print("%c",  32); # 
   print("%c",  76); # L
@@ -263,14 +257,12 @@ proc native_print_global_variable_error begin
   print("%c", 108); # l
   print("%c",  32); # 
   print("%c",  91); # [
-  ${t9} = P + 3; # Posicion del nombre de la variable
-  ${t10} = Stack[${t9}]; # Obtiniendo nombre
-  ${t11} = P + 4; # Cambio simulado de ambito
-  ${t12} = ${t11} + 0; # Posicion para enviar la cadena
-  Stack[${t12}] = ${t10}; # Enviando la cadena
-  P = P + 4;
+  ${t7} = P + 3; # Posicion del nombre de la variable
+  ${t8} = Stack[${t7}]; # Obtiniendo nombre
+  P = P + 4; # Cambio de ambito
+  Stack[P] = ${t8}; # Enviando la cadena
   call native_print_string;
-  P = P - 4;
+  P = P - 4; # Regresando a ambito actual
   print("%c",  93); # ]
   print("%c",  32); #
   print("%c", 121); # n

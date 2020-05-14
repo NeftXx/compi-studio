@@ -44,15 +44,15 @@ export default class Relational extends Expression {
   ): void {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
     let dir1 = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir1);
     this.expRight.translate(typeFactory, codeBuilder, scope);
     let dir2 = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir2);
     let LV = codeBuilder.getNewLabel();
     let LF = codeBuilder.getNewLabel();
     codeBuilder.setTranslatedCode(
       `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
     );
+    codeBuilder.removeUnusedTemporary(dir1);
+    codeBuilder.removeUnusedTemporary(dir2);
     codeBuilder.addTrueLabel(LV);
     codeBuilder.addFalseLabel(LF);
   }

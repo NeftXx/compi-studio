@@ -8,15 +8,31 @@ define Lista as [
   integer tam
 ];
 
-void principal() {
-  Lista lista = strc Lista();
-  integer contador = 0;
-  while(contador < 10) {
-    Nodo nuevo = strc Nodo();
-    nuevo.dato = (contador + 1) * 10;
-    nuevo.sig = lista.inicio;
-    lista.inicio = nuevo;
-    lista.tam = lista.tam + 1;
-    contador = contador + 1;
+void insertar(Lista lista, integer dato) {
+  Nodo nuevo = strc Nodo();
+  nuevo.dato = dato;
+  nuevo.sig = lista.inicio;
+  lista.inicio = nuevo;
+}
+
+void imprimirLista(Lista lista) {
+  Nodo temp = lista.inicio;
+  while(temp != null) {
+    print(temp.dato);
+    temp = temp.sig;
   }
+  print('\n');
+}
+
+void principal() {
+  print("================= LISTA SIMPLE =================\n");
+  Lista lista = strc Lista();
+  insertar(lista, 10);
+  insertar(lista, 20);
+  insertar(lista, 30);
+  insertar(lista, 1);
+  insertar(lista, 40);
+  insertar(lista, 56);
+  // 56 -> 40 -> 1 -> 30 -> 20 -> 10
+  imprimirLista(lista);
 }

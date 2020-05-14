@@ -49,12 +49,14 @@ export default class AccessArray extends Expression {
       L3 = codeBuilder.getNewLabel(),
       L4 = codeBuilder.getNewLabel(),
       L5 = codeBuilder.getNewLabel();
-    codeBuilder.setTranslatedCode(`${t1} = Heap[${dir}];`);
+    codeBuilder.setTranslatedCode(
+      `${t1} = Heap[${dir}]; # Obteniendo direccion del arreglo\n`
+    );
     codeBuilder.removeUnusedTemporary(dir);
     this.access.translate(typeFactory, codeBuilder, scope);
     let value = codeBuilder.getLastAddress();
     codeBuilder.removeUnusedTemporary(value);
-    codeBuilder.setTranslatedCode(`
+    codeBuilder.setTranslatedCode(`# Verificando que la posicion este dentro de los limites del arreglo
 if (${value} > -1) goto ${L1};
 goto ${L2};
 ${L1}:
@@ -73,7 +75,8 @@ ${L5}:
     if (typeFactory.isBoolean(this.type)) {
       let LV = codeBuilder.getNewLabel(),
         LF = codeBuilder.getNewLabel();
-      codeBuilder.setTranslatedCode(`if (${t4} == 1) goto ${LV};
+      codeBuilder.setTranslatedCode(`# Convertiendo arreglo a booleano
+if (${t4} == 1) goto ${LV};
 goto ${LF};
 `);
       codeBuilder.addTrueLabel(LV);

@@ -69,6 +69,7 @@ export default class FunctionStm extends Statement {
     if (this.identifier === "principal") {
       codeBuilder.setMainFunction(this.methodScope);
     }
+    codeBuilder.clearUnusedTemporary();
     codeBuilder.setTranslatedCode(`# Inicio de procedimiento
 proc ${this.methodScope.getName()}  begin
 `);

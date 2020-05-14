@@ -56,9 +56,16 @@ export default class AttributeAccess extends Access {
     let lastDir = codeBuilder.getLastAddress();
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
-    codeBuilder.setTranslatedCode(`${t1} = Heap[${lastDir}];
+    if (this.exp.itsHeap) {
+      codeBuilder.setTranslatedCode(`${t1} = Heap[${lastDir}];
 ${t2} = ${t1} + ${this.dir};
 `);
-    codeBuilder.setLastAddress(t2);
+      codeBuilder.setLastAddress(t2);
+    } else {
+      codeBuilder.setTranslatedCode(`${t1} = Stack[${lastDir}];
+${t2} = ${t1} + ${this.dir};
+`);
+      codeBuilder.setLastAddress(t2);
+    }
   }
 }

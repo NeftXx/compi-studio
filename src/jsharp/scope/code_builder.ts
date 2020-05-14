@@ -170,6 +170,10 @@ export default class CodeTranslator {
     if (index > -1) this.unusedTemporary.splice(index, 1);
   }
 
+  public clearUnusedTemporary() {
+    this.unusedTemporary.length = 0;
+  }
+
   public getCodeTranslate(): string {
     this.nativeFunction.generete(this);
     this.nativeStringFunctions.generete(this);

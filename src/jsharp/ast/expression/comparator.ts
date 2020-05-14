@@ -54,7 +54,7 @@ export default class Comparator extends Expression {
     codeBuilder: CodeTranslator,
     scope: BlockScope
   ): void {
-    if (this.operator === "==" || this.operator === "!=") {
+    if (this.operator === "==" || this.operator === "<>") {
       this.expLeft.translate(typeFactory, codeBuilder, scope);
       let dir1 = this.getDir(typeFactory, codeBuilder, this.expLeft);
       this.expRight.translate(typeFactory, codeBuilder, scope);
@@ -67,6 +67,8 @@ export default class Comparator extends Expression {
           t2 = codeBuilder.getNewTemporary(),
           t3 = codeBuilder.getNewTemporary();
         let size = scope.size;
+        codeBuilder.removeUnusedTemporary(dir1);
+        codeBuilder.removeUnusedTemporary(dir2);
         codeBuilder.setTranslatedCode(`${t1} = P + ${size};
 ${t2} = ${t1} + 1;
 Stack[${t2}] = ${dir1};
@@ -79,14 +81,25 @@ ${t3} = Stack[${t1}];
 `);
         dir1 = t3;
         dir2 = "1";
+        let LV = codeBuilder.getNewLabel();
+        let LF = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(
+          `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
+        );
+        codeBuilder.addTrueLabel(LV);
+        codeBuilder.addFalseLabel(LF);
+      } else {
+        let LV = codeBuilder.getNewLabel();
+        let LF = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(
+          `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
+        );
+        codeBuilder.removeUnusedTemporary(dir1);
+        codeBuilder.removeUnusedTemporary(dir2);
+        codeBuilder.addTrueLabel(LV);
+        codeBuilder.addFalseLabel(LF);
       }
-      let LV = codeBuilder.getNewLabel();
-      let LF = codeBuilder.getNewLabel();
-      codeBuilder.setTranslatedCode(
-        `if (${dir1} ${this.operator} ${dir2}) goto ${LV};\ngoto ${LF};\n`
-      );
-      codeBuilder.addTrueLabel(LV);
-      codeBuilder.addFalseLabel(LF);
+
       return;
     } else if (this.operator === "===") {
     }
@@ -108,7 +121,6 @@ ${t3} = Stack[${t1}];
       codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
     } else {
       dirExp = codeBuilder.getLastAddress();
-      codeBuilder.removeUnusedTemporary(dirExp);
     }
     return dirExp;
   }

@@ -59,6 +59,7 @@ export default class ReturnStm extends Statement {
       this.exp.translate(typeFactory, codeBuilder, scope);
       let dirExp = this.getDir(typeFactory, codeBuilder);
       codeBuilder.setTranslatedCode(`Stack[P] = ${dirExp};\n`);
+      codeBuilder.removeUnusedTemporary(dirExp);
     }
     codeBuilder.setTranslatedCode(`goto ${label};\n`);
     codeBuilder.addReturnLabel(label);

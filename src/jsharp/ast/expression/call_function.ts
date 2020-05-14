@@ -59,28 +59,37 @@ export default class CallFunction extends Expression {
       paramList.push(this.getDir(typeFactory, codeBuilder, argument));
     }
     let scopeSize = scope.size;
-    codeBuilder.setTranslatedCode(`P = P + ${scopeSize};\n`);
+    codeBuilder.setTranslatedCode(`P = P + ${scopeSize}; # Cambio de ambito\n`);
     let temp = codeBuilder.getNewTemporary();
     let unused = codeBuilder.getUnusedTemporary();
     unused.map((m, n) => {
-      codeBuilder.setTranslatedCode(`${temp} = P + ${n};
-Stack[${temp}] = ${m};
+      codeBuilder.setTranslatedCode(`${temp} = P + ${n}; # Direccion de temporal no usado
+Stack[${temp}] = ${m}; # Guardando temporal no usado
 `);
     });
-    codeBuilder.setTranslatedCode(`P = P + ${unused.length};\n`);
+    codeBuilder.setTranslatedCode(`# Aumentando el ambito, para guardar temporales no usados
+P = P + ${unused.length};
+# Mandando parametros
+`);
     paramList.map((m, n) => {
-      codeBuilder.setTranslatedCode(`${temp} = P + ${n + 1};
-Stack[${temp}] = ${m};
+      codeBuilder.setTranslatedCode(`${temp} = P + ${
+        n + 1
+      }; # parametro numero ${n}
+Stack[${temp}] = ${m}; # Enviando parametros
 `);
     });
 
     codeBuilder.setTranslatedCode(`call ${this.scopeMethod.getName()};\n`);
     let temp2 = codeBuilder.getNewTemporary();
-    codeBuilder.setTranslatedCode(`${temp2} = Stack[P];\n`);
-    codeBuilder.setTranslatedCode(`P = P - ${unused.length};\n`);
+    codeBuilder.setTranslatedCode(
+      `${temp2} = Stack[P]; # Obteniendo valor del return\n`
+    );
+    codeBuilder.setTranslatedCode(`# Regresando a la posicion donde estan los temporales
+P = P - ${unused.length};
+`);
     unused.map((m, n) => {
-      codeBuilder.setTranslatedCode(`${temp} = P + ${n};
-${m} = Stack[${temp}];
+      codeBuilder.setTranslatedCode(`${temp} = P + ${n}; # Posicion de temporal
+${m} = Stack[${temp}]; # Recuperando temporal
 `);
     });
     codeBuilder.setTranslatedCode(`P = P - ${scopeSize};\n`);
@@ -88,7 +97,7 @@ ${m} = Stack[${temp}];
       codeBuilder.removeUnusedTemporary(m);
     });
     codeBuilder.setLastAddress(temp2);
-    codeBuilder.addUnusedTemporary(temp2);
+    if (!typeFactory.isVoid(this.type)) codeBuilder.addUnusedTemporary(temp2);
   }
 
   private getDir(
@@ -106,8 +115,7 @@ ${m} = Stack[${temp}];
       codeBuilder.printTrueLabels();
       codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
     } else {
-      dirExp = codeBuilder.getLastAddress();
-      codeBuilder.removeUnusedTemporary(dirExp);
+      dirExp = codeBuilder.getLastAddress();      
     }
     return dirExp;
   }

@@ -34,8 +34,8 @@ export default class UMenos extends Expression {
     this.exp.translate(typeFactory, codeBuilder, scope);
     let dir = codeBuilder.getNewTemporary();
     let last = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(last);
     codeBuilder.setTranslatedCode(`${dir} = -${last};\n`);
+    codeBuilder.removeUnusedTemporary(last);
     codeBuilder.setLastAddress(dir);
     codeBuilder.addUnusedTemporary(dir);
   }

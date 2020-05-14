@@ -72,6 +72,8 @@ export default class SwitchStm extends Statement {
         codeBuilder.setTranslatedCode(
           `if (${dirExp} == ${dirCurrent}) goto ${label.labelExit};\n`
         );
+        codeBuilder.removeUnusedTemporary(dirExp);
+        codeBuilder.removeUnusedTemporary(dirCurrent);
       } else {
         if (!defaultLabel) {
           defaultLabel = label;
@@ -108,6 +110,7 @@ export default class SwitchStm extends Statement {
       codeBuilder.setTranslatedCode(`goto ${LS};\n`);
       codeBuilder.printTrueLabels();
       codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
+      codeBuilder.addUnusedTemporary(dirExp);
     } else {
       dirExp = codeBuilder.getLastAddress();
     }

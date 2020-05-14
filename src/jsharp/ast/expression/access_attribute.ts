@@ -68,12 +68,12 @@ export default class AccessAttribute extends Expression {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     let lastDir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(lastDir);
     if (typeFactory.isArrayType(this.exp.type)) {
       let t1 = codeBuilder.getNewTemporary();
       let L1 = codeBuilder.getNewLabel(),
         L2 = codeBuilder.getNewLabel();
-      codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+      codeBuilder.setTranslatedCode(`# Accediendo a arreglo
+if (${lastDir} == -1) goto ${L1};
 ${t1} = Heap[${lastDir}];
 goto ${L2};
 ${L1}:
@@ -81,6 +81,7 @@ E = 4;
 ${t1} = 0;
 ${L2}:
 `);
+      codeBuilder.removeUnusedTemporary(lastDir);
       codeBuilder.setLastAddress(t1);
       codeBuilder.addUnusedTemporary(t1);
     } else {
@@ -88,7 +89,8 @@ ${L2}:
         t2 = codeBuilder.getNewTemporary();
       let L1 = codeBuilder.getNewLabel(),
         L2 = codeBuilder.getNewLabel();
-      codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+      codeBuilder.setTranslatedCode(`# Accediendo a estructura
+if (${lastDir} == -1) goto ${L1};
 ${t1} = ${lastDir} + ${this.dir};
 ${t2} = Heap[${t1}];
 goto ${L2};
@@ -97,10 +99,12 @@ E = 4;
 ${t2} = -1;
 ${L2}:
 `);
+      codeBuilder.removeUnusedTemporary(lastDir);
       if (typeFactory.isBoolean(this.type)) {
         let LV = codeBuilder.getNewLabel(),
           LF = codeBuilder.getNewLabel();
-        codeBuilder.setTranslatedCode(`if (${t2} == 1) goto ${LV};
+        codeBuilder.setTranslatedCode(`# Convertiendo atributo a booleano
+if (${t2} == 1) goto ${LV};
 goto ${LF};
 `);
         codeBuilder.addTrueLabel(LV);

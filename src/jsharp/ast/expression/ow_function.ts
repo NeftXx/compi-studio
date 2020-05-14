@@ -153,26 +153,25 @@ export default class OwnFunctions extends Expression {
     scope: BlockScope
   ) {
     let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
+      t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir);
     this.param.translate(typeFactory, codeBuilder, scope);
     let dirParam = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dirParam);
     let size = scope.size;
-    codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir};
-${t2} = ${t1} + 2;
-Stack[${t2}] = ${dirParam};
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio simulado de ambito
+${t1} = P + 1;
+Stack[${t1}] = ${dir};
+${t1} = P + 2;
+Stack[${t1}] = ${dirParam};
 P = P + ${size};
 call native_char_at;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-    codeBuilder.setLastAddress(t3);
-    codeBuilder.addUnusedTemporary(t3);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.removeUnusedTemporary(dirParam);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
   }
 
   private toUpperCase(
@@ -181,21 +180,20 @@ ${t3} = Stack[${t1}];
     scope: BlockScope
   ) {
     let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
+      t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
-    codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir};
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio simulado de ambito
+${t1} = P + 1;
+Stack[${t1}] = ${dir};
 P = P + ${size};
 call native_to_upper_case;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-    codeBuilder.setLastAddress(t3);
-    codeBuilder.addUnusedTemporary(t3);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
   }
 
   private toLowerCase(
@@ -204,21 +202,20 @@ ${t3} = Stack[${t1}];
     scope: BlockScope
   ) {
     let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
+      t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
-    codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir};
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio simulado de ambito
+${t1} = P + 1;
+Stack[${t1}] = ${dir};
 P = P + ${size};
 call native_to_lower_case;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-    codeBuilder.setLastAddress(t3);
-    codeBuilder.addUnusedTemporary(t3);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
   }
 
   private lengthString(
@@ -227,21 +224,20 @@ ${t3} = Stack[${t1}];
     scope: BlockScope
   ) {
     let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
+      t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
-    codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir};
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio de ambito
+${t1} = P + 1;
+Stack[${t1}] = ${dir};
 P = P + ${size};
 call native_cadena_length;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-    codeBuilder.setLastAddress(t3);
-    codeBuilder.addUnusedTemporary(t3);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
   }
 
   private toCharArray(
@@ -250,20 +246,18 @@ ${t3} = Stack[${t1}];
     scope: BlockScope
   ) {
     let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
+      t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
-    codeBuilder.removeUnusedTemporary(dir);
     let size = scope.size;
-    codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir};
-P = P + ${size};
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio de ambito
+${t1} = P + 1;
+Stack[${t1}] = ${dir};
 call native_to_char_array;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-    codeBuilder.setLastAddress(t3);
-    codeBuilder.addUnusedTemporary(t3);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
   }
 }

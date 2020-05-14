@@ -39,12 +39,15 @@ export default class Identifier extends Expression {
       if (variable) {
         let t1 = codeBuilder.getNewTemporary(),
           t2 = codeBuilder.getNewTemporary();
-        codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
-${t2} = Stack[${t1}];\n`);
+        codeBuilder.setTranslatedCode(`# Obteniendo variable ${this.identifier}
+${t1} = P + ${variable.ptr}; # Direccion de la variable ${this.identifier}
+${t2} = Stack[${t1}]; # Guardando valor de la variable ${this.identifier} en temporal
+`);
         if (typeFactory.isBoolean(this.type)) {
           let LV = codeBuilder.getNewLabel(),
             LF = codeBuilder.getNewLabel();
-          codeBuilder.setTranslatedCode(`if (${t2} == 1) goto ${LV};
+          codeBuilder.setTranslatedCode(`# Convertiendo variable booleana
+if (${t2} == 1) goto ${LV};
 goto ${LF};
 `);
           codeBuilder.addTrueLabel(LV);

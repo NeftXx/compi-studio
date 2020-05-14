@@ -85,6 +85,7 @@ export class VarDeclaration extends Declaration {
     codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};
 Stack[${t1}] = ${dir};
 `);
+    codeBuilder.removeUnusedTemporary(dir);
   }
 
   private translateGlobal(
@@ -116,10 +117,12 @@ Heap[${variable.ptr}] = ${dir};
 Heap[${variable.ptr + 1}] = 1;
 `);
     } else {
+      let last = codeBuilder.getLastAddress();
       codeBuilder.setTranslatedCode(`
-Heap[${variable.ptr}] = ${codeBuilder.getLastAddress()};
+Heap[${variable.ptr}] = ${last};
 Heap[${variable.ptr + 1}] = 1;
 `);
+      codeBuilder.removeUnusedTemporary(last);
     }
     codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
     let t2 = codeBuilder.getNewTemporary();
@@ -213,10 +216,12 @@ Heap[${variable.ptr}] = ${dir};
 Heap[${variable.ptr + 1}] = 1;
 `);
     } else {
+      let last = codeBuilder.getLastAddress();
       codeBuilder.setTranslatedCode(`
-Heap[${variable.ptr}] = ${codeBuilder.getLastAddress()};
+Heap[${variable.ptr}] = ${last};
 Heap[${variable.ptr + 1}] = 1;
 `);
+      codeBuilder.removeUnusedTemporary(last);
     }
     codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
     let t2 = codeBuilder.getNewTemporary();
@@ -337,6 +342,7 @@ export class VarDeclarationType extends Declaration {
 Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
 `);
     });
+    codeBuilder.removeUnusedTemporary(dir);
   }
 
   private translateGlobal(
@@ -379,6 +385,7 @@ Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
   Heap[${variable.ptr}] = ${dirExp};
   Heap[${variable.ptr + 1}] = 1;
   `);
+        codeBuilder.removeUnusedTemporary(dirExp);
       }
       codeBuilder.setTranslatedCode(`goto ${LF};\n${LV}:\n`);
       let t2 = codeBuilder.getNewTemporary();

@@ -26,6 +26,8 @@ export default class IncreaseDecrease extends Expression {
       this.exp instanceof AccessArray ||
       this.exp instanceof AccessAttribute ||
       this.exp instanceof Identifier;
+    if (!verify) {
+    }
   }
 
   public translate(

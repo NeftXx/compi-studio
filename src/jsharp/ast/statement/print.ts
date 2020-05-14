@@ -4,8 +4,6 @@ import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
-import Identifier from "../expression/identifier";
-import AccessArray from "../expression/access_array";
 
 export default class Print extends Statement {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -28,17 +26,17 @@ export default class Print extends Statement {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     if (typeFactory.isChar(this.exp.type)) {
-      codeBuilder.setTranslatedCode(
-        `print("%c", ${codeBuilder.getLastAddress()});\n`
-      );
+      let last = codeBuilder.getLastAddress();
+      codeBuilder.setTranslatedCode(`print("%c", ${last});\n`);
+      codeBuilder.removeUnusedTemporary(last);
     } else if (typeFactory.isInteger(this.exp.type)) {
-      codeBuilder.setTranslatedCode(
-        `print("%i", ${codeBuilder.getLastAddress()});\n`
-      );
+      let last = codeBuilder.getLastAddress();
+      codeBuilder.setTranslatedCode(`print("%i", ${last});\n`);
+      codeBuilder.removeUnusedTemporary(last);
     } else if (typeFactory.isDouble(this.exp.type)) {
-      codeBuilder.setTranslatedCode(
-        `print("%d", ${codeBuilder.getLastAddress()});\n`
-      );
+      let last = codeBuilder.getLastAddress();
+      codeBuilder.setTranslatedCode(`print("%d", ${last});\n`);
+      codeBuilder.removeUnusedTemporary(last);
     } else if (typeFactory.isBoolean(this.exp.type)) {
       let dir = codeBuilder.getNewTemporary();
       codeBuilder.printFalseLabels();
@@ -72,6 +70,7 @@ export default class Print extends Statement {
       codeBuilder.setTranslatedCode(
         `Stack[${t2}] = ${dirLast}; # asignacion de parametro\n`
       );
+      codeBuilder.removeUnusedTemporary(dirLast);
       codeBuilder.setTranslatedCode(
         `P = P + ${size};\ncall native_print_string;\nP = P - ${size};\n`
       );

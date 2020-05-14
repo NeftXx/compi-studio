@@ -40,26 +40,18 @@ export class StructDeclaration extends Expression {
     if (this.structureType && this.structureType.structure) {
       let size = scope.size;
       let t1 = codeBuilder.getNewTemporary(),
-        t2 = codeBuilder.getNewTemporary(),
-        t3 = codeBuilder.getNewTemporary(),
-        t4 = codeBuilder.getNewTemporary(),
-        t5 = codeBuilder.getNewTemporary(),
-        t6 = codeBuilder.getNewTemporary();
-      codeBuilder.setTranslatedCode(`${t1} = P + ${size}; # Cambio simulado de ambito      
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${this.nodeInfo.line};
-${t3} = ${t1} + 2;
-Stack[${t3}] = ${this.nodeInfo.column};
-${t4} = ${t1} + 0;
-Stack[${t4}] = -1;
-P = P + ${size};
+        t2 = codeBuilder.getNewTemporary();
+      codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio de ambito      
+${t1} = P + 1; # Posicion de parametro
+Stack[${t1}] = ${this.nodeInfo.line}; # Mandando linea
+${t1} = P + 2; # Posicion de parametro
+Stack[${t1}] = ${this.nodeInfo.column}; # Mandado columna
 call ${this.structureType.nameReal};
+${t2} = Stack[P];
 P = P - ${size};
-${t5} = ${t1} + 0;
-${t6} = Stack[${t5}];
 `);
-      codeBuilder.setLastAddress(t6);
-      codeBuilder.addUnusedTemporary(t6);
+      codeBuilder.setLastAddress(t2);
+      codeBuilder.addUnusedTemporary(t2);
     }
   }
 }
