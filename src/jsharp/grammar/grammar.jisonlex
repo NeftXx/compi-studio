@@ -127,8 +127,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 "="                               { return "="; }
 ">"                               { return ">"; }
 "<"                               { return "<"; }
-"?"                               { return "?"; }
-":"                               { return ":"; }
+"$"                               { return "$"; }
 "^"                               { return "^"; }
 "!"                               { return "!"; }
 "("                               { return "("; }

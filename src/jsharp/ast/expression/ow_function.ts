@@ -163,7 +163,6 @@ ${t1} = P + 1;
 Stack[${t1}] = ${dir};
 ${t1} = P + 2;
 Stack[${t1}] = ${dirParam};
-P = P + ${size};
 call native_char_at;
 ${t2} = Stack[P];
 P = P - ${size};
@@ -186,7 +185,6 @@ P = P - ${size};
     codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio simulado de ambito
 ${t1} = P + 1;
 Stack[${t1}] = ${dir};
-P = P + ${size};
 call native_to_upper_case;
 ${t2} = Stack[P];
 P = P - ${size};
@@ -208,7 +206,6 @@ P = P - ${size};
     codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio simulado de ambito
 ${t1} = P + 1;
 Stack[${t1}] = ${dir};
-P = P + ${size};
 call native_to_lower_case;
 ${t2} = Stack[P];
 P = P - ${size};
@@ -230,7 +227,6 @@ P = P - ${size};
     codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio de ambito
 ${t1} = P + 1;
 Stack[${t1}] = ${dir};
-P = P + ${size};
 call native_cadena_length;
 ${t2} = Stack[P];
 P = P - ${size};

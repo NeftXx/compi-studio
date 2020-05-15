@@ -145,6 +145,7 @@ ${L2}:
     let size = this.attributeList.length;
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
       t4 = codeBuilder.getNewTemporary(),
       t5 = codeBuilder.getNewTemporary(),
       t6 = codeBuilder.getNewTemporary(),
@@ -159,17 +160,17 @@ ${t2} = Heap[${this.type.enablePointer}]; # Posicion del puntero de habilitacion
 if (${t2} == 0) goto ${L1}; # Si es igual a cero no esta declarado aun
 ${t1} = H; # Puntero donde se guardara el objeto ${this.identifier}
 Heap[${t1}] = ${size}; # Tamaño de la estructura
-H = H + 1; # Aumento del heap
+H = H + ${size + 1}; # Aumento del heap
 `);
 
     for (let i = 0; i < size; i++) {
       let attribute = this.attributeList[i];
       attribute.translate(typeFactory, codeBuilder, this.scopeDefinition);
       codeBuilder.setTranslatedCode(
-        `Heap[H] = ${codeBuilder.getLastAddress()}; # Enviando valor del atributo ${
+        `${t3} = ${t1} + ${i + 1};
+Heap[${t3}] = ${codeBuilder.getLastAddress()}; # Enviando valor del atributo ${
           attribute.identifier
         }
-H = H + 1; # Aumento del heap
 `
       );
     }

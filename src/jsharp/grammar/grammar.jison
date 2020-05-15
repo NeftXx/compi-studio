@@ -43,6 +43,9 @@
   const { default: CallFunction } = require("../ast/expression/call_function");
   const { default: CallFunctionStm } = require("../ast/statement/call_function_stm");
   const { default: ArrayValues } = require("../ast/expression/array_values");
+  const { default: ReferenceValue } = require("../ast/expression/reference_value");
+  const { default: IncreaseDecrease } = require("../ast/expression/increase_decrease");
+  const { default: DecreaseIncrease } = require("../ast/statement/var_assignment/decrease_increase")
   const {
     VarDeclaration,
     VarDeclarationGlobal,
@@ -53,8 +56,6 @@
 %start compilation_unit
 
 %right '='
-%right '?' ':'
-%left '++' '--'
 %left '||'
 %left '&&'
 %left '^'
@@ -63,8 +64,8 @@
 %left '+' '-'
 %left '*' '/' '%'
 %right '^^'
-%right UMINUS NOT
-%left '(' ')' '.' '[' ']'
+%right UMINUS NOT '$'
+%left '(' ')' '.' '[' ']' '++' '--'
 
 %% /* language grammar */
 
@@ -318,14 +319,19 @@ struct_declaration
     );
   }
   | 'strc' IDENTIFIER '[' expression ']' {
-    let typeArray2 = yy.typeFactory.createArrayType(
-      yy.typeFactory.createNewStructure(yy.filename, $2), 1
-    );
+    if ($2 === "string") {
     $$ = new StructDeclarationArray(
-      new NodeInfo(
-        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
-      ), typeArray2, $4
-    );
+        new NodeInfo(
+          yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+        ), yy.typeFactory.createArrayType(yy.typeFactory.getString(), 1), $4
+      );
+    } else {
+      $$ = new StructDeclarationArray(
+        new NodeInfo(
+          yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+        ), yy.typeFactory.createNewStructure(yy.filename, $2), $4
+      );
+    }    
   }
   | 'strc' IDENTIFIER '(' ')' {
     $$ = new StructDeclaration(
@@ -437,7 +443,79 @@ var_assignment
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), tempArray, $6
     );
-  }  
+  }
+  | IDENTIFIER '++' {
+    let tempId2 = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempId2, $2
+    );
+  }
+  | IDENTIFIER '--' {
+    let tempId3 = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempId3, $2
+    );
+  }
+  | IDENTIFIER '[' expression ']' '++' {
+    let idTemp4 = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    let tempArray2 = new ArrayAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), idTemp4, $3
+    );
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempArray2, $5
+    );
+  }
+  | IDENTIFIER '[' expression ']' '--' {
+    let idTemp5 = new IdentifierAccess (
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1
+    );
+    let tempArray3 = new ArrayAccess(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), idTemp5, $3
+    );
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), tempArray3, $5
+    );
+  }
+  | access_list '++' {
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
+  | access_list '--' {
+    $$ = new DecreaseIncrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
 ;
 
 access_list
@@ -835,12 +913,33 @@ expression
       ), $1, $3
     );
   }
+  | expression '++' {
+    $$ = new IncreaseDecrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
+  | expression '--' {
+    $$ = new IncreaseDecrease(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, $2
+    );
+  }
   | '-' expression %prec UMINUS {
     $$ = new UMenos(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
       ), $2
     )
+  }
+  | '$' expression {
+    $$ = new ReferenceValue(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $2
+    );
   }
   | array_values { $$ = $1; }
   | call_function_expression { $$ = $1; }

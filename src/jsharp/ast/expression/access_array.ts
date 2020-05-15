@@ -5,6 +5,7 @@ import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory, ArrayType, ErrorType } from "../../scope/type";
 
 export default class AccessArray extends Expression {
+  public tempDir: string;
   public constructor(
     nodeInfo: NodeInfo,
     private exp: Expression,
@@ -82,6 +83,7 @@ goto ${LF};
       codeBuilder.addTrueLabel(LV);
       codeBuilder.addFalseLabel(LF);
     } else {
+      this.tempDir = t3;
       codeBuilder.setLastAddress(t4);
       codeBuilder.addUnusedTemporary(t4);
     }

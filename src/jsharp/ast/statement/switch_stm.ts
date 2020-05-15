@@ -1,6 +1,6 @@
 import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
-import { TypeFactory, ErrorType } from "../../scope/type";
+import { TypeFactory, ErrorType, JType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
@@ -64,15 +64,37 @@ export default class SwitchStm extends Statement {
     let defaultLabel: CaseStm;
     let dirCurrent: string;
     this.breakLabel = codeBuilder.getNewLabel();
+    let typeExp = this.exp.type;
+    let scopeSize = scope.size;
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary();
+    let dirCond: string;
     for (let label of this.labels) {
       label.labelExit = codeBuilder.getNewLabel();
       if (label.exp) {
         label.exp.translate(typeFactory, codeBuilder, scope);
         dirCurrent = this.getDir(typeFactory, codeBuilder);
+        dirCond = dirExp;
+        if (
+          typeFactory.isString(typeExp) &&
+          typeFactory.isString(label.exp.type)
+        ) {
+          codeBuilder.setTranslatedCode(`P = P + ${scopeSize};
+${t1} = P + 1;
+Stack[${t1}] = ${dirExp};
+${t1} = P + 2;
+Stack[${t1}] = ${dirCurrent};
+call native_comparar_cadenas;
+${t2} = Stack[P];
+P = P - ${scopeSize};
+`);
+          codeBuilder.removeUnusedTemporary(dirCurrent);
+          dirCond = t2;
+          dirCurrent = "1";
+        }
         codeBuilder.setTranslatedCode(
-          `if (${dirExp} == ${dirCurrent}) goto ${label.labelExit};\n`
+          `if (${dirCond} == ${dirCurrent}) goto ${label.labelExit};\n`
         );
-        codeBuilder.removeUnusedTemporary(dirExp);
         codeBuilder.removeUnusedTemporary(dirCurrent);
       } else {
         if (!defaultLabel) {
@@ -80,6 +102,7 @@ export default class SwitchStm extends Statement {
         }
       }
     }
+    codeBuilder.removeUnusedTemporary(dirExp);
     if (defaultLabel) {
       codeBuilder.setTranslatedCode(`goto ${defaultLabel.labelExit};\n`);
     }

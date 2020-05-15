@@ -57,14 +57,22 @@ export default class SubIf extends Statement {
   ): void {
     if (this.expression) {
       this.expression.translate(typeFactory, codeBuilder, scope);
-    }
-    codeBuilder.printTrueLabels();
-    this.block.breakLabel = this.breakLabel;
-    this.block.continueLabel = this.continueLabel;
-    this.block.translate(typeFactory, codeBuilder, this.localScope);
-    if (this.labelExit !== "") {
+      codeBuilder.printTrueLabels();
+      let falseLabels = codeBuilder.tempFalseLabels();
+      this.block.breakLabel = this.breakLabel;
+      this.block.continueLabel = this.continueLabel;
+      this.block.translate(typeFactory, codeBuilder, this.localScope);
+      codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);
+      let length = falseLabels.length;
+      for (let i = 0; i < length; i++) {
+        codeBuilder.setTranslatedCode(`${falseLabels.pop()}: `);
+      }
+      codeBuilder.setTranslatedCode("\n");
+    } else {
+      this.block.breakLabel = this.breakLabel;
+      this.block.continueLabel = this.continueLabel;
+      this.block.translate(typeFactory, codeBuilder, this.localScope);
       codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);
     }
-    codeBuilder.printFalseLabels();
   }
 }

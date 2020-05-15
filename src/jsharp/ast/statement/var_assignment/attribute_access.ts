@@ -60,12 +60,16 @@ export default class AttributeAccess extends Access {
       codeBuilder.setTranslatedCode(`${t1} = Heap[${lastDir}];
 ${t2} = ${t1} + ${this.dir};
 `);
+      codeBuilder.removeUnusedTemporary(lastDir);
       codeBuilder.setLastAddress(t2);
+      codeBuilder.addUnusedTemporary(t2);
     } else {
       codeBuilder.setTranslatedCode(`${t1} = Stack[${lastDir}];
 ${t2} = ${t1} + ${this.dir};
 `);
+      codeBuilder.removeUnusedTemporary(lastDir);
       codeBuilder.setLastAddress(t2);
+      codeBuilder.addUnusedTemporary(t2);
     }
   }
 }

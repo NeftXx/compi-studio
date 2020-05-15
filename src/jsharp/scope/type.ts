@@ -37,7 +37,7 @@ export class BaseType extends JType {
     if (this === BaseType.INTEGER) return 0;
     if (this === BaseType.DOUBLE) return 0.0;
     if (this === BaseType.BOOLEAN) return 0;
-    if (this === BaseType.CHAR) return "\0";
+    if (this === BaseType.CHAR) return 0;
     return -1;
   }
 }

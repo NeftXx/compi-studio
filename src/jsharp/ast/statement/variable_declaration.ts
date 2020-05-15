@@ -39,6 +39,13 @@ export class VarDeclaration extends Declaration {
     if (type instanceof ErrorType) {
       scope.addError(type);
     }
+    if (typeFactory.isNull(type)) {
+      type = new ErrorType(
+        `Error no se puede asignar la expresion null a este tipo de declaracion.`,
+        this.nodeInfo
+      );
+      scope.addError(type as ErrorType);
+    }
     let ok = scope.createVariableLocal(this.identifier, type, this.isConstant);
     if (!ok) {
       scope.addError(
@@ -169,6 +176,13 @@ export class VarDeclarationGlobal extends Declaration {
     let type = this.exp.type;
     if (type instanceof ErrorType) {
       scope.addError(type);
+    }
+    if (typeFactory.isNull(type)) {
+      type = new ErrorType(
+        `Error no se puede asignar la expresion null a este tipo de declaracion.`,
+        this.nodeInfo
+      );
+      scope.addError(type as ErrorType);
     }
     let globalScope = scope.getGlobal();
     let ok = globalScope.createVariableLocal(this.identifier, type, false);

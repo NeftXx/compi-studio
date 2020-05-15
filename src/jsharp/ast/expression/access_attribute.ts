@@ -11,6 +11,7 @@ import {
 
 export default class AccessAttribute extends Expression {
   private dir: number;
+  public tempDir: string;
 
   public constructor(
     nodeInfo: NodeInfo,
@@ -89,6 +90,7 @@ ${L2}:
         t2 = codeBuilder.getNewTemporary();
       let L1 = codeBuilder.getNewLabel(),
         L2 = codeBuilder.getNewLabel();
+      codeBuilder.removeUnusedTemporary(lastDir);
       codeBuilder.setTranslatedCode(`# Accediendo a estructura
 if (${lastDir} == -1) goto ${L1};
 ${t1} = ${lastDir} + ${this.dir};
@@ -99,7 +101,6 @@ E = 4;
 ${t2} = -1;
 ${L2}:
 `);
-      codeBuilder.removeUnusedTemporary(lastDir);
       if (typeFactory.isBoolean(this.type)) {
         let LV = codeBuilder.getNewLabel(),
           LF = codeBuilder.getNewLabel();
@@ -110,6 +111,7 @@ goto ${LF};
         codeBuilder.addTrueLabel(LV);
         codeBuilder.addFalseLabel(LF);
       } else {
+        this.tempDir = t1;
         codeBuilder.setLastAddress(t2);
         codeBuilder.addUnusedTemporary(t2);
       }

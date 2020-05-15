@@ -53,8 +53,10 @@ export default class ArrayAccess extends Access {
       L5 = codeBuilder.getNewLabel();
     if (this.exp.itsHeap) {
       codeBuilder.setTranslatedCode(`${t1} = Heap[${dirExp}];\n`);
+      codeBuilder.removeUnusedTemporary(dirExp);
     } else {
       codeBuilder.setTranslatedCode(`${t1} = Stack[${dirExp}];\n`);
+      codeBuilder.removeUnusedTemporary(dirExp);
     }
     codeBuilder.setTranslatedCode(`${t2} = Heap[${t1}];\n`);
     this.valueAccess.translate(typeFactory, codeBuilder, scope);
@@ -75,5 +77,6 @@ E = 2;
 ${L5}:
 `);
     codeBuilder.setLastAddress(t4);
+    codeBuilder.addUnusedTemporary(t4);
   }
 }

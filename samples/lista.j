@@ -19,9 +19,10 @@ void imprimirLista(Lista lista) {
   Nodo temp = lista.inicio;
   while(temp != null) {
     print(temp.dato);
+    print(" -> ");
     temp = temp.sig;
   }
-  print('\n');
+  print("null\n");
 }
 
 void principal() {

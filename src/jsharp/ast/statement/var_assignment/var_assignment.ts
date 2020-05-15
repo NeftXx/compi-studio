@@ -80,5 +80,7 @@ export default class VarAssignment extends Statement {
     } else {
       codeBuilder.setTranslatedCode(`Stack[${dirAccess}] = ${dirExp};\n`);
     }
+    codeBuilder.removeUnusedTemporary(dirAccess);
+    codeBuilder.removeUnusedTemporary(dirExp);
   }
 }

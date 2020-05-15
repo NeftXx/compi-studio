@@ -155,6 +155,7 @@ btnDeleteBuffer.addEventListener("click", async () => {
     if (res) {
       delete buffers[nameFile];
       SELECT_FILE.remove(SELECT_FILE.selectedIndex);
+      selectBuffer(editorCode, INIT_FILE);
       M.FormSelect.init(SELECT_FILE);
       Toast.fire({
         icon: "success",

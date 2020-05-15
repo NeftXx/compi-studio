@@ -75,11 +75,13 @@ E = 3;
 ${LF}:
 `);
       codeBuilder.setLastAddress(t2);
+      codeBuilder.addUnusedTemporary(t2);
     } else {
       let variable = scope.getVariable(this.identifier);
       let t1 = codeBuilder.getNewTemporary();
       codeBuilder.setTranslatedCode(`${t1} = P + ${variable.ptr};\n`);
       codeBuilder.setLastAddress(t1);
+      codeBuilder.addUnusedTemporary(t1);
     }
   }
 

@@ -64,22 +64,20 @@ export default class Comparator extends Expression {
         typeFactory.isString(this.expRight.type)
       ) {
         let t1 = codeBuilder.getNewTemporary(),
-          t2 = codeBuilder.getNewTemporary(),
-          t3 = codeBuilder.getNewTemporary();
+          t2 = codeBuilder.getNewTemporary();
         let size = scope.size;
         codeBuilder.removeUnusedTemporary(dir1);
         codeBuilder.removeUnusedTemporary(dir2);
-        codeBuilder.setTranslatedCode(`${t1} = P + ${size};
-${t2} = ${t1} + 1;
-Stack[${t2}] = ${dir1};
-${t2} = ${t1} + 2;
-Stack[${t2}] = ${dir2};
-P = P + ${size};
+        codeBuilder.setTranslatedCode(`P = P + ${size};
+${t1} = P + 1;
+Stack[${t1}] = ${dir1};
+${t1} = P + 2;
+Stack[${t1}] = ${dir2};
 call native_comparar_cadenas;
+${t2} = Stack[P];
 P = P - ${size};
-${t3} = Stack[${t1}];
 `);
-        dir1 = t3;
+        dir1 = t2;
         dir2 = "1";
         let LV = codeBuilder.getNewLabel();
         let LF = codeBuilder.getNewLabel();
@@ -99,8 +97,6 @@ ${t3} = Stack[${t1}];
         codeBuilder.addTrueLabel(LV);
         codeBuilder.addFalseLabel(LF);
       }
-
-      return;
     } else if (this.operator === "===") {
     }
   }

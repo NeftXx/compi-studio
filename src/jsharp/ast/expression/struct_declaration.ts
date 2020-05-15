@@ -5,7 +5,6 @@ import {
   StructureType,
   ErrorType,
   ArrayType,
-  BaseType,
 } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Expression from "./expression";
@@ -99,56 +98,37 @@ export class StructDeclarationArray extends Expression {
   ): void {
     if (this.type instanceof ArrayType) {
       let type = this.type.type;
-      if (type instanceof BaseType) {
-        this.translateBaseType(typeFactory, codeBuilder, scope, type);
-      } else if (type instanceof StructureType) {
-        this.translateStructureType(typeFactory, codeBuilder, scope, type);
-      }
-    }
-  }
-
-  private translateBaseType(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope,
-    type: BaseType
-  ) {
-    let t1 = codeBuilder.getNewTemporary(),
-      t2 = codeBuilder.getNewTemporary(),
-      t3 = codeBuilder.getNewTemporary();
-    let L1 = codeBuilder.getNewLabel(),
-      L2 = codeBuilder.getNewLabel(),
-      L3 = codeBuilder.getNewLabel(),
-      L4 = codeBuilder.getNewLabel();
-    this.exp.translate(typeFactory, codeBuilder, scope);
-    codeBuilder.setTranslatedCode(`${t1} = -1;
-${t2} = ${codeBuilder.getLastAddress()};
+      let t1 = codeBuilder.getNewTemporary(),
+        t2 = codeBuilder.getNewTemporary(),
+        t3 = codeBuilder.getNewTemporary();
+      let L1 = codeBuilder.getNewLabel(),
+        L2 = codeBuilder.getNewLabel(),
+        L3 = codeBuilder.getNewLabel(),
+        L4 = codeBuilder.getNewLabel();
+      this.exp.translate(typeFactory, codeBuilder, scope);
+      let last = codeBuilder.getLastAddress();
+      codeBuilder.setTranslatedCode(`${t1} = -1;
+${t2} = ${last};
 if (${t2} > -1) goto ${L1};
 E = 3;
 goto ${L2};
 ${L1}:
 ${t1} = H;
 Heap[H] = ${t2};
+H = H + 1;
 ${t3} = 0;
 ${L3}:
 if (${t3} > ${t2}) goto ${L4};
-H = H + 1;
 Heap[H] = ${type.getValueDefault()};
+H = H + 1;
 ${t3} = ${t3} + 1;
 goto ${L3};
 ${L4}:
 ${L2}:
 `);
-    codeBuilder.setLastAddress(t1);
-    codeBuilder.addUnusedTemporary(t1);
-  }
-
-  private translateStructureType(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope,
-    type: StructureType
-  ) {
-    this.exp.translate(typeFactory, codeBuilder, scope);
+      codeBuilder.removeUnusedTemporary(last);
+      codeBuilder.setLastAddress(t1);
+      codeBuilder.addUnusedTemporary(t1);
+    }
   }
 }
