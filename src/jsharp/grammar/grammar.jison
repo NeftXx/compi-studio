@@ -55,17 +55,18 @@
 
 %start compilation_unit
 
-%right '='
 %left '||'
 %left '&&'
 %left '^'
-%left '!=' '=='
+%left '!=' '==' '==='
 %nonassoc '>=' '>' '<=' '<'
 %left '+' '-'
 %left '*' '/' '%'
 %right '^^'
+%right CAST 'strc'
 %right UMINUS NOT '$'
-%left '(' ')' '.' '[' ']' '++' '--'
+%nonassoc '++' '--'
+%left '(' ')' '.' '[' ']'
 
 %% /* language grammar */
 
@@ -863,6 +864,13 @@ expression
       ), $1, "<=", $3
     )
   }
+  | expression '===' expression {
+    $$ = new Comparator(
+      new NodeInfo(
+        yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1
+      ), $1, "===", $3
+    )
+  }
   | expression '==' expression {
     $$ = new Comparator(
       new NodeInfo(
@@ -877,7 +885,7 @@ expression
       ), $1, "!=", $3
     )
   }
-  | '(' primitive_type ')' expression {
+  | '(' primitive_type ')' expression %prec CAST {
     $$ = new Cast(
       new NodeInfo(
         yy.filename, yylineno + 1, yy.lexer.yylloc.first_column + 1

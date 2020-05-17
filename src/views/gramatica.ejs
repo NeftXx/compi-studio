@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <%- include('partials/head') -%>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+    <style>
+      body {
+        font-family: var(
+          --vscode-markdown-font-family,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe WPC",
+          "Segoe UI",
+          "Ubuntu",
+          "Droid Sans",
+          sans-serif
+        );
+        font-size: var(--vscode-markdown-font-size, 14px);
+        padding: 0 26px;
+        line-height: var(--vscode-markdown-line-height, 22px);
+        word-wrap: break-word;
+      }
+
+      #code-csp-warning {
+        position: fixed;
+        top: 0;
+        right: 0;
+        color: white;
+        margin: 16px;
+        text-align: center;
+        font-size: 12px;
+        font-family: sans-serif;
+        background-color: #444444;
+        cursor: pointer;
+        padding: 6px;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+      }
+
+      #code-csp-warning:hover {
+        text-decoration: none;
+        background-color: #007acc;
+        box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+      }
+
+      body.scrollBeyondLastLine {
+        margin-bottom: calc(100vh - 22px);
+      }
+
+      body.showEditorSelection .code-line {
+        position: relative;
+      }
+
+      body.showEditorSelection .code-active-line:before,
+      body.showEditorSelection .code-line:hover:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -12px;
+        height: 100%;
+      }
+
+      body.showEditorSelection li.code-active-line:before,
+      body.showEditorSelection li.code-line:hover:before {
+        left: -30px;
+      }
+
+      .vscode-light.showEditorSelection .code-active-line:before {
+        border-left: 3px solid rgba(0, 0, 0, 0.15);
+      }
+
+      .vscode-light.showEditorSelection .code-line:hover:before {
+        border-left: 3px solid rgba(0, 0, 0, 0.4);
+      }
+
+      .vscode-light.showEditorSelection .code-line .code-line:hover:before {
+        border-left: none;
+      }
+
+      .vscode-dark.showEditorSelection .code-active-line:before {
+        border-left: 3px solid rgba(255, 255, 255, 0.4);
+      }
+
+      .vscode-dark.showEditorSelection .code-line:hover:before {
+        border-left: 3px solid rgba(255, 255, 255, 0.6);
+      }
+
+      .vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+        border-left: none;
+      }
+
+      .vscode-high-contrast.showEditorSelection .code-active-line:before {
+        border-left: 3px solid rgba(255, 160, 0, 0.7);
+      }
+
+      .vscode-high-contrast.showEditorSelection .code-line:hover:before {
+        border-left: 3px solid rgba(255, 160, 0, 1);
+      }
+
+      .vscode-high-contrast.showEditorSelection
+        .code-line
+        .code-line:hover:before {
+        border-left: none;
+      }
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      a:focus,
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: 1px solid -webkit-focus-ring-color;
+        outline-offset: -1px;
+      }
+
+      hr {
+        border: 0;
+        height: 2px;
+        border-bottom: 2px solid;
+      }
+
+      h1 {
+        padding-bottom: 0.3em;
+        line-height: 1.2;
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-weight: normal;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      table > thead > tr > th {
+        text-align: left;
+        border-bottom: 1px solid;
+      }
+
+      table > thead > tr > th,
+      table > thead > tr > td,
+      table > tbody > tr > th,
+      table > tbody > tr > td {
+        padding: 5px 10px;
+      }
+
+      table > tbody > tr + tr > td {
+        border-top: 1px solid;
+      }
+
+      blockquote {
+        margin: 0 7px 0 5px;
+        padding: 0 16px 0 10px;
+        border-left-width: 5px;
+        border-left-style: solid;
+      }
+
+      code {
+        font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New",
+          monospace, "Droid Sans Fallback";
+        font-size: 1em;
+        line-height: 1.357em;
+      }
+
+      body.wordWrap pre {
+        white-space: pre-wrap;
+      }
+
+      pre:not(.hljs),
+      pre.hljs code > div {
+        padding: 16px;
+        border-radius: 3px;
+        overflow: auto;
+      }
+
+      pre code {
+        color: var(--vscode-editor-foreground);
+        tab-size: 4;
+      }
+
+      /** Theming */
+
+      .vscode-light pre {
+        background-color: rgba(220, 220, 220, 0.4);
+      }
+
+      .vscode-dark pre {
+        background-color: rgba(10, 10, 10, 0.4);
+      }
+
+      .vscode-high-contrast pre {
+        background-color: rgb(0, 0, 0);
+      }
+
+      .vscode-high-contrast h1 {
+        border-color: rgb(0, 0, 0);
+      }
+
+      .vscode-light table > thead > tr > th {
+        border-color: rgba(0, 0, 0, 0.69);
+      }
+
+      .vscode-dark table > thead > tr > th {
+        border-color: rgba(255, 255, 255, 0.69);
+      }
+
+      .vscode-light h1,
+      .vscode-light hr,
+      .vscode-light table > tbody > tr + tr > td {
+        border-color: rgba(0, 0, 0, 0.18);
+      }
+
+      .vscode-dark h1,
+      .vscode-dark hr,
+      .vscode-dark table > tbody > tr + tr > td {
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+    </style>
+
+    <style>
+      /* Tomorrow Theme */
+      /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+      /* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+      /* Tomorrow Comment */
+      .hljs-comment,
+      .hljs-quote {
+        color: #8e908c;
+      }
+
+      /* Tomorrow Red */
+      .hljs-variable,
+      .hljs-template-variable,
+      .hljs-tag,
+      .hljs-name,
+      .hljs-selector-id,
+      .hljs-selector-class,
+      .hljs-regexp,
+      .hljs-deletion {
+        color: #c82829;
+      }
+
+      /* Tomorrow Orange */
+      .hljs-number,
+      .hljs-built_in,
+      .hljs-builtin-name,
+      .hljs-literal,
+      .hljs-type,
+      .hljs-params,
+      .hljs-meta,
+      .hljs-link {
+        color: #f5871f;
+      }
+
+      /* Tomorrow Yellow */
+      .hljs-attribute {
+        color: #eab700;
+      }
+
+      /* Tomorrow Green */
+      .hljs-string,
+      .hljs-symbol,
+      .hljs-bullet,
+      .hljs-addition {
+        color: #718c00;
+      }
+
+      /* Tomorrow Blue */
+      .hljs-title,
+      .hljs-section {
+        color: #4271ae;
+      }
+
+      /* Tomorrow Purple */
+      .hljs-keyword,
+      .hljs-selector-tag {
+        color: #8959a8;
+      }
+
+      .hljs {
+        display: block;
+        overflow-x: auto;
+        color: #4d4d4c;
+        padding: 0.5em;
+      }
+
+      .hljs-emphasis {
+        font-style: italic;
+      }
+
+      .hljs-strong {
+        font-weight: bold;
+      }
+    </style>
+
+    <style>
+      /*
+ * Markdown PDF CSS
+ */
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI",
+          "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+        padding: 0 12px;
+      }
+
+      pre {
+        background-color: #f8f8f8;
+        border: 1px solid #cccccc;
+        border-radius: 3px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+      }
+
+      pre:not(.hljs) {
+        padding: 23px;
+        line-height: 19px;
+      }
+
+      blockquote {
+        background: rgba(127, 127, 127, 0.1);
+        border-color: rgba(0, 122, 204, 0.5);
+      }
+
+      .emoji {
+        height: 1.4em;
+      }
+
+      code {
+        font-size: 14px;
+        line-height: 19px;
+      }
+
+      /* for inline code */
+      :not(pre):not(.hljs) > code {
+        color: #c9ae75; /* Change the old color so it seems less like an error */
+        font-size: inherit;
+      }
+
+      /* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+      .page {
+        page-break-after: always;
+      }
+    </style>
+
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <%- include('partials/menu') -%>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme:
+          document.body.classList.contains("vscode-dark") ||
+          document.body.classList.contains("vscode-high-contrast")
+            ? "dark"
+            : "default",
+      });
+    </script>
+    <h1 id="gram%C3%A1tica">Gramática</h1>
+    <h2 id="expresiones-regulares-usados">Expresiones regulares usados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Expresion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>EndOfLine</td>
+          <td>\r|\n|\r\n</td>
+        </tr>
+        <tr>
+          <td>Identifier</td>
+          <td>[a-zA-Z_][_a-za-z0-9ññ]*</td>
+        </tr>
+        <tr>
+          <td>IntegerLiteral</td>
+          <td>[0-9]+</td>
+        </tr>
+        <tr>
+          <td>BooleanLiteral</td>
+          <td>true|false</td>
+        </tr>
+        <tr>
+          <td>NullLiteral</td>
+          <td>null</td>
+        </tr>
+        <tr>
+          <td>File</td>
+          <td>[a-zA-Z0-9_-]+(.[A-Za-z0-9]+)*(.[j])</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2 id="precedencia-utilizada">Precedencia utilizada</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nivel</th>
+          <th>Operador</th>
+          <th>Descripción</th>
+          <th>Asociatividad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>12</td>
+          <td>[]<br />.<br />()</td>
+          <td>
+            Acceso a elemento de arreglo<br />
+            Acceso a elemento de estructura<br />Paréntesis
+          </td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>++<br />--</td>
+          <td>
+            Post-incremento unario<br />
+            Post-incremento unario
+          </td>
+          <td>No asociativo</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>!<br />-<br />$</td>
+          <td>
+            Not lógico unario<br />
+            Menos unario<br />Paso por valor de objetos
+          </td>
+          <td>De derecha a izquierda</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>()<br />strc</td>
+          <td>Casteo<br />Creación de estructuras</td>
+          <td>De derecha a izquierda</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>^^</td>
+          <td>Potencia</td>
+          <td>De derecha a izquierda</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>* / %</td>
+          <td>Multiplicativo</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>+-<br />+</td>
+          <td>Aditivo<br />Concatenación de cadenas</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>&lt; &lt;= &gt; &gt;=</td>
+          <td>Relacional</td>
+          <td>No asociativo</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>!= == ===</td>
+          <td>Igualdad</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>^</td>
+          <td>Xor</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>&amp;&amp;</td>
+          <td>And</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>||</td>
+          <td>Or</td>
+          <td>De izquierda a derecha</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2
+      id="enumeraci%C3%B3n-y-cantidad-de-s%C3%ADmbolos-terminales-y-no-terminales"
+    >
+      Enumeración y cantidad de símbolos terminales y no terminales
+    </h2>
+    <h3 id="terminales">Terminales</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Terminal</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>import</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>switch</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>continue</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>private</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>define</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>integer</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>var</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>case</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>return</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>void</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>as</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>double</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>const</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>if</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>default</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td>print</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td>for</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>18</td>
+          <td>strc</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>19</td>
+          <td>char</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>20</td>
+          <td>global</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>21</td>
+          <td>else</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>22</td>
+          <td>break</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>23</td>
+          <td>public</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>24</td>
+          <td>while</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>25</td>
+          <td>do</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>26</td>
+          <td>boolean</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>27</td>
+          <td>null_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>28</td>
+          <td>boolean_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>29</td>
+          <td>double_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>30</td>
+          <td>integer_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>31</td>
+          <td>char_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>32</td>
+          <td>string_literal</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>33</td>
+          <td>file</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>34</td>
+          <td>identifier</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>35</td>
+          <td>===</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>36</td>
+          <td>^^</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>37</td>
+          <td>++</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>38</td>
+          <td>--</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>39</td>
+          <td>!=</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>40</td>
+          <td>==</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>41</td>
+          <td>&gt;=</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>42</td>
+          <td>&lt;=</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>43</td>
+          <td>&amp;&amp;</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>44</td>
+          <td>||</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>45</td>
+          <td>:=</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>46</td>
+          <td>+</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>47</td>
+          <td>-</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>48</td>
+          <td>*</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>49</td>
+          <td>/</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>50</td>
+          <td>%</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>=</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>52</td>
+          <td>&gt;</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>53</td>
+          <td>&lt;</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>54</td>
+          <td>$</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>55</td>
+          <td>^</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>56</td>
+          <td>!</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>(</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>58</td>
+          <td>)</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>59</td>
+          <td>[</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>]</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>61</td>
+          <td>{</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>62</td>
+          <td>}</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>,</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>64</td>
+          <td>?</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>65</td>
+          <td>:</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>66</td>
+          <td>;</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>67</td>
+          <td>.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>68</td>
+          <td>EOF</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="no-terminales">No Terminales</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>No Terminal</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>compilation_unit</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>import_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>file_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>global_statements_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>global_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>function_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>type</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>primitive_type</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>parameter_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>parameter</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>block</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>block_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>break_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td>continue_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td>return_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td>struct_definition</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>18</td>
+          <td>struct_declaration</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>19</td>
+          <td>attribute_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>20</td>
+          <td>attribute</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>21</td>
+          <td>variable_declaration</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>22</td>
+          <td>id_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>23</td>
+          <td>var_assignment</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>24</td>
+          <td>access_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>25</td>
+          <td>do_while_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>26</td>
+          <td>while_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>27</td>
+          <td>if_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>28</td>
+          <td>if_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>29</td>
+          <td>switch_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>30</td>
+          <td>switch_labels</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>31</td>
+          <td>switch_label</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>32</td>
+          <td>for_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>33</td>
+          <td>for_init</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>34</td>
+          <td>for_conditional</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>35</td>
+          <td>for_final</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>36</td>
+          <td>print_statement</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>37</td>
+          <td>call_function</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>38</td>
+          <td>call_function</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>39</td>
+          <td>expression_list</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>40</td>
+          <td>array_values</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>41</td>
+          <td>expression</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2 id="gram%C3%A1tica-funcional">Gramática funcional</h2>
+    <pre class="hljs"><code><div>&lt;compilation_unit&gt;
+  : &lt;import_statement&gt; &lt;global_statements_list&gt; EOF {
+
+  }
+  | &lt;global_statements_list&gt; EOF {
+
+  }
+;
+
+&lt;import_statement&gt;
+  : import &lt;file_list&gt; [;] {
+
+  }
+;
+
+&lt;file_list&gt;
+  : &lt;file_list&gt; , file {}
+  | file {}
+;
+
+&lt;global_statements_list&gt;
+  : &lt;global_statements_list&gt; &lt;global_statement&gt; {}
+  | &lt;global_statement&gt; {}
+;
+
+&lt;global_statement&gt;
+  : &lt;function_statement&gt; {}
+  | &lt;struct_definition&gt; {}
+  | &lt;variable_declaration&gt; [;] {}
+;
+
+&lt;function_statement&gt;
+  : type identifier ( &lt;parameter_list&gt; ) &lt;block&gt; {
+
+  }
+  | type identifier ( ) &lt;block&gt; {}
+  | void identifier ( &lt;parameter_list&gt; ) &lt;block&gt; {}
+  | void identifier ( ) &lt;block&gt; {}
+;
+
+&lt;type&gt;
+  : &lt;primitive_type&gt; {
+
+  }
+  | identifier {}
+  | &lt;primitive_type&gt; [ ] {}
+  | identifier [ ] {}
+;
+
+&lt;primitive_type&gt;
+  : integer
+  | double
+  | char
+  | boolean
+;
+
+&lt;parameter_list&gt;
+  : &lt;parameter_list&gt; , &lt;parameter&gt;
+  | &lt;parameter&gt;
+;
+
+&lt;parameter&gt;
+  : &lt;type&gt; identifier
+;
+
+&lt;block&gt;
+  : {  &lt;block_statement&gt; }
+;
+
+&lt;block_statement&gt;
+  : &lt;block_statement&gt; &lt;statement&gt;
+  | &lt;statement&gt;
+;
+
+&lt;statement&gt;
+  : &lt;print_statement&gt;
+  | &lt;if_statement&gt;
+  | &lt;switch_statement&gt;
+  | &lt;while_statement&gt;
+  | &lt;do_while_statement&gt;
+  | &lt;struct_definition&gt;
+  | &lt;var_assignment&gt;
+  | &lt;variable_declaration&gt;
+  | &lt;break_statement&gt;
+  | &lt;continue_statement&gt;
+  | &lt;return_statement&gt;
+  | &lt;for_statement&gt;
+  | &lt;call_function_statement&gt;
+;
+
+&lt;break_statement&gt;
+  : break
+;
+
+&lt;continue_statement&gt;
+  : continue
+;
+
+&lt;return_statement&gt;
+  : return
+  | return &lt;expression&gt;
+;
+
+&lt;struct_definition&gt;
+  : define identifier as [ &lt;attribute_list&gt; ]
+;
+
+&lt;struct_declaration&gt;
+  : strc &lt;primitive_type&gt; [ &lt;expression&gt; ]
+  | strc identifier [ &lt;expression&gt; ]
+  | strc identifier ( )
+;
+
+&lt;attribute_list&gt;
+  : &lt;attribute_list&gt; , &lt;attribute&gt;
+  | &lt;attribute&gt;
+;
+
+&lt;attribute&gt;
+  : &lt;type&gt; identifier
+  | &lt;type&gt; identifier = &lt;expression&gt;
+;
+
+&lt;variable_declaration&gt;
+  : &lt;type&gt; &lt;id_list&gt; = &lt;expression&gt;
+  | &lt;type&gt; &lt;id_list&gt;
+  | var identifier := &lt;expression&gt;
+  | const identifier := &lt;expression&gt;
+  | global identifier := &lt;expression&gt;
+;
+
+&lt;id_list&gt;
+  : &lt;id_list&gt; , identifier
+  | identifier
+;
+
+&lt;var_assignment&gt;
+  : &lt;access_list&gt; = &lt;expression&gt;
+  | &lt;access_list&gt; ++
+  | &lt;access_list&gt; --
+;
+
+&lt;access_list&gt;
+  : &lt;access_list&gt; . identifier
+  | &lt;access_list&gt; [ &lt;expression&gt; ]
+  | identifier
+;
+
+&lt;do_while_statement&gt;
+  : do &lt;block&gt; while ( &lt;expression&gt; )
+;
+
+&lt;while_statement&gt;
+  : while ( &lt;expression&gt; ) &lt;block&gt;
+;
+
+&lt;if_statement&gt;
+  : &lt;if_list&gt; else &lt;block&gt;
+  | &lt;if_list&gt;
+;
+
+&lt;if_list&gt;
+  : &lt;if_list&gt; else if ( &lt;expression&gt; ) &lt;block&gt;
+  | if ( &lt;expression&gt; ) &lt;block&gt;
+;
+
+&lt;switch_statement&gt;
+  : switch ( &lt;expression&gt; ) { &lt;switch_labels&gt; }
+;
+
+&lt;switch_labels&gt;
+  : &lt;switch_labels&gt; &lt;switch_label&gt;
+  | &lt;switch_label&gt;
+;
+
+&lt;switch_label&gt;
+  : case &lt;expression&gt; : &lt;block_statement&gt;
+  | default : &lt;block_statement&gt;
+;
+
+&lt;for_statement&gt;
+  : for ( &lt;for_init&gt; ; &lt;for_conditional&gt; ; &lt;for_final&gt; ) &lt;block&gt;
+;
+
+&lt;for_init&gt;
+  : &lt;variable_declaration&gt;
+  | &lt;var_assignment&gt;
+  | /* epsilon */
+;
+
+&lt;for_conditional&gt;
+  : &lt;expression&gt;
+  | /* epsilon */
+;
+
+&lt;for_final&gt;
+  : &lt;var_assignment&gt;
+  | /* epsilon */
+;
+
+&lt;print_statement&gt;
+  : print ( &lt;expression&gt; )
+;
+
+&lt;call_function&gt;
+  : identifier ( &lt;expression_list&gt; )
+  | identifier ( )
+;
+
+&lt;expression_list&gt;
+  : &lt;expression_list&gt; , &lt;expression&gt;
+  | &lt;expression&gt;
+;
+
+</div></code></pre>
+  </body>
+  <%- include('partials/script') -%>
+</html>

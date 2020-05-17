@@ -1,7 +1,7 @@
 number        [0-9]+("."[0-9]+)?
 char_terminal "c"|"i"|"d"
 label         "L"[0-9]+
-id            [a-zA-Z][_a-zA-Z0-9ñÑ]+
+id            [a-zA-Z_][_a-zA-Z0-9ñÑ]*
 
 %options case-insensitive
 
@@ -11,7 +11,7 @@ id            [a-zA-Z][_a-zA-Z0-9ñÑ]+
 [#][*][^*]*[*]+([^*#][^*]*[*]+)*[#]   /* skip long commentar */
 "#".*                                 /* skip comment */
 "\""                                  { return 'DOUBLE_QUOTE' }
-"!="                                  { return "<>";            }
+"<>"                                  { return "<>";            }
 "=="                                  { return "==";            }
 ">="                                  { return ">=";            }
 "<="                                  { return "<=";            }
@@ -42,7 +42,7 @@ id            [a-zA-Z][_a-zA-Z0-9ñÑ]+
 "if"                                  { return "if";            }
 {number}                              { return "NUMBER";        }
 {label}                               { return "LABEL";         }
-{id}                                  { return "ID";            }
 {char_terminal}                       { return "CHAR_TERMINAL"; }
+{id}                                  { return "ID";            }
 <<EOF>>                               { return "EOF";           }
 .                                     { return "INVALID"        }

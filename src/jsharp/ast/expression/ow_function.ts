@@ -2,7 +2,7 @@ import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import CodeTranslator from "../../scope/code_builder";
 import { BlockScope, FileScope } from "../../scope/scope";
-import { TypeFactory, ErrorType } from "../../scope/type";
+import { TypeFactory, ErrorType, StructureType } from "../../scope/type";
 import Identifier from "./identifier";
 
 export default class OwnFunctions extends Expression {
@@ -21,6 +21,8 @@ export default class OwnFunctions extends Expression {
     "getreference",
     "instanceof",
   ];
+
+  private typeStructure: StructureType;
 
   public constructor(
     nodeInfo: NodeInfo,
@@ -92,6 +94,7 @@ export default class OwnFunctions extends Expression {
               this.param.identifier
             );
             if (structure) {
+              this.typeStructure = structure;
               this.type = typeFactory.getBoolean();
             } else {
               this.type = new ErrorType(
@@ -134,15 +137,51 @@ export default class OwnFunctions extends Expression {
     let type = this.exp.type;
     if (typeFactory.isString(type)) {
       if (this.identifier === OwnFunctions.STRING_FUNCTIONS[0]) {
-        this.toCharArray(typeFactory, codeBuilder, scope);
+        this.toCharArray(codeBuilder, scope);
       } else if (this.identifier === OwnFunctions.STRING_FUNCTIONS[1]) {
-        this.lengthString(typeFactory, codeBuilder, scope);
+        this.lengthString(codeBuilder, scope);
       } else if (this.identifier === OwnFunctions.STRING_FUNCTIONS[2]) {
-        this.toUpperCase(typeFactory, codeBuilder, scope);
+        this.toUpperCase(codeBuilder, scope);
       } else if (this.identifier === OwnFunctions.STRING_FUNCTIONS[3]) {
-        this.toLowerCase(typeFactory, codeBuilder, scope);
+        this.toLowerCase(codeBuilder, scope);
       } else if (this.identifier === OwnFunctions.STRING_FUNCTIONS[4]) {
         this.chartAt(typeFactory, codeBuilder, scope);
+      }
+    } else if (typeFactory.isArrayType(type)) {
+      if (this.identifier === OwnFunctions.ARRAY_FUNCTIONS[0]) {
+        this.linealize(codeBuilder, scope);
+      }
+    } else if (type instanceof StructureType) {
+      if (this.identifier === OwnFunctions.STRUCTURE_FUNCTIONS[0]) {
+        this.sizeStructure(codeBuilder);
+      } else if (this.identifier === OwnFunctions.STRUCTURE_FUNCTIONS[1]) {
+        let L1 = codeBuilder.getNewLabel(),
+          L2 = codeBuilder.getNewLabel();
+        let lastDir = codeBuilder.getLastAddress();
+        codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+goto ${L2};
+${L1}:
+E = 4;
+${L2}:
+`);
+      } else if (this.identifier === OwnFunctions.STRUCTURE_FUNCTIONS[2]) {
+        let L1 = codeBuilder.getNewLabel(),
+          L2 = codeBuilder.getNewLabel();
+        let lastDir = codeBuilder.getLastAddress();
+        codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+goto ${L2};
+${L1}:
+E = 4;
+${L2}:
+`);
+        codeBuilder.removeUnusedTemporary(lastDir);
+        let label = codeBuilder.getNewLabel();
+        codeBuilder.setTranslatedCode(`goto ${label};\n`);
+        if (type === this.typeStructure) {
+          codeBuilder.addTrueLabel(label);
+        } else {
+          codeBuilder.addFalseLabel(label);
+        }
       }
     }
   }
@@ -173,11 +212,7 @@ P = P - ${size};
     codeBuilder.addUnusedTemporary(t2);
   }
 
-  private toUpperCase(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope
-  ) {
+  private toUpperCase(codeBuilder: CodeTranslator, scope: BlockScope) {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
@@ -194,11 +229,7 @@ P = P - ${size};
     codeBuilder.addUnusedTemporary(t2);
   }
 
-  private toLowerCase(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope
-  ) {
+  private toLowerCase(codeBuilder: CodeTranslator, scope: BlockScope) {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
@@ -215,11 +246,7 @@ P = P - ${size};
     codeBuilder.addUnusedTemporary(t2);
   }
 
-  private lengthString(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope
-  ) {
+  private lengthString(codeBuilder: CodeTranslator, scope: BlockScope) {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
@@ -236,11 +263,7 @@ P = P - ${size};
     codeBuilder.addUnusedTemporary(t2);
   }
 
-  private toCharArray(
-    typeFactory: TypeFactory,
-    codeBuilder: CodeTranslator,
-    scope: BlockScope
-  ) {
+  private toCharArray(codeBuilder: CodeTranslator, scope: BlockScope) {
     let t1 = codeBuilder.getNewTemporary(),
       t2 = codeBuilder.getNewTemporary();
     let dir = codeBuilder.getLastAddress();
@@ -255,5 +278,41 @@ P = P - ${size};
     codeBuilder.removeUnusedTemporary(dir);
     codeBuilder.setLastAddress(t2);
     codeBuilder.addUnusedTemporary(t2);
+  }
+
+  private linealize(codeBuilder: CodeTranslator, scope: BlockScope) {
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary();
+    let dir = codeBuilder.getLastAddress();
+    let size = scope.size;
+    codeBuilder.setTranslatedCode(`P = P + ${size}; # Cambio de ambito
+# Mandando parametros
+${t1} = P + 1; # parametro numero 0
+Stack[${t1}] = ${dir}; # Enviando parametros
+call native_copiar_arreglo;
+${t2} = Stack[P]; # Obteniendo valor del return
+P = P - ${size}; # Regresando a ambito actual
+`);
+    codeBuilder.removeUnusedTemporary(dir);
+    codeBuilder.setLastAddress(t2);
+    codeBuilder.addUnusedTemporary(t2);
+  }
+
+  private sizeStructure(codeBuilder: CodeTranslator) {
+    let t1 = codeBuilder.getNewTemporary();
+    let L1 = codeBuilder.getNewLabel(),
+      L2 = codeBuilder.getNewLabel();
+    let lastDir = codeBuilder.getLastAddress();
+    codeBuilder.setTranslatedCode(`if (${lastDir} == -1) goto ${L1};
+${t1} = Heap[${lastDir}];
+goto ${L2};
+${L1}:
+E = 4;
+${t1} = 0;
+${L2}:
+`);
+    codeBuilder.removeUnusedTemporary(lastDir);
+    codeBuilder.setLastAddress(t1);
+    codeBuilder.addUnusedTemporary(t1);
   }
 }

@@ -43,36 +43,26 @@ var_declaration_list
 
 var_declaration
   : var_declaration ',' ID {
-    $$ = $1;
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$.push(new VarDeclaration(line, column, $3, false));
+    $$ = $1;    
+    $$.push(new VarDeclaration(@3.first_line, @3.first_column, $3, false));
   }
   | var_declaration ',' ID '[' ']' {
-    $$ = $1;
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$.push(new VarDeclaration(line, column, $3, true));
+    $$ = $1;    
+    $$.push(new VarDeclaration(@3.first_line, @3.first_column, $3, true));
   }
   | 'var' ID {
     $$ = [];
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$.push(new VarDeclaration(line, column, $2, false));
+    $$.push(new VarDeclaration(@2.first_line, @2.first_column, $2, false));
   }
   | 'var' ID '[' ']' {
     $$ = [];
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$.push(new VarDeclaration(line, column, $2, true));
+    $$.push(new VarDeclaration(@2.first_line, @2.first_column, $2, true));
   }
 ;
 
 method_declaration
   : 'proc' ID 'begin' statement_block 'end' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new MethodDeclaration(line, column, $2, $4);
+    $$ = new MethodDeclaration(@2.first_line, @2.first_column, $2, $4);
   }
 ;
 
@@ -91,38 +81,29 @@ statement
 ;
 
 assigment
-  : ID '=' arit_exp {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new VarAssigment(line, column, $1, $3);
+  : ID '=' arit_exp ';' {
+    $$ = new VarAssigment(@1.first_line, @1.first_column, $1, $3);
   }
-  | ID '[' value ']' '=' value {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new StructureAssigment(line, column, $1, $3, $6);
+  | ID '[' value ']' '=' value ';' {    
+    $$ = new StructureAssigment(@1.first_line, @1.first_column, $1, $3, $6);
+  }
+  | ID '[' value ']' '=' minus ';' {    
+    $$ = new StructureAssigment(@1.first_line, @1.first_column, $1, $3, $6);
   }
 ;
 
 arit_exp
   : value arit_op value {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new ArithmeticExp(line, column, $1, $2, $3);
+    $$ = new ArithmeticExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | value arit_op minus {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new ArithmeticExp(line, column, $1, $2, $3);
+    $$ = new ArithmeticExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | minus arit_op value {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new ArithmeticExp(line, column, $1, $2, $3);
+    $$ = new ArithmeticExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | minus arit_op minus {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new ArithmeticExp(line, column, $1, $2, $3);
+    $$ = new ArithmeticExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | value { $$ = $1; }
   | access_structure { $$ = $1; }
@@ -131,93 +112,67 @@ arit_exp
 
 minus
   : '-' value %prec UMINUS {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new Minus(line, column, $2);
+    $$ = new Minus(@1.first_line, @1.first_column, $2);
   }
 ;
 
 value
   : ID {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new Identifier(line, column, $1);
+    $$ = new Identifier(@1.first_line, @1.first_column, $1);
   }
   | NUMBER {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new NumberExp(line, column, Number($1));
+    $$ = new NumberExp(@1.first_line, @1.first_column, Number($1));
   }
 ;
 
 access_structure
   : ID '[' value ']' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new AccessStructure(line, column, $1, $3);
+    $$ = new AccessStructure(@1.first_line, @1.first_column, $1, $3);
   }
 ;
 
 destiny_of_jump
   : LABEL ':' {
-    var line = yylineno + 1;
-    var column = yy.lexer.yylloc.first_column + 1;
-    $$ = new DestinyJump(line, column, $1);
+    $$ = new DestinyJump(@1.first_line, @1.first_column, $1);
   }
 ;
 
 inconditional_jump
   : 'goto' LABEL ';' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new InconditionalJump(line, column, $2);
+    $$ = new InconditionalJump(@2.first_line, @2.first_column, $2);
   }
 ;
 
 conditional_jump_if
   : 'if' '(' rel_exp ')' 'goto' LABEL ';' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new ConditionalJumpIf(line, column, $3, $6);
+    $$ = new ConditionalJumpIf(@1.first_line, @1.first_column, $3, $6);
   }
 ;
 
 rel_exp
   : value rel_op value {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new RelationalExp(line, column, $1, $2, $3);
+    $$ = new RelationalExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | value rel_op minus {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new RelationalExp(line, column, $1, $2, $3);
+    $$ = new RelationalExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | minus rel_op minus {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new RelationalExp(line, column, $1, $2, $3);
+    $$ = new RelationalExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
   | minus rel_op value {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new RelationalExp(line, column, $1, $2, $3);
+    $$ = new RelationalExp(@2.first_line, @2.first_column, $1, $2, $3);
   }
 ;
 
 method_invocation
   : 'call' ID ';' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;
-    $$ = new MethodInvocation(line, column, $2);
+    $$ = new MethodInvocation(@2.first_line, @2.first_column, $2);
   }
 ;
 
 print_statement
-  : 'print' '(' DOUBLE_QUOTE '%' CHAR_TERMINAL DOUBLE_QUOTE ',' print_value ')' ';' {
-    let line = yylineno + 1;
-    let column = yy.lexer.yylloc.first_column + 1;    
-    $$ = new Print(line, column, $5.toLowerCase(), $8);
+  : 'print' '(' DOUBLE_QUOTE '%' CHAR_TERMINAL DOUBLE_QUOTE ',' print_value ')' ';' {  
+    $$ = new Print(@1.first_line, @1.first_column, $5.toLowerCase(), $8);
   }
 ;
 

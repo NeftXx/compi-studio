@@ -22,6 +22,8 @@ socket.on("translateResult", function (result) {
   }
 });
 
+socket.on("optimizedCode", function (result) {});
+
 var btnSendFiles = document.getElementById("btnSendFiles");
 btnSendFiles.addEventListener("click", () => {
   var filesData = [];
@@ -29,4 +31,14 @@ btnSendFiles.addEventListener("click", () => {
     filesData.push({ filename: prop, content: buffers[prop].getValue() });
   }
   socket.emit("filesData", filesData);
+});
+
+var btnOptimization = document.getElementById("btnOptimization");
+btnOptimization.addEventListener("click", () => {
+  socket.emit("optimization", editorCd3.getValue());
+});
+
+var btnGetTra = document.getElementById("btnGetTra");
+btnGetTra.addEventListener("click", () => {
+  editorCd3.setValue(resultC3D.getValue());
 });

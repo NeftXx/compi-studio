@@ -13,6 +13,174 @@ export default class NativePrintFunction {
     this.printGlobalGetVariableError(codeBuilder);
     this.printErrorDeclStruct(codeBuilder);
     this.printErrorGetStruct(codeBuilder);
+    this.linealize(codeBuilder);
+  }
+
+  private linealize(codeBuilder: CodeTranslator) {
+    let t1 = codeBuilder.getNewTemporary(),
+      t2 = codeBuilder.getNewTemporary(),
+      t3 = codeBuilder.getNewTemporary(),
+      t4 = codeBuilder.getNewTemporary(),
+      t5 = codeBuilder.getNewTemporary(),
+      t6 = codeBuilder.getNewTemporary(),
+      t7 = codeBuilder.getNewTemporary(),
+      t8 = codeBuilder.getNewTemporary(),
+      t9 = codeBuilder.getNewTemporary(),
+      t10 = codeBuilder.getNewTemporary(),
+      t11 = codeBuilder.getNewTemporary(),
+      t12 = codeBuilder.getNewTemporary(),
+      t13 = codeBuilder.getNewTemporary(),
+      t14 = codeBuilder.getNewTemporary(),
+      t15 = codeBuilder.getNewTemporary(),
+      t16 = codeBuilder.getNewTemporary(),
+      t17 = codeBuilder.getNewTemporary(),
+      t18 = codeBuilder.getNewTemporary(),
+      t19 = codeBuilder.getNewTemporary(),
+      t20 = codeBuilder.getNewTemporary(),
+      t21 = codeBuilder.getNewTemporary(),
+      t22 = codeBuilder.getNewTemporary(),
+      t23 = codeBuilder.getNewTemporary(),
+      t24 = codeBuilder.getNewTemporary(),
+      t25 = codeBuilder.getNewTemporary(),
+      t26 = codeBuilder.getNewTemporary(),
+      t27 = codeBuilder.getNewTemporary(),
+      t28 = codeBuilder.getNewTemporary(),
+      t29 = codeBuilder.getNewTemporary(),
+      t30 = codeBuilder.getNewTemporary(),
+      t31 = codeBuilder.getNewTemporary(),
+      t32 = codeBuilder.getNewTemporary(),
+      t33 = codeBuilder.getNewTemporary(),
+      t34 = codeBuilder.getNewTemporary(),
+      t35 = codeBuilder.getNewTemporary();
+    let L2 = codeBuilder.getNewLabel(),
+      L3 = codeBuilder.getNewLabel(),
+      L4 = codeBuilder.getNewLabel(),
+      L5 = codeBuilder.getNewLabel(),
+      L6 = codeBuilder.getNewLabel(),
+      L7 = codeBuilder.getNewLabel(),
+      L8 = codeBuilder.getNewLabel(),
+      L9 = codeBuilder.getNewLabel(),
+      L10 = codeBuilder.getNewLabel(),
+      L11 = codeBuilder.getNewLabel(),
+      L12 = codeBuilder.getNewLabel(),
+      L13 = codeBuilder.getNewLabel(),
+      L14 = codeBuilder.getNewLabel(),
+      L15 = codeBuilder.getNewLabel(),
+      L16 = codeBuilder.getNewLabel(),
+      L17 = codeBuilder.getNewLabel(),
+      L18 = codeBuilder.getNewLabel(),
+      L19 = codeBuilder.getNewLabel(),
+      L20 = codeBuilder.getNewLabel(),
+      L21 = codeBuilder.getNewLabel(),
+      L22 = codeBuilder.getNewLabel();
+    codeBuilder.setTranslatedCode(`
+# Inicio de procedimiento
+proc native_copiar_arreglo  begin
+# Obteniendo variable arreglo
+${t1} = P + 1; # Direccion de la variable arreglo
+${t2} = Stack[${t1}]; # Guardando valor de la variable arreglo en temporal
+# Accediendo a arreglo
+if (${t2} == -1) goto ${L2};
+${t3} = Heap[${t2}];
+goto ${L3};
+${L2}:
+E = 4;
+${t3} = 0;
+${L3}:
+${t4} = P + 2; # Direccion de variable  len
+Stack[${t4}] = ${t3}; # Asignacion de valor a variable len
+# Obteniendo variable len
+${t8} = P + 2; # Direccion de la variable len
+${t9} = Stack[${t8}]; # Guardando valor de la variable len en temporal
+${t5} = -1;
+${t6} = ${t9};
+if (${t6} > -1) goto ${L4};
+E = 3;
+goto ${L5};
+${L4}:
+${t5} = H;
+Heap[H] = ${t6};
+H = H + 1;
+${t7} = 0;
+${L6}:
+if (${t7} > ${t6}) goto ${L7};
+Heap[H] = 0;
+H = H + 1;
+${t7} = ${t7} + 1;
+goto ${L6};
+${L7}:
+${L5}:
+${t10} = P + 3; # Direccion de variable  copia
+Stack[${t10}] = ${t5}; # Asignacion de valor a variable copia
+${t11} = P + 4; # Direccion de variable  i
+Stack[${t11}] = 0; # Asignacion de valor a variable i
+${L8}:
+# Obteniendo variable i
+${t12} = P + 4; # Direccion de la variable i
+${t13} = Stack[${t12}]; # Guardando valor de la variable i en temporal
+# Obteniendo variable len
+${t14} = P + 2; # Direccion de la variable len
+${t15} = Stack[${t14}]; # Guardando valor de la variable len en temporal
+if (${t13} < ${t15}) goto ${L9};
+goto ${L10};
+${L9}: 
+${t16} = P + 3;
+${t17} = Stack[${t16}];
+${t18} = Heap[${t17}];
+# Obteniendo variable i
+${t21} = P + 4; # Direccion de la variable i
+${t22} = Stack[${t21}]; # Guardando valor de la variable i en temporal
+if (${t22} > -1) goto ${L12};
+goto ${L13};
+${L12}:
+if (${t22} < ${t18}) goto ${L14};
+goto ${L15};
+${L14}:
+${t19} = ${t22} + 1;
+${t20} = ${t17} + ${t19};
+goto ${L16};
+${L15}:
+${L13}:
+E = 2;
+${L16}:
+# Obteniendo variable arreglo
+${t23} = P + 1; # Direccion de la variable arreglo
+${t24} = Stack[${t23}]; # Guardando valor de la variable arreglo en temporal
+${t25} = Heap[${t24}]; # Obteniendo direccion del arreglo
+# Obteniendo variable i
+${t29} = P + 4; # Direccion de la variable i
+${t30} = Stack[${t29}]; # Guardando valor de la variable i en temporal
+# Verificando que la posicion este dentro de los limites del arreglo
+if (${t30} > -1) goto ${L17};
+goto ${L18};
+${L17}:
+if (${t30} < ${t25}) goto ${L19};
+goto ${L20};
+${L19}:
+${t26} = ${t30} + 1;
+${t27} = ${t24} + ${t26};
+${t28} = Heap[${t27}];
+goto ${L21};
+${L20}:
+${L18}:
+E = 2;
+${L21}:
+Heap[${t20}] = ${t28};
+${t31} = P + 4;
+${t32} = Stack[${t31}];
+${t33} = ${t32} + 1;
+Stack[${t31}] = ${t33};
+goto ${L8};
+${L11}:
+${L10}: 
+# Obteniendo variable copia
+${t34} = P + 3; # Direccion de la variable copia
+${t35} = Stack[${t34}]; # Guardando valor de la variable copia en temporal
+Stack[P] = ${t35};
+goto ${L22};
+${L22}:
+end
+`);
   }
 
   private printString(codeBuilder: CodeTranslator): void {

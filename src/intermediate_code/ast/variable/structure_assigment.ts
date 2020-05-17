@@ -32,7 +32,11 @@ export default class StructureAssigment extends AstNode {
     let binding = scope.getVar(this.id);
     if (binding && binding.value instanceof Array) {
       if (position > StructureAssigment.MAX_MEMORY) {
-        return;
+        throw new ErrorC3D(
+          this.line,
+          this.column,
+          `when assigning the result in the ${this.id}.`
+        );
       }
       binding.value[position] = value;
     }

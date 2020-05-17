@@ -193,6 +193,9 @@ btnCreateZip.addEventListener("click", () => {
 function clearProject() {
   buffers = {};
   SELECT_FILE.innerHTML = "";
+  document.getElementById("body-errors-table").innerHTML = "";
+  document.getElementById("body-symbols-table").innerHTML = "";
+  resultC3D.setValue("");
   init();
 }
 

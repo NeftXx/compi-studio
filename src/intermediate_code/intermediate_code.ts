@@ -2,7 +2,7 @@ import Ast from "./ast/ast";
 import { parse } from "./grammar/grammar";
 import { logger } from "../utils/logger";
 
-export default class IntermediateCode {
+export class IntermediateCode {
   private message: string;
 
   constructor() {

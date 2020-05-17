@@ -74,6 +74,17 @@ export default class Print extends Statement {
       codeBuilder.setTranslatedCode(
         `P = P + ${size};\ncall native_print_string;\nP = P - ${size};\n`
       );
+    } else {
+      let dirLast = codeBuilder.getLastAddress();
+      let LV = codeBuilder.getNewLabel(),
+        LF = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(`if (${dirLast} == -1) goto ${LV};
+print("%i", ${dirLast});
+goto ${LF};
+${LV}:
+print("%c", 110); print("%c", 117); print("%c", 108); print("%c", 108);
+${LF}:
+`);
     }
   }
 }

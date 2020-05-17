@@ -52,7 +52,6 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 "print"                           { return "print"; }
 "for"                             { return "for"; }
 "strc"                            { return "strc"; }
-"throw"                           { return "throw"; }
 "char"                            { return "char"; }
 "global"                          { return "global"; }
 "else"                            { return "else"; }
@@ -109,6 +108,7 @@ File                  [a-zA-Z0-9_-]+(\.[A-Za-z0-9]+)*(\.[j])
 
 
 /* Separators */
+"==="                             { return "==="; }
 "^^"                              { return "^^"; }
 "++"                              { return "++"; }
 "--"                              { return "--"; }

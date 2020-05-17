@@ -27,26 +27,18 @@ export default class Comparator extends Expression {
       this.type = type2;
       return;
     }
-    if (this.operator === "==" || this.operator === "!=") {
-      if (
-        (typeFactory.isNumeric(type1) && typeFactory.isNumeric(type2)) ||
-        type1.isEquals(type2)
-      ) {
-        this.type = typeFactory.getBoolean();
-      } else {
-        this.type = typeFactory.getErrorType(
-          `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
-          this.nodeInfo
-        );
-      }
-      this.operator = this.operator === "!=" ? "<>" : this.operator;
-    } else if (this.operator === "===" || this.operator === "!==") {
+    if (
+      (typeFactory.isNumeric(type1) && typeFactory.isNumeric(type2)) ||
+      type1.isEquals(type2)
+    ) {
+      this.type = typeFactory.getBoolean();
     } else {
       this.type = typeFactory.getErrorType(
         `Error no se puede usar el operando <strong>'${this.operator}'</strong> con una expresion de tipo <strong>${type1}</strong> con una expresion <strong>${type2}</strong>.`,
         this.nodeInfo
       );
     }
+    this.operator = this.operator === "!=" ? "<>" : this.operator;
   }
 
   public translate(
@@ -98,6 +90,19 @@ P = P - ${size};
         codeBuilder.addFalseLabel(LF);
       }
     } else if (this.operator === "===") {
+      this.expLeft.translate(typeFactory, codeBuilder, scope);
+      let dir1 = this.getDir(typeFactory, codeBuilder, this.expLeft);
+      this.expRight.translate(typeFactory, codeBuilder, scope);
+      let dir2 = this.getDir(typeFactory, codeBuilder, this.expRight);
+      let LV = codeBuilder.getNewLabel();
+      let LF = codeBuilder.getNewLabel();
+      codeBuilder.setTranslatedCode(
+        `if (${dir1} == ${dir2}) goto ${LV};\ngoto ${LF};\n`
+      );
+      codeBuilder.removeUnusedTemporary(dir1);
+      codeBuilder.removeUnusedTemporary(dir2);
+      codeBuilder.addTrueLabel(LV);
+      codeBuilder.addFalseLabel(LF);
     }
   }
 
