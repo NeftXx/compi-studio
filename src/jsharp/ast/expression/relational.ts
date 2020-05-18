@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Relational extends Expression {
   public constructor(
@@ -55,5 +56,17 @@ export default class Relational extends Expression {
     codeBuilder.removeUnusedTemporary(dir2);
     codeBuilder.addTrueLabel(LV);
     codeBuilder.addFalseLabel(LF);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.expLeft.getAstNode(ast, str);
+    let j = this.expRight.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="\\${this.operator}"];
+  node${NUM} -> node${i};
+  node${NUM} -> node${j};
+`);
+    return NUM;
   }
 }

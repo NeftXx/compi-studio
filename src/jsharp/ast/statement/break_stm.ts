@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
+import Ast from "../ast";
 
 export default class BreakStm extends Statement {
   public breakLabel: string;
@@ -31,5 +32,11 @@ export default class BreakStm extends Statement {
     scope: BlockScope
   ): void {
     codeBuilder.setTranslatedCode(`goto ${this.breakLabel};\n`);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`node${NUM}[label="break"];`);
+    return NUM;
   }
 }

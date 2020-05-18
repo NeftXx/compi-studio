@@ -20,6 +20,12 @@ export default class SocketConnector {
         c3d.exec(input);
         clientSocket.emit("optimizedCode", "hola");
       });
+
+      clientSocket.on("astgraphs", (data: Array<FileInformation>) => {
+        let jsharp = new JSharp();
+        let createAstNodes = jsharp.createAstNodes(data);
+        clientSocket.emit("astgraphsResult", createAstNodes);
+      });
     });
   }
 }

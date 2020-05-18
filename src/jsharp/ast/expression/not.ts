@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Not extends Expression {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -33,5 +34,15 @@ export default class Not extends Expression {
   ): void {
     this.exp.translate(typeFactory, codeBuilder, scope);
     codeBuilder.swapLabels();
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="!"];
+  node${NUM} -> node${i};
+`);
+    return NUM;
   }
 }

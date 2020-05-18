@@ -5,6 +5,7 @@ import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
 import CaseStm from "./case_stm";
+import Ast from "../ast";
 
 export default class SwitchStm extends Statement {
   private localScope: BlockScope;
@@ -138,5 +139,31 @@ P = P - ${scopeSize};
       dirExp = codeBuilder.getLastAddress();
     }
     return dirExp;
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM_EXP = this.exp.getAstNode(ast, str);
+
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="switch"];
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="\\{"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let t: number;
+    for (let label of this.labels) {
+      t = label.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label="\\}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

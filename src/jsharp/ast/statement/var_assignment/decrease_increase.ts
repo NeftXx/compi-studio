@@ -6,6 +6,7 @@ import { BlockScope } from "../../../scope/scope";
 import CodeTranslator from "../../../scope/code_builder";
 import Access from "./access";
 import IdentifierAccess from "./identifier_access";
+import Ast from "../../ast";
 
 export default class DecreaseIncrease extends Statement {
   public constructor(
@@ -65,5 +66,17 @@ ${t2} = ${t1} ${operator} 1;
 Stack[${dirAccess}] = ${t2};
 `);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.access.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Aumento/Decremento"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="${this.operator}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

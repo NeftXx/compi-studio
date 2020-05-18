@@ -8,6 +8,7 @@ import {
   ErrorType,
   ArrayType,
 } from "../../scope/type";
+import Ast from "../ast";
 
 export default class AccessAttribute extends Expression {
   private dir: number;
@@ -116,5 +117,17 @@ goto ${LF};
         codeBuilder.addUnusedTemporary(t2);
       }
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Acceso"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

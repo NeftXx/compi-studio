@@ -3,6 +3,7 @@ import { TypeFactory, StructureType, ErrorType } from "../../../scope/type";
 import CodeTranslator from "../../../scope/code_builder";
 import { BlockScope } from "../../../scope/scope";
 import NodeInfo from "../../../scope/node_info";
+import Ast from "../../ast";
 
 export default class AttributeAccess extends Access {
   private dir: number;
@@ -71,5 +72,19 @@ ${t2} = ${t1} + ${this.dir};
       codeBuilder.setLastAddress(t2);
       codeBuilder.addUnusedTemporary(t2);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Acceso"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="."];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

@@ -1,9 +1,10 @@
 import Expression from "./expression";
 import NodeInfo from "../../scope/node_info";
 import CodeTranslator from "../../scope/code_builder";
-import { BlockScope, FileScope } from "../../scope/scope";
+import { BlockScope } from "../../scope/scope";
 import { TypeFactory, ErrorType, StructureType } from "../../scope/type";
 import Identifier from "./identifier";
+import Ast from "../ast";
 
 export default class OwnFunctions extends Expression {
   private static readonly STRING_FUNCTIONS: Array<string> = [
@@ -314,5 +315,27 @@ ${L2}:
     codeBuilder.removeUnusedTemporary(lastDir);
     codeBuilder.setLastAddress(t1);
     codeBuilder.addUnusedTemporary(t1);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Llamada a funcion"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    if (this.param) {
+      i = this.param.getAstNode(ast, str);
+      str.push(`  node${NUM} --> node${i};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

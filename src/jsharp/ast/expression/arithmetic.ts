@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Expression from "./expression";
+import Ast from "../ast";
 
 export default class Arithmetic extends Expression {
   public constructor(
@@ -300,5 +301,17 @@ P = P - ${size};
         codeBuilder.addUnusedTemporary(dir);
       }
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.expLeft.getAstNode(ast, str);
+    let j = this.expRight.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="${this.operator}"];
+  node${NUM} -> node${i};
+  node${NUM} -> node${j};
+`);
+    return NUM;
   }
 }

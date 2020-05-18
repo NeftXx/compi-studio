@@ -5,6 +5,7 @@ import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
 import BlockStm from "./block";
+import Ast from "../ast";
 
 export default class ForStm extends Statement {
   private localScope: BlockScope;
@@ -81,5 +82,42 @@ ${this.breakLabel}:
       codeBuilder.setTranslatedCode(`${falseLabels.pop()}: `);
     }
     codeBuilder.setTranslatedCode("\n");
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="for"];
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let t: number;
+    if (this.init) {
+      t = this.init.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=";"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    if (this.cond) {
+      t = this.cond.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=";"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    if (this.final) {
+      t = this.cond.getAstNode(ast, str);
+      str.push(` node${NUM} -> node${t};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    t = this.block.getAstNode(ast, str);
+    str.push(`  node${NUM} -> node${t};\n`);
+    return NUM;
   }
 }

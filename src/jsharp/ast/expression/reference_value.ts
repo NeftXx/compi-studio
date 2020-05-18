@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class ReferenceValue extends Expression {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -40,5 +41,15 @@ P = P - ${size}; # Regresando a ambito actual
     codeBuilder.removeUnusedTemporary(dir);
     codeBuilder.setLastAddress(t2);
     codeBuilder.addUnusedTemporary(t2);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="$"];
+  node${NUM} -> node${i};
+`);
+    return NUM;
   }
 }

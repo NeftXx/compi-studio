@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { TypeFactory, JType, ErrorType } from "../../scope/type";
 import { MethodScope } from "../../scope/scope";
 import Statement from "./statement";
+import Ast from "../ast";
 
 export default class ParameterStm extends Statement {
   public constructor(
@@ -34,4 +35,16 @@ export default class ParameterStm extends Statement {
     codeBuilder: CodeTranslator,
     scope: MethodScope
   ): void {}
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Parametro"];
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
+  }
 }

@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Xor extends Expression {
   public constructor(
@@ -62,5 +63,17 @@ export default class Xor extends Expression {
       }
       codeBuilder.setTranslatedCode("\n");
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.expLeft.getAstNode(ast, str);
+    let j = this.expRight.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="^^"];
+  node${NUM} -> node${i};
+  node${NUM} -> node${j};
+`);
+    return NUM;
   }
 }

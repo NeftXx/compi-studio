@@ -6,6 +6,7 @@ import { TypeFactory, ErrorType } from "../../scope/type";
 import AccessArray from "./access_array";
 import AccessAttribute from "./access_attribute";
 import Identifier from "./identifier";
+import Ast from "../ast";
 
 export default class IncreaseDecrease extends Expression {
   public constructor(
@@ -129,5 +130,17 @@ Heap[${access.tempDir}] = ${t1};
     codeBuilder.setTranslatedCode(`${t1} = ${codeBuilder.getLastAddress()} ${operator} 1;
 Heap[${arrayAccess.tempDir}] = ${t1};
 `);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Aumento/Incremento"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="${this.operator}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

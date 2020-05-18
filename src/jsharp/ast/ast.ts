@@ -10,12 +10,15 @@ import { Structure } from "./statement/structure";
 
 export default class Ast {
   private fileScope: FileScope;
+  public contNodes: number;
 
   public constructor(
     public readonly astNodes: Array<Statement>,
     public readonly filename: string,
     public readonly importList?: ImportStm
-  ) {}
+  ) {
+    this.contNodes = 0;
+  }
 
   public createScope(typeFactory: TypeFactory, symbolTable: SymbolTable) {
     let fileScope = symbolTable.enterFileScope(this.filename);
@@ -108,5 +111,25 @@ Heap[${codeBuilder.ptrHeap}] = 0;`);
         statement.translate(typeFactory, codeBuilder, this.fileScope);
       }
     }
+  }
+
+  public getAstGraph(): string {
+    const NUM = this.contNodes++;
+    let str: Array<string> = [
+      `digraph grafica {
+  rankdir=TB;
+  node [shape=record, style=filled, fillcolor=seashell2];
+  node${NUM}[label="AST"];
+`,
+    ];
+    let t: number;
+    for (let statement of this.astNodes) {
+      t = statement.getAstNode(this, str);
+      str.push(`
+  node${NUM} -> node${t};
+`);
+    }
+    str.push("\n}\n");
+    return str.join("");
   }
 }

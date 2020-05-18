@@ -3,6 +3,7 @@ import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
+import Ast from "../ast";
 
 export default class UMenos extends Expression {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -38,5 +39,15 @@ export default class UMenos extends Expression {
     codeBuilder.removeUnusedTemporary(last);
     codeBuilder.setLastAddress(dir);
     codeBuilder.addUnusedTemporary(dir);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="-"];
+  node${NUM} -> node${i};
+`);
+    return NUM;
   }
 }

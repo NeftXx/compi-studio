@@ -4,6 +4,7 @@ import { TypeFactory } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import SubIf from "./sub_if";
+import Ast from "../ast";
 
 export default class IfStm extends Statement {
   public constructor(nodeInfo: NodeInfo, public subIfs: Array<SubIf>) {
@@ -37,5 +38,16 @@ export default class IfStm extends Statement {
       subIf.translate(typeFactory, codeBuilder, scope);
     }
     codeBuilder.setTranslatedCode(`${labelExit}:\n`);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`  node${NUM}[label="Sentencia IF"];\n`);
+    let t: number;
+    for (let sub of this.subIfs) {
+      t = sub.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    return NUM;
   }
 }

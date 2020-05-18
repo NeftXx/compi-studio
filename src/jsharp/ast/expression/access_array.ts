@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory, ArrayType, ErrorType } from "../../scope/type";
+import Ast from "../ast";
 
 export default class AccessArray extends Expression {
   public tempDir: string;
@@ -87,5 +88,21 @@ goto ${LF};
       codeBuilder.setLastAddress(t4);
       codeBuilder.addUnusedTemporary(t4);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    let j = this.access.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Acceso"];
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="["];
+  node${NUM} -> node${ast.contNodes++}
+  node${NUM} -> node${j};
+  node${ast.contNodes}[label="]"];
+  node${NUM} -> node${ast.contNodes++}
+`);
+    return NUM;
   }
 }

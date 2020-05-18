@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import CodeTranslator from "../../scope/code_builder";
 import { BlockScope } from "../../scope/scope";
 import { JType, TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Literal extends Expression {
   public constructor(nodeInfo: NodeInfo, type: JType, public value: any) {
@@ -54,5 +55,19 @@ H = H + 1;
     } else {
       codeBuilder.setLastAddress("-1");
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let value = this.value;
+    if (typeof value === "string") {
+      value = value.replace(/\n|\r|"|:|->|{|}/gi, "");
+    }
+    str.push(`
+  node${NUM}[label="literal"];
+  node${ast.contNodes}[label="${value}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

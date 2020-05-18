@@ -108,6 +108,73 @@ export class JSharp {
     }
   }
 
+  public createAstNodes(data: Array<FileInformation>): any {
+    let astGraphs: Array<string> = [];
+    let currentFile = "";
+    try {
+      let typeFactory = new TypeFactory(); // controlador de tipos
+      let trees: Array<Ast> = []; // arreglo de AST
+      let errorsList: Array<ErrorType> = []; // arreglo de errores
+      let parser: any;
+      for (let file of data) {
+        // Si el contenido esta vacio no se analiza
+        if (file.content !== "") {
+          parser = new JSharpParser();
+          currentFile = file.filename;
+          // enviando el nombre del archivo actual, el controlador de tipos
+          // y el arreglo de errores al analizador
+          parser.yy = {
+            filename: currentFile,
+            typeFactory: typeFactory,
+            errorsList: errorsList,
+          };
+          trees.push(parser.parse(file.content));
+        }
+      }
+      for (let tree of trees) {
+        astGraphs.push(tree.getAstGraph());
+      }
+    } catch (error) {
+      // Si ocurrio un error, verifico si fue del analizador o un error de codigo mio
+      if (error.hash) {
+        // si es del analizador debulvo el error
+        return {
+          errorsTable: `
+    <tr>
+      <td>Error no se esperaba: <strong>${
+        error.hash.token
+      }</strong>. Se esperaba: <strong>${error.hash.expected.join(
+            " "
+          )}</strong>.</td>
+      <td>${error.hash.loc.first_line}</td>
+      <td>${error.hash.loc.last_column}</td>
+      <td>${currentFile}</td>
+    </tr>`,
+        };
+      } else {
+        // muestro el error en consola
+        logger.error(error.message);
+        console.log(error);
+        // y reporte que hubo un error en el servidor
+        return {
+          errorsTable: `
+    <tr>
+      <td>Ha ocurrido un error en el servidor</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    `,
+          astGraphs,
+        };
+      }
+    }
+    return {
+      errorsTable: "",
+      astGraphs,
+    };
+  }
+
   private buildScopes(
     trees: Array<Ast>,
     typeFactory: TypeFactory,

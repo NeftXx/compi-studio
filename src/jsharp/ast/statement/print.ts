@@ -4,6 +4,7 @@ import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
+import Ast from "../ast";
 
 export default class Print extends Statement {
   public constructor(nodeInfo: NodeInfo, private exp: Expression) {
@@ -86,5 +87,19 @@ print("%c", 110); print("%c", 117); print("%c", 108); print("%c", 108);
 ${LF}:
 `);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    const NUM_EXP = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="print"];
+  node${ast.contNodes}[label="("]
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

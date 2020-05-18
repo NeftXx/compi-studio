@@ -5,6 +5,7 @@ import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
 import BlockStm from "./block";
+import Ast from "../ast";
 
 export default class SubIf extends Statement {
   private labelExit: string;
@@ -74,5 +75,36 @@ export default class SubIf extends Statement {
       this.block.translate(typeFactory, codeBuilder, this.localScope);
       codeBuilder.setTranslatedCode(`goto ${this.labelExit};\n`);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    const NUM_BLOCK = this.block.getAstNode(ast, str);
+    if (this.expression) {
+      const NUM_EXP = this.expression.getAstNode(ast, str);
+      str.push(`
+  node${NUM}[label="if"];
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="\\{"];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_BLOCK};
+  node${ast.contNodes}[label="\\}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    } else {
+      str.push(`  
+  node${NUM}[label="else"];
+  node${ast.contNodes}[label="\\{"];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_BLOCK};
+  node${ast.contNodes}[label="\\}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    }
+    return NUM;
   }
 }

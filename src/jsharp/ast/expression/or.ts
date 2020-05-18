@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Or extends Expression {
   public constructor(
@@ -44,5 +45,17 @@ export default class Or extends Expression {
     this.expLeft.translate(typeFactory, codeBuilder, scope);
     codeBuilder.printFalseLabels();
     this.expRight.translate(typeFactory, codeBuilder, scope);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.expLeft.getAstNode(ast, str);
+    let j = this.expRight.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="||"];
+  node${NUM} -> node${i};
+  node${NUM} -> node${j};
+`);
+    return NUM;
   }
 }

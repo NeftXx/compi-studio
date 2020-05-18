@@ -8,6 +8,7 @@ import {
 } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Expression from "./expression";
+import Ast from "../ast";
 
 export class StructDeclaration extends Expression {
   private structureType: StructureType;
@@ -52,6 +53,22 @@ P = P - ${size};
       codeBuilder.setLastAddress(t2);
       codeBuilder.addUnusedTemporary(t2);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Estructura"];
+  node${ast.contNodes}[label="strc"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }
 
@@ -130,5 +147,23 @@ ${L2}:
       codeBuilder.setLastAddress(t1);
       codeBuilder.addUnusedTemporary(t1);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="Estructura"];
+  node${ast.contNodes}[label="strc"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="["];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${i};
+  node${ast.contNodes}[label="]"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

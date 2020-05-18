@@ -5,6 +5,7 @@ import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import BlockStm from "./block";
 import Expression from "../expression/expression";
+import Ast from "../ast";
 
 export default class DoWhileStm extends Statement {
   private localScope: BlockScope;
@@ -57,5 +58,27 @@ export default class DoWhileStm extends Statement {
 ${this.breakLabel}:
 `);
     codeBuilder.printFalseLabels();
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="do"];
+  node${ast.contNodes}[label="\\{"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let t: number = this.block.getAstNode(ast, str);
+    str.push(`  node${NUM} -> node${t};
+  node${ast.contNodes}[label="\\}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    t = this.expression.getAstNode(ast, str);
+    str.push(`  node${NUM} -> node${t};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

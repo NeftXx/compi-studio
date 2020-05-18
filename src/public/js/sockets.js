@@ -1,8 +1,27 @@
 var socket = io();
 
+const errorTable = document.getElementById("body-errors-table");
+const symbols = document.getElementById("body-symbols-table");
+const astVisor = document.getElementById("ast-visor");
+var viz = new Viz();
+
+function createMermaid(text) {
+  var div = document.createElement("div");
+  div.setAttribute("class", "card");
+  astVisor.appendChild(div);
+  viz
+    .renderSVGElement(text)
+    .then(function (element) {
+      div.appendChild(element);
+    })
+    .catch((error) => {
+      viz = new Viz();
+      console.error(error);
+    });
+}
+
 socket.on("translateResult", function (result) {
-  document.getElementById("body-errors-table").innerHTML = result.errorsTable;
-  var symbols = document.getElementById("body-symbols-table");
+  errorTable.innerHTML = result.errorsTable;
   symbols.innerHTML = result.symbolsTable;
   $(document).ready(function () {
     $(".collapsible").collapsible();
@@ -22,7 +41,24 @@ socket.on("translateResult", function (result) {
   }
 });
 
+socket.on("astgraphsResult", function (result) {
+  astVisor.innerHTML = "";
+  errorTable.innerHTML = result.errorsTable;
+  result.astGraphs.forEach((element) => {
+    createMermaid(element);
+  });
+});
+
 socket.on("optimizedCode", function (result) {});
+
+var btnAst = document.getElementById("btnAst");
+btnAst.addEventListener("click", () => {
+  var filesData = [];
+  for (const prop in buffers) {
+    filesData.push({ filename: prop, content: buffers[prop].getValue() });
+  }
+  socket.emit("astgraphs", filesData);
+});
 
 var btnSendFiles = document.getElementById("btnSendFiles");
 btnSendFiles.addEventListener("click", () => {

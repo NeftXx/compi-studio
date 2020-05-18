@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory, ArrayType, ErrorType } from "../../scope/type";
+import Ast from "../ast";
 
 export default class ArrayValues extends Expression {
   public constructor(nodeInfo: NodeInfo, public expList: Array<Expression>) {
@@ -85,5 +86,24 @@ H = H + 1;
       dirExp = codeBuilder.getLastAddress();
     }
     return dirExp;
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Valores de Array"];
+  node${ast.contNodes}[label="{"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let i: number;
+    for (let exp of this.expList) {
+      i = exp.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${i};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label="}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

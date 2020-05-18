@@ -5,6 +5,7 @@ import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import BlockStm from "./block";
 import Expression from "../expression/expression";
+import Ast from "../ast";
 
 export default class WhileStm extends Statement {
   private localScope: BlockScope;
@@ -64,5 +65,21 @@ ${this.breakLabel}:
       codeBuilder.setTranslatedCode(`${falseLabels.pop()}: `);
     }
     codeBuilder.setTranslatedCode("\n");
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM_EXP = this.expression.getAstNode(ast, str);
+    const NUM_BLOCK = this.block.getAstNode(ast, str);
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="while"];
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_BLOCK};
+`);
+    return NUM;
   }
 }

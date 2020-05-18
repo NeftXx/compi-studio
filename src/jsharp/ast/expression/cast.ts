@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory, JType } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Cast extends Expression {
   public constructor(nodeInfo: NodeInfo, type: JType, private exp: Expression) {
@@ -62,5 +63,21 @@ ${dir} = ${last} - ${t1};
       codeBuilder.setLastAddress(dir);
       codeBuilder.addUnusedTemporary(dir);
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let i = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="cast"];
+  node${ast.contNodes}[label="("];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=")"];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${i};
+`);
+    return NUM;
   }
 }

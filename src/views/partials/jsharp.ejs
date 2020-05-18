@@ -1,17 +1,32 @@
 <div style="padding-bottom: 1em;">
   <div class="center-align" style="padding-top: 1em; padding-bottom: 1em;">
-    <a id="btnNewBuffer" class="waves-effect waves-light btn-small brown lighten-2"><i
-        class="material-icons right">insert_drive_file</i>Nuevo</a>
-    <a id="btnUpFile" class="waves-effect waves-light btn-small blue"><i
-        class="material-icons right">file_upload</i>Cargar</a>
-    <a id="btnDownloadJSharp" class="waves-effect waves-light btn-small blue-grey lighten-1"><i
-        class="material-icons right">file_download</i>Descargar código J#</a>
-    <a id="btnDownloadC3D" class="waves-effect waves-light btn-small blue-grey"><i
-        class="material-icons right">file_download</i>Descargar traducción</a>
-    <a id="btnSendFiles" class="waves-effect waves-light btn-small"><i
-        class="material-icons right">play_arrow</i>Traducir</a>
-    <a id="btnClearTranslate" class="waves-effect waves-light btn-small red lighten-2"><i
-        class="material-icons right">clear</i>Limpiar traducción</a>
+    <a
+      id="btnNewBuffer"
+      class="waves-effect waves-light btn-small brown lighten-2"
+      ><i class="material-icons right">insert_drive_file</i>Nuevo</a
+    >
+    <a id="btnUpFile" class="waves-effect waves-light btn-small blue"
+      ><i class="material-icons right">file_upload</i>Cargar</a
+    >
+    <a
+      id="btnDownloadJSharp"
+      class="waves-effect waves-light btn-small blue-grey lighten-1"
+      ><i class="material-icons right">file_download</i>Descargar código J#</a
+    >
+    <a id="btnDownloadC3D" class="waves-effect waves-light btn-small blue-grey"
+      ><i class="material-icons right">file_download</i>Descargar traducción</a
+    >
+    <a id="btnSendFiles" class="waves-effect waves-light btn-small"
+      ><i class="material-icons right">play_arrow</i>Traducir</a
+    >
+    <a id="btnAst" class="waves-effect waves-light btn-small brown lighten-3"
+      ><i class="material-icons right">device_hub</i>AST</a
+    >
+    <a
+      id="btnClearTranslate"
+      class="waves-effect waves-light btn-small red lighten-2"
+      ><i class="material-icons right">clear</i>Limpiar traducción</a
+    >
   </div>
   <div class="row">
     <div class="input-field col s11">
@@ -19,10 +34,20 @@
       <label>Archivos:</label>
     </div>
     <div class="col s1">
-      <a id="btnClearBuffer" class="tooltipped btn-floating btn-small waves-effect waves-light grey lighten-1"
-        data-position="bottom" data-tooltip="Limpiar"><i class="material-icons">clear</i></a>
-      <a id="btnDeleteBuffer" class="tooltipped btn-floating btn-small waves-effect waves-light grey lighten-1"
-        data-position="bottom" data-tooltip="Borrar"><i class="material-icons">delete</i></a>
+      <a
+        id="btnClearBuffer"
+        class="tooltipped btn-floating btn-small waves-effect waves-light grey lighten-1"
+        data-position="bottom"
+        data-tooltip="Limpiar"
+        ><i class="material-icons">clear</i></a
+      >
+      <a
+        id="btnDeleteBuffer"
+        class="tooltipped btn-floating btn-small waves-effect waves-light grey lighten-1"
+        data-position="bottom"
+        data-tooltip="Borrar"
+        ><i class="material-icons">delete</i></a
+      >
     </div>
   </div>
   <div class="row">
@@ -42,6 +67,9 @@
     <li class="tab col s3">
       <a href="#symbols-table">Tabla de simbolos</a>
     </li>
+    <li class="tab col s3">
+      <a href="#ast-visor">Ast</a>
+    </li>
   </ul>
   <div id="errors-table" class="col s12">
     <table class="highlight">
@@ -59,4 +87,5 @@
   <div id="symbols-table" class="col s12">
     <div id="body-symbols-table" class="card"></div>
   </div>
+  <div id="ast-visor" class="col s12"></div>
 </div>

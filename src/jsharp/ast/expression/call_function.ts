@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { BlockScope, MethodScope } from "../../scope/scope";
 import CodeTranslator from "../../scope/code_builder";
 import { TypeFactory, JType, ErrorType } from "../../scope/type";
+import Ast from "../ast";
 
 export default class CallFunction extends Expression {
   private identifierReal: string;
@@ -115,8 +116,31 @@ ${m} = Stack[${temp}]; # Recuperando temporal
       codeBuilder.printTrueLabels();
       codeBuilder.setTranslatedCode(`${dirExp} = 1;\n${LS}:\n`);
     } else {
-      dirExp = codeBuilder.getLastAddress();      
+      dirExp = codeBuilder.getLastAddress();
     }
     return dirExp;
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Llamada a funcion"];
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="("]
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let i: number;
+    for (let arg of this.argumentsList) {
+      i = arg.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${i};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=")"]
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=";"]
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

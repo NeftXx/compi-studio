@@ -5,6 +5,7 @@ import { FileScope, MethodScope } from "../../scope/scope";
 import Statement from "./statement";
 import Parameter from "./parameter";
 import Block from "./block";
+import Ast from "../ast";
 
 export default class FunctionStm extends Statement {
   private methodScope: MethodScope | undefined;
@@ -76,5 +77,24 @@ proc ${this.methodScope.getName()}  begin
     this.block.translate(typeFactory, codeBuilder, this.methodScope);
     codeBuilder.printReturnLabels();
     codeBuilder.setTranslatedCode("end\n# Fin de procedimiento\n");
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Funcion"];
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let t: number;
+    for (let parameter of this.parameters) {
+      t = parameter.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    t = this.block.getAstNode(ast, str);
+    str.push(`  node${NUM} -> node${t};`);
+    return NUM;
   }
 }

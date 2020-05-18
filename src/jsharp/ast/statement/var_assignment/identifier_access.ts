@@ -3,6 +3,7 @@ import { TypeFactory, ErrorType } from "../../../scope/type";
 import { BlockScope } from "../../../scope/scope";
 import CodeTranslator from "../../../scope/code_builder";
 import Access from "./access";
+import Ast from "../../ast";
 
 export default class IdentifierAccess extends Access {
   public isConstant: boolean;
@@ -97,5 +98,14 @@ ${LF}:
     codeBuilder.setTranslatedCode("H = H + 1;\n");
     codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
     codeBuilder.setLastAddress(tempStart);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`  node${NUM}[label="Identificador"];
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

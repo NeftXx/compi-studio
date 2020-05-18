@@ -4,6 +4,7 @@ import { TypeFactory, JType, ErrorType, StructureType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
+import Ast from "../ast";
 
 export class Structure extends Statement {
   private type: StructureType;
@@ -220,6 +221,33 @@ end
     codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
     codeBuilder.setLastAddress(tempStart);
   }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Estructura"];
+  node${ast.contNodes}[label="define"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="as"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="["];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    let t: number;
+    for (let attr of this.attributeList) {
+      t = attr.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${t};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label="]"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=";"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
+  }
 }
 
 export class Attribute extends Statement {
@@ -272,5 +300,21 @@ export class Attribute extends Statement {
     } else {
       codeBuilder.setLastAddress(this.type.getValueDefault());
     }
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Atributo"];
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    if (this.exp) {
+      const NUM_EXP = this.exp.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${NUM_EXP};\n`);
+    }
+    return NUM;
   }
 }

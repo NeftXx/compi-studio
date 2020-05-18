@@ -6,6 +6,7 @@ import { BlockScope } from "../../../scope/scope";
 import CodeTranslator from "../../../scope/code_builder";
 import Access from "./access";
 import IdentifierAccess from "./identifier_access";
+import Ast from "../../ast";
 
 export default class VarAssignment extends Statement {
   public constructor(
@@ -82,5 +83,16 @@ export default class VarAssignment extends Statement {
     }
     codeBuilder.removeUnusedTemporary(dirAccess);
     codeBuilder.removeUnusedTemporary(dirExp);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let t: number = this.access.getAstNode(ast, str);
+    str.push(`node${NUM}[label="Asignacion"];
+  node${NUM} -> node${t};
+`);
+    t = this.exp.getAstNode(ast, str);
+    str.push(`node${NUM} -> node${t};\n`);
+    return NUM;
   }
 }

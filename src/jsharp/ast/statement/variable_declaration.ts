@@ -4,6 +4,7 @@ import CodeTranslator from "../../scope/code_builder";
 import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType, JType } from "../../scope/type";
 import { BlockScope, FileScope } from "../../scope/scope";
+import Ast from "../ast";
 
 export abstract class Declaration extends Statement {
   protected translateStr(codeBuilder: CodeTranslator, str: string) {
@@ -160,6 +161,21 @@ Heap[${variable.ptr + 1}] = 1;
       `# Fin declaracion de la variable global ${this.identifier}\n`
     );
   }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    let temp = this.isConstant ? "const" : "var";
+    const NUM_EXP = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="${temp}"];
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=":="];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+`);
+    return NUM;
+  }
 }
 
 export class VarDeclarationGlobal extends Declaration {
@@ -265,6 +281,20 @@ Heap[${variable.ptr + 1}] = 1;
     codeBuilder.setTranslatedCode(
       `# Fin declaracion de la variable global ${this.identifier}\n`
     );
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    const NUM_EXP = this.exp.getAstNode(ast, str);
+    str.push(`
+  node${NUM}[label="global"];
+  node${ast.contNodes}[label="${this.identifier}"];
+  node${NUM} -> node${ast.contNodes++};
+  node${ast.contNodes}[label=":="];
+  node${NUM} -> node${ast.contNodes++};
+  node${NUM} -> node${NUM_EXP};
+`);
+    return NUM;
   }
 }
 
@@ -430,5 +460,29 @@ Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
         `# Fin declaracion de la variable global ${id}\n`
       );
     });
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="Declaracion"];
+  node${ast.contNodes}[label="${this.type}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    for (let id of this.idList) {
+      str.push(`
+  node${ast.contNodes}[label="${id}"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    }
+    if (this.exp) {
+      const NUM_EXP = this.exp.getAstNode(ast, str);
+      str.push(`
+  node${ast.contNodes}[label=":="];
+  node${NUM} -> node${ast.contNodes};
+  node${NUM} -> node${NUM_EXP};
+`);
+    }
+    return NUM;
   }
 }

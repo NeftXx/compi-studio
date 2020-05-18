@@ -4,6 +4,7 @@ import { TypeFactory, JType, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import Expression from "../expression/expression";
+import Ast from "../ast";
 
 export default class ReturnStm extends Statement {
   public type: JType;
@@ -79,5 +80,19 @@ export default class ReturnStm extends Statement {
       dirExp = codeBuilder.getLastAddress();
     }
     return dirExp;
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`  node${NUM}[label="return"];\n`);
+    if (this.exp) {
+      const NUM_EXP = this.exp.getAstNode(ast, str);
+      str.push(`  node${NUM} -> node${NUM_EXP};\n`);
+    }
+    str.push(`
+  node${ast.contNodes}[label=";"];
+  node${NUM} -> node${ast.contNodes++};
+`);
+    return NUM;
   }
 }

@@ -4,6 +4,7 @@ import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
 import CallFunction from "../expression/call_function";
+import Ast from "../ast";
 
 export default class CallFunctionStm extends Statement {
   public constructor(nodeInfo: NodeInfo, public callFunction: CallFunction) {
@@ -26,5 +27,9 @@ export default class CallFunctionStm extends Statement {
     scope: BlockScope
   ): void {
     this.callFunction.translate(typeFactory, codeBuilder, scope);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    return this.callFunction.getAstNode(ast, str);
   }
 }

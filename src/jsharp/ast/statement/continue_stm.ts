@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import { TypeFactory, ErrorType } from "../../scope/type";
 import { BlockScope } from "../../scope/scope";
 import Statement from "./statement";
+import Ast from "../ast";
 
 export default class ContinueStm extends Statement {
   public continueLabel: string;
@@ -30,5 +31,11 @@ export default class ContinueStm extends Statement {
     scope: BlockScope
   ): void {
     codeBuilder.setTranslatedCode(`goto ${this.continueLabel};\n`);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`  node${NUM}[label="continue"];\n`);
+    return NUM;
   }
 }

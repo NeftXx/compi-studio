@@ -3,6 +3,7 @@ import NodeInfo from "../../scope/node_info";
 import CodeTranslator from "../../scope/code_builder";
 import { BlockScope, FileScope } from "../../scope/scope";
 import { TypeFactory, ErrorType } from "../../scope/type";
+import Ast from "../ast";
 
 export default class Identifier extends Expression {
   public constructor(nodeInfo: NodeInfo, public identifier: string) {
@@ -129,5 +130,13 @@ goto ${LF};
     codeBuilder.setTranslatedCode("H = H + 1;\n");
     codeBuilder.setTranslatedCode(`# Fin de cadena\n`);
     codeBuilder.setLastAddress(tempStart);
+  }
+
+  getAstNode(ast: Ast, str: Array<string>): number {
+    const NUM = ast.contNodes++;
+    str.push(`
+  node${NUM}[label="${this.identifier}"];
+`);
+    return NUM;
   }
 }
