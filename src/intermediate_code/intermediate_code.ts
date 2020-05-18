@@ -13,7 +13,6 @@ export class IntermediateCode {
     try {
       let ast: Ast = parse(input);
       ast.preInterpret();
-      ast.interpret();
       this.message = "successfully completed";
       return true;
     } catch (error) {
