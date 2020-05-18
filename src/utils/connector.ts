@@ -17,8 +17,8 @@ export default class SocketConnector {
 
       clientSocket.on("optimization", (input) => {
         let c3d = new IntermediateCode();
-        c3d.exec(input);
-        clientSocket.emit("optimizedCode", "hola");
+        let result = c3d.exec(input);
+        clientSocket.emit("optimizedCode", result);
       });
 
       clientSocket.on("astgraphs", (data: Array<FileInformation>) => {

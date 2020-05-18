@@ -1,6 +1,7 @@
 import Scope from "../../scope/scope";
 import { ErrorC3D } from "../../utils/errorC3D";
 import AstNode from "../ast_node";
+import NumberExp from "./number_exp";
 
 export default class RelationalExp extends AstNode {
   constructor(
@@ -45,5 +46,16 @@ export default class RelationalExp extends AstNode {
     }
 
     throw new ErrorC3D(this.line, this.column, `this operator is not valid.`);
+  }
+
+  public isEquals(): boolean {
+    if (this.exp1 instanceof NumberExp && this.exp2 instanceof NumberExp) {
+      return this.exp1.value === this.exp2.value;
+    }
+    return false;
+  }
+
+  public toString(): string {
+    return `${this.exp1.toString()} ${this.operator} ${this.exp2.toString()}`;
   }
 }

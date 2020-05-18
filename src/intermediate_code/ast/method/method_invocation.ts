@@ -26,4 +26,8 @@ export default class MethodInvocation extends AstNode {
       );
     }
   }
+
+  public toString(): string {
+    return `call ${this.id};\n`;
+  }
 }

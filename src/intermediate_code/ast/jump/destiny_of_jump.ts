@@ -11,4 +11,8 @@ export default class DestinyJump extends AstNode {
   }
 
   public interpret(scope: Scope): void {}
+
+  public toString(): string {
+    return `${this.label}:\n`;
+  }
 }

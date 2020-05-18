@@ -9,4 +9,8 @@ export default class InconJump extends Jump {
   public interpret(scope: Scope): void {
     this.getDestinyJump(scope);
   }
+
+  public toString(): string {
+    return `goto ${this.label};\n`;
+  }
 }

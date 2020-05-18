@@ -3,6 +3,7 @@ var socket = io();
 const errorTable = document.getElementById("body-errors-table");
 const symbols = document.getElementById("body-symbols-table");
 const astVisor = document.getElementById("ast-visor");
+const bodyReportOp = document.getElementById("body-report-op");
 var viz = new Viz();
 
 function createMermaid(text) {
@@ -49,7 +50,17 @@ socket.on("astgraphsResult", function (result) {
   });
 });
 
-socket.on("optimizedCode", function (result) {});
+socket.on("optimizedCode", function (result) {
+  if (result && result.text && result.nodesRemove) {
+    editorCd3.setValue(result.text);
+    bodyReportOp.innerHTML = result.nodesRemove;
+  }
+});
+
+var btnClearRun = document.getElementById("btnClearRun");
+btnClearRun.addEventListener("click", () => {
+  editorCd3.setValue("");
+});
 
 var btnAst = document.getElementById("btnAst");
 btnAst.addEventListener("click", () => {

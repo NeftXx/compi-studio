@@ -23,4 +23,8 @@ export default class Identifier extends AstNode {
       );
     }
   }
+
+  public toString(): string {
+    return this.id;
+  }
 }

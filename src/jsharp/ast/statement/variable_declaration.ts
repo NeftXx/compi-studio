@@ -479,7 +479,7 @@ Stack[${t1}] = ${dir}; # Asignacion de valor a variable ${id}
       const NUM_EXP = this.exp.getAstNode(ast, str);
       str.push(`
   node${ast.contNodes}[label=":="];
-  node${NUM} -> node${ast.contNodes};
+  node${NUM} -> node${ast.contNodes++};
   node${NUM} -> node${NUM_EXP};
 `);
     }

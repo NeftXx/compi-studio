@@ -38,4 +38,8 @@ export default class Print extends AstNode {
         return;
     }
   }
+
+  public toString(): string {
+    return `print("%${this.terminal}", ${this.exp.toString()});\n`;
+  }
 }

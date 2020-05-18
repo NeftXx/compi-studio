@@ -22,4 +22,8 @@ export default class Minus extends AstNode {
     }
     return -value;
   }
+
+  public toString(): string {
+    return `-${this.exp.toString()}`;
+  }
 }

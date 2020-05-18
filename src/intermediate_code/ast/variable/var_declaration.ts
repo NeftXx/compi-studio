@@ -31,4 +31,11 @@ export default class VarDeclaration extends AstNode {
     // No hace nada al momento de interpretar ya que se guardan
     // las declaraciones en el pre-analisis
   }
+
+  public toString(): string {
+    if (this.isStructure) {
+      return `var ${this.id}[];`;
+    }
+    return `var ${this.id};`;
+  }
 }

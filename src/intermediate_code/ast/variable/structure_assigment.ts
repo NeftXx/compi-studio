@@ -41,4 +41,10 @@ export default class StructureAssigment extends AstNode {
       binding.value[position] = value;
     }
   }
+
+  public toString(): string {
+    return `${
+      this.id
+    }[${this.position.toString()}] = ${this.exp.toString()};\n`;
+  }
 }

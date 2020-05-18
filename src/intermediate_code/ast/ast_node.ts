@@ -5,4 +5,5 @@ export default abstract class AstNode {
 
   public abstract preInterpret(scope: Scope): void;
   public abstract interpret(scope: Scope): any;
+  public abstract toString(): string;
 }

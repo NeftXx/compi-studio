@@ -38,4 +38,8 @@ export default class AccessHeap extends AstNode {
       );
     }
   }
+
+  public toString(): string {
+    return `${this.id}[${this.position.toString()}]`;
+  }
 }

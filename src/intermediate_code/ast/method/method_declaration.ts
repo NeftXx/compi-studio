@@ -1,8 +1,5 @@
 import AstNode from "../ast_node";
 import Scope from "../../scope/scope";
-import Jump from "../jump/jump";
-import MethodInvocation from "./method_invocation";
-import Ast from "../ast";
 
 export default class MethodDeclaration extends AstNode {
   constructor(
@@ -25,5 +22,14 @@ export default class MethodDeclaration extends AstNode {
   public interpret(scope: Scope): void {
     // El interpretar de esta clase se paso al metodo call, esto para
     // no alterar el flujo natural del interprete
+  }
+
+  public toString(): string {
+    let str: Array<string> = [`proc ${this.id} begin\n`];
+    this.nodes.forEach((node) => {
+      str.push(node.toString());
+    });
+    str.push(`end\n`);
+    return str.join("");
   }
 }

@@ -3,26 +3,21 @@ import { parse } from "./grammar/grammar";
 import { logger } from "../utils/logger";
 
 export class IntermediateCode {
-  private message: string;
-
-  constructor() {
-    this.message = "";
-  }
-
-  exec(input: string): boolean {
+  exec(input: string): any {
     try {
       let ast: Ast = parse(input);
-      ast.preInterpret();
-      this.message = "successfully completed";
-      return true;
+      ast.optimize();
+      return {
+        nodesRemove: ast.opt.report(),
+        text: ast.getText(),
+      };
     } catch (error) {
       logger.error(error.message);
-      this.message = error.message;
-      return false;
+      console.error(error);
+      return {
+        nodesRemove: "",
+        text: error.message,
+      };
     }
-  }
-
-  getMessage(): string {
-    return this.message;
   }
 }

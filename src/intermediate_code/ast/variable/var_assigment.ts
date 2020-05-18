@@ -37,4 +37,8 @@ export default class VarAssigment extends AstNode {
       );
     }
   }
+
+  public toString(): string {
+    return `${this.id} = ${this.exp.toString()};\n`;
+  }
 }

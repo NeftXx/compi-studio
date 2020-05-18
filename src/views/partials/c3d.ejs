@@ -21,10 +21,10 @@
     >
   </div>
   <div class="row">
-    <div class="col s6">
+    <div class="col s7">
       <textarea name="editor-cd3" id="editor-cd3"></textarea>
     </div>
-    <div class="col s6">
+    <div class="col s5">
       <div class="row">
         <div class="col s6">
           <h5 class="center-align"><strong>STACK</strong></h5>
@@ -40,6 +40,34 @@
     </div>
   </div>
 </div>
-<div style="padding-bottom: 2em;">
-  <textarea name="console" id="console"></textarea>
+<div style="padding-top: 1em; padding-bottom: 2em;">
+  <ul id="tabs-tables" class="tabs">
+    <li class="tab col s3">
+      <a class="active" href="#div-console">Consola</a>
+    </li>
+    <li class="tab col s3">
+      <a href="#report-opt">Reporte de optimización</a>
+    </li>
+    <li class="tab col s3">
+      <a href="#graph-blocks">Bloques</a>
+    </li>
+  </ul>
+  <div id="div-console" class="col s12">
+    <textarea name="console" id="console"></textarea>
+  </div>
+  <div id="report-opt" class="col s12">
+    <table class="highlight">
+      <thead>
+        <tr>
+          <th>Regla</th>
+          <th>Nodos</th>
+          <th>Optimización</th>
+          <th>Linea</th>
+          <th>Columna</th>
+        </tr>
+      </thead>
+      <tbody id="body-report-op"></tbody>
+    </table>
+  </div>
+  <div id="graph-blocks" class="col s12"></div>
 </div>

@@ -13,7 +13,7 @@
   const { default: InconditionalJump } = require("../ast/jump/inconditional_jump");
   const { default: ConditionalJumpIf } = require("../ast/jump/conditional_jump_if");
   const { default: RelationalExp } = require("../ast/expression/relational_exp");
-  const { default: MethodInvocation } = require("../ast/expression/relational_exp");
+  const { default: MethodInvocation } = require("../ast/method/method_invocation");
   const { default: Print } = require("../ast/print");
 %}
 

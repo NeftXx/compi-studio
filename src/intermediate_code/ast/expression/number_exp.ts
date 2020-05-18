@@ -2,7 +2,7 @@ import Scope from "../../scope/scope";
 import AstNode from "../ast_node";
 
 export default class NumberExp extends AstNode {
-  constructor(line: number, column: number, private value: number) {
+  constructor(line: number, column: number, public value: number) {
     super(line, column);
     this.value = value;
   }
@@ -13,5 +13,9 @@ export default class NumberExp extends AstNode {
 
   public interpret(scope: Scope): number {
     return this.value;
+  }
+
+  public toString(): string {
+    return this.value.toString();
   }
 }

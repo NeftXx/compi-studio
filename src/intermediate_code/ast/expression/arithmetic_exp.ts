@@ -44,4 +44,8 @@ export default class ArithmeticExp extends AstNode {
 
     throw new ErrorC3D(this.line, this.column, `this operator is not valid.`);
   }
+
+  public toString(): string {
+    return `${this.exp1.toString()} ${this.operator} ${this.exp2.toString()}`;
+  }
 }
