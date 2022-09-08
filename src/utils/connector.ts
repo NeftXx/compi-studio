@@ -6,7 +6,7 @@ import { logger } from "./logger";
 
 export default class SocketConnector {
   public on(server: Server) {
-    let io = SocketIO.listen(server);
+    let io = new SocketIO.Server(server);
     io.on("connection", (clientSocket: SocketIO.Socket) => {
       logger.info("SOCKET connected client");
       clientSocket.on("filesData", (data: Array<FileInformation>) => {
